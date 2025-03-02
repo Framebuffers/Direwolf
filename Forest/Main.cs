@@ -1,10 +1,17 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Transactions;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace Forest.MockAttributesTest
 {
@@ -12,8 +19,11 @@ namespace Forest.MockAttributesTest
     {
         public static void Main(string[] args)
         {
-            TestClass t = new();
-            t.HelloWorld();
+            AddinFullClassName a = new(typeof(Program));
+            Console.WriteLine(a.GetType().GetCustomAttribute<RevitCommand>().ToString());
+            Console.WriteLine(a);
+            //TestClass t = new();
+            //t.HelloWorld();
         }
 
         // Mocks
@@ -70,4 +80,6 @@ namespace Forest.MockAttributesTest
             Console.WriteLine($"Running inside the attribute: Construction Attached! Mode is {t}");
         }
     }
+
+   
 }

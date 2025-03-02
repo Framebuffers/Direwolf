@@ -3,9 +3,8 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using Direwolf.ManifestGenerator;
-using static Autodesk.Internal.Windows.SwfMediaPlayer;
 
-namespace Lab1PlaceGroup
+namespace Direwolf
 {
     [Transaction(TransactionMode.Manual)]
     [ManifestAttributes(

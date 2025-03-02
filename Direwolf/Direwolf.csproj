@@ -18,6 +18,7 @@
   <ItemGroup>
     <PackageReference Include="Autodesk.Revit.SDK" Version="2025.0.2.419" />
     <PackageReference Include="Microsoft.XmlSerializer.Generator" Version="9.0.2" />
+    <PackageReference Include="System.Xml.XDocument" Version="4.3.0" />
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
   </ItemGroup>
 
