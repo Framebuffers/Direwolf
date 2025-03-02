@@ -17,29 +17,34 @@ namespace Forest.MockAttributesTest
 {
     public class Program
     {
+
         public static void Main(string[] args)
         {
-            AddinFullClassName a = new(typeof(Program));
-            Console.WriteLine(a.GetType().GetCustomAttribute<RevitCommand>().ToString());
-            Console.WriteLine(a);
+            //var a = new(typeof(Program));
+            //Console.WriteLine();
+            TestClass t = new();
+            //Console.WriteLine(nameof(TestClass));
             //TestClass t = new();
             //t.HelloWorld();
         }
 
         // Mocks
         [Transaction(TransactionMode.Manual)]
-        [Construction(TransactionMode.Manual)]
-        internal class TestClass
+        [RevitCommand("Test", "11037623-EDDC-42FC-AD0E-ACBE3FE52B96", typeof(TransactionAttribute), "this", "path")]
+        //[Construction(TransactionMode.Manual)]
+        public class TestClass
         {
+     
             public void HelloWorld() => System.Console.WriteLine("Hello, from within the test class!");
             
             // code from within the attributes is ran first.
             public TestClass()
             {
+                
                 Console.WriteLine("Listing all custom attributes:");
                 foreach (var attr in typeof(TestClass).GetCustomAttributes())
                 {
-                    Console.WriteLine(attr.ToString());
+                    
                 }
 
 
