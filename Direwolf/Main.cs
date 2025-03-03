@@ -27,25 +27,15 @@ namespace Direwolf
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             RevitTask.Initialize(commandData.Application);
+
             //Direwolf dw = new();
             //Reap r = new();
             //r.Execute(commandData.Application.ActiveUIDocument.Document);
             //var r = dw.AsyncFetch(new DocumentHowler(commandData.Application.ActiveUIDocument.Document));
-            ResultData d = new(commandData);
-            d.Execute();
-            
-           
-//await RevitTask.RunAsync(() =>
-//            {
-//                wolfpack.Dispatch();
-//                var r = new Dictionary<string, object>()
-//                {
-//                    [wolfpack.GetType().Name] = wolfpack.ToString() ?? string.Empty
-//                };
-//                Wolfden.Add(new Catch(r));
-//            });
-
-            ////Get application and document objects  
+            Document d = commandData.Application.ActiveUIDocument.Document;
+            Direwolf dw = new();
+            dw.ExecuteRevitQueryAsync(commandData, new DocumentHowler(d), new DocumentInfoHowl(d), "DocumentInformation");
+            dw.ShowResultToGUI();
             //UIApplication uiapp = commandData.Application;
             //Document doc = uiapp.ActiveUIDocument.Document;
 
@@ -78,21 +68,23 @@ namespace Direwolf
                 Command = e;
             }
             private ExternalCommandData Command { get; set; }
+            
             public async void Execute()
             {
                 RevitTask.Initialize(Command.Application);
-                var commandData = Command;
+
                 var t = await RevitTask.RunAsync(
                   () =>
                   {
-                      var howler = new DocumentHowler(commandData.Application.ActiveUIDocument.Document);
-                      howler.CreateWolf(new GenericWolf(), new DocumentInfoHowl(commandData.Application.ActiveUIDocument.Document));
-                      howler.Dispatch();
-                      var r = new Dictionary<string, object>()
-                      {
-                          ["result"] = howler.ToString() ?? string.Empty
-                      };
-                      Catch c = new(r);
+
+                      //var howler = new DocumentHowler(commandData.Application.ActiveUIDocument.Document);
+                      //howler.CreateWolf(new GenericWolf(), new DocumentInfoHowl(commandData.Application.ActiveUIDocument.Document));
+                      //howler.Dispatch();
+                      //var r = new Dictionary<string, object>()
+                      //{
+                      //    ["result"] = howler.ToString() ?? string.Empty
+                      //};
+                      //Catch c = new(r);
 
                       TaskDialog t = new("TestResult");
                       t.MainContent = JsonSerializer.Serialize(c);
@@ -125,24 +117,8 @@ namespace Direwolf
         public DocumentHowler(Document revitDoc)
         {
             DocumentInfoHowl h = new(revitDoc);
-            CreateWolf(new GenericWolf(), h);
-
-        }
-    }
-
-    public record GenericWolf : Wolf
-    {
-        public override bool Run()
-        {
-            try
-            {
-                Instruction?.Execute();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            CreateWolf(new Wolf(), h);
+            //Dispatch();
         }
     }
 
@@ -152,7 +128,7 @@ namespace Direwolf
         {
             try
             {
-                Callback?.Catches.Push(new Catch(new Dictionary<string, object>()
+                PushCatchesToWolf(new Catch(new Dictionary<string, object>()
                 {
                     ["DocumentPath"] = RevitDocument.PathName,
                     ["DocumentTitle"] = RevitDocument.Title

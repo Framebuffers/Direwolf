@@ -1,5 +1,6 @@
 ﻿using Autodesk.Internal.Windows;
 using Autodesk.Revit.DB.Mechanical;
+using Autodesk.Revit.UI;
 using Direwolf.Contracts;
 using Direwolf.Definitions;
 using Revit.Async;
@@ -16,34 +17,43 @@ namespace Direwolf
 {
     public sealed class Direwolf
     {
-        //private JsonDocument Wolfden { get; set; } = [];
-        //public string GetCollectedData()
-        //{
-
-        //}
-
-        //public void LoadCollectedData(IHowler howler)
-        //{
-        //    if (howler is not null)
-        //    {
-        //        JsonObject j = JsonSerializer.Serialize(howler); 
-
-        //    }
-        //}
-
-        private List<Catch> Wolfden { get; set; } = [];
-        public string GetData() => JsonSerializer.Serialize(Wolfden);
-        public async Task AsyncFetch(IHowler wolfpack)
+        private List<Wolfpack> Results { get; set; } = [];
+        public void ExecuteQuery(IHowler dispatch, IHowl instruction, IWolf? runner = null, string queryName = "Query")
         {
-            await RevitTask.RunAsync(() =>
+            try
             {
-                wolfpack.Dispatch();
-                var r = new Dictionary<string, object>()
-                {
-                    [wolfpack.GetType().Name] = wolfpack.ToString() ?? string.Empty
-                };
-                Wolfden.Add(new Catch(r));
-            });
+                var howler = dispatch ?? new Howler();
+                var wolf = runner ?? new Wolf();
+                howler.CreateWolf(wolf, instruction);
+                howler.Dispatch();
+                Results.Add(new Wolfpack(howler, queryName));
+            }
+            catch (Exception e)
+            {
+                Results.Add(new Wolfpack(Howler.CreateFailedQueryHowler(e), "FailedQuery"));
+            }
         }
+
+        public async void ExecuteRevitQueryAsync(ExternalCommandData cmd, IHowler dispatcher, IHowl instruction, string queryName = "", IWolf? runner = null)
+        {
+            RevitTask.Initialize(cmd.Application);
+            var t = await RevitTask.RunAsync(
+                () =>
+                {
+                    ExecuteQuery(dispatcher, instruction, runner, queryName);
+                    return 0;
+                });
+        }
+
+        public void ShowResultToGUI()
+        {
+            TaskDialog t = new("Direwolf Query Results")
+            {
+                MainContent = GetResultsAsJson(),
+            };
+            t.Show();
+        }
+
+        public string GetResultsAsJson() => JsonSerializer.Serialize(Results);
     }
 }
