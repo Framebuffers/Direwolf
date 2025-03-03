@@ -17,43 +17,48 @@ namespace Direwolf
 {
     public sealed class Direwolf
     {
-        private List<Wolfpack> Results { get; set; } = [];
-        public void ExecuteQuery(IHowler dispatch, IHowl instruction, IWolf? runner = null, string queryName = "Query")
+        //private List<Wolfpack> Results { get; set; } = [];
+        //private List<Catch> Catches { get; set; } = [];
+        public static Wolfpack ExecuteQuery(IHowler dispatch, IHowl instruction, IWolf? runner = null, string queryName = "Query")
         {
             try
             {
-                var howler = dispatch ?? new Howler();
                 var wolf = runner ?? new Wolf();
-                howler.CreateWolf(wolf, instruction);
-                howler.Dispatch();
-                Results.Add(new Wolfpack(howler, queryName));
+                dispatch.CreateWolf(wolf, instruction);
+                //var r = dispatch.Howl()
+                //dispatch.Dispatch();
+                return dispatch.Howl();
+                //return JsonSerializer.Serialize(dispatch.ToString());
+                //Catches.AddRange(dispatch.Den);
             }
-            catch (Exception e)
+            catch
             {
-                Results.Add(new Wolfpack(Howler.CreateFailedQueryHowler(e), "FailedQuery"));
+                throw new Exception();
+                //return Howler.CreateFailedQueryHowler(e);
             }
         }
 
-        public async void ExecuteRevitQueryAsync(ExternalCommandData cmd, IHowler dispatcher, IHowl instruction, string queryName = "", IWolf? runner = null)
+        public static void WriteToFile(Wolfpack w)
         {
-            RevitTask.Initialize(cmd.Application);
-            var t = await RevitTask.RunAsync(
-                () =>
-                {
-                    ExecuteQuery(dispatcher, instruction, runner, queryName);
-                    return 0;
-                });
+            File.WriteAllText("""%HOMEDRIVE%HOMEPATH\Desktop\wolfpack.json""", w.ToString());
         }
 
-        public void ShowResultToGUI()
+
+        public static void ShowResultToGUI(Wolfpack w)
         {
+            //using StringWriter s = new();
+            //foreach (var c in h.Den)
+            //{
+            //    s.WriteLine(c.ToString());
+            //}
+
             TaskDialog t = new("Direwolf Query Results")
             {
-                MainContent = GetResultsAsJson(),
+                MainContent = $"ToString():\n{w}\n\nSerializer:\n{JsonSerializer.Serialize(w)}"
             };
             t.Show();
         }
 
-        public string GetResultsAsJson() => JsonSerializer.Serialize(Results);
+        //public string GetResultsAsJson() => JsonSerializer.Serialize(res);
     }
 }

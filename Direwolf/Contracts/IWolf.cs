@@ -12,7 +12,6 @@ namespace Direwolf.Contracts
         public IHowler? Callback { get; set; }
         public IHowl? Instruction { get; set; }
         public Stack<Catch> Catches { get; set; }
-        public void AddCatchesToHowler();
         public bool Run();
     }
 }

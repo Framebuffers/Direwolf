@@ -1,6 +1,7 @@
 ﻿using Direwolf.Contracts;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -11,45 +12,46 @@ namespace Direwolf.Definitions
 {
     /// <summary>
     /// Inside a wolf there is two things: who summoned you, and what you need to do.
-    /// When the Howler calls Run(), the Wolf attaches itself to the howl and executes the instruction inside the Howl.
+    /// When the Howler calls Howl(), the Wolf attaches itself to the howl and executes the instruction inside the Howl.
     /// </summary>
     public record struct Wolf() : IWolf
     {
         [JsonIgnore] public IHowler? Callback { get; set; }
         [JsonIgnore] public IHowl? Instruction { get; set; }
-        [JsonPropertyName("results")] public Stack<Catch> Catches { get; set; } = []; // this is a cache for results *for a particular Wolf*
-        
-        public readonly void AddCatchesToHowler()
+        [JsonPropertyName("Results")] public Stack<Catch> Catches { get; set; } = []; // this is a cache for results *for a particular Wolf*
+        public bool Run()
         {
-            foreach (var c in Catches)
+            if (Instruction is not null)
             {
-                Callback?.Den.Add(c);
+                try
+                {
+                    Instruction.Callback = this; // attach to load contents back the chain.
+                    //if (Callback is null) Console.WriteLine($"Callback is null");
+                    Instruction.Execute();
+                    foreach (var c in Catches)
+                    {
+                        Callback?.Den.Push(c);
+                    }
+                    return true; // it did the thing!
+                }
+                catch (Exception e) // something went wrong.
+                {
+                    Console.WriteLine(e.Message);
+                    return false;
+                }
             }
-        }
-
-        public readonly bool Run()
-        {
-            try
-            {
-                Instruction?.Execute();
-                if (Catches is not null && Catches?.Count is not 0) AddCatchesToHowler();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            return true; // nothing ran, so no error.
         }
 
         public override string ToString()
         {
-            var obj = new Dictionary<string, object>
-            {
-                ["Origin"] = Callback?.GetType().Name ?? "Direwolf",
-                ["ServiceName"] = this.GetType().Name ?? "Lonewolf",
-            };
-            return JsonSerializer.Serialize(new Catch(obj));
+            return JsonSerializer.Serialize(Catches);
+            //var obj = new Dictionary<string, object>
+            //{
+            //    ["Origin"] = Callback?.GetType().Name ?? "Direwolf",
+            //    ["ServiceName"] = this.GetType().Name ?? "Lonewolf",
+            //};
+            //return new Catch(obj).ToString();
         }
     }
-
 }

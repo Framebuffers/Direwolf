@@ -107,6 +107,7 @@ namespace Forest
         [JsonIgnore] public IHowler? Callback { get; set; }
         [JsonIgnore] public IHowl? Instruction { get; set; }
         [JsonPropertyName("Results")] public Stack<Catch> Catches { get; set; } = []; // this is a cache for results *for a particular Wolf*
+
         public bool Run()
         {
             if (Instruction is not null)
@@ -132,7 +133,6 @@ namespace Forest
 
         public override string ToString()
         {
-
             var obj = new Dictionary<string, object>
             {
                 ["Origin"] = Callback?.GetType().Name ?? "Direwolf",

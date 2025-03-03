@@ -31,11 +31,31 @@ namespace Direwolf
             //Direwolf dw = new();
             //Reap r = new();
             //r.Execute(commandData.Application.ActiveUIDocument.Document);
-            //var r = dw.AsyncFetch(new DocumentHowler(commandData.Application.ActiveUIDocument.Document));
+            //var r = dw.AsyncFetch(new RevitDocumentDispatch(commandData.Application.ActiveUIDocument.Document));
+            using StringWriter s = new();
             Document d = commandData.Application.ActiveUIDocument.Document;
-            Direwolf dw = new();
-            dw.ExecuteRevitQueryAsync(commandData, new DocumentHowler(d), new DocumentInfoHowl(d), "DocumentInformation");
-            dw.ShowResultToGUI();
+            //Direwolf dw = new();
+            Direwolf.WriteToFile(
+                Direwolf.ExecuteQuery(
+                    new RevitDocumentDispatch(d), new GetDocumentInfo(d), null, "DocumentInfo")
+                );
+
+            //dw.ExecuteRevitQueryAsync(commandData, new RevitDocumentDispatch(d), new GetDocumentInfo(d), "DocumentInfo");
+            //dw.ExecuteQuery(new RevitDocumentDispatch(d), new GetDocumentInfo(d), null, "GetDocumentInfo");
+            //dw.ShowResultToGUI();
+            //var howler = new RevitDocumentDispatch(d);
+            //s.WriteLine($"Den before dispatch: {JsonSerializer.Serialize(howler.Den)}\n");
+            ////s.WriteLine($"First wolf: {howler.Wolfpack[0]}\n");
+            //howler.Dispatch();
+            //s.WriteLine("Dispatched\n");
+            //s.WriteLine($"Den after dispatch: {JsonSerializer.Serialize(howler.Den)}\n");
+            //s.WriteLine($"Wolf: {JsonSerializer.Serialize(howler.Den)}\n");
+            //TaskDialog t = new("Direwolf Query Results")
+            //{
+            //    MainContent = s.ToString()
+            //};
+            //t.Show();
+            
             //UIApplication uiapp = commandData.Application;
             //Document doc = uiapp.ActiveUIDocument.Document;
 
@@ -61,83 +81,99 @@ namespace Direwolf
             return Result.Succeeded;
         }
 
-        public class ResultData
+        //    public class ResultData
+        //    {
+        //        public ResultData(ExternalCommandData e)
+        //        {
+        //            Command = e;
+        //        }
+        //        private ExternalCommandData Command { get; set; }
+
+        //        public async void Execute()
+        //        {
+        //            RevitTask.Initialize(Command.Application);
+
+        //            var t = await RevitTask.RunAsync(
+        //              () =>
+        //              {
+
+        //                  //var howler = new RevitDocumentDispatch(commandData.Application.ActiveUIDocument.Document);
+        //                  //howler.CreateWolf(new GenericWolf(), new GetDocumentInfo(commandData.Application.ActiveUIDocument.Document));
+        //                  //howler.Dispatch();
+        //                  //var r = new Dictionary<string, object>()
+        //                  //{
+        //                  //    ["result"] = howler.ToString() ?? string.Empty
+        //                  //};
+        //                  //Catch c = new(r);
+
+        //                  TaskDialog t = new("TestResult");
+        //                  t.MainContent = JsonSerializer.Serialize(c);
+        //                  t.Show();
+        //                  return 0;
+        //              }
+        //      );
+        //        }
+        //    }
+        //}
+
+        //public class Reap : ICommand
+        //{
+        //    public bool CanExecute(object parameter) => true;
+        //    public event EventHandler CanExecuteChanged;
+        //    public async void Execute(object parameter)
+        //    {
+        //        var doc = parameter as Document;
+        //        Direwolf dw = new();
+        //        dw.AsyncFetch(new RevitDocumentDispatch(doc)); 
+        //        TaskDialog t = new("Result");
+        //        t.MainContent = dw.GetData();
+        //        t.Show();
+
+        //    }
+        //}
+
+        public record class RevitDocumentDispatch : Howler
         {
-            public ResultData(ExternalCommandData e)
+            public RevitDocumentDispatch(Document revitDoc)
             {
-                Command = e;
-            }
-            private ExternalCommandData Command { get; set; }
-            
-            public async void Execute()
-            {
-                RevitTask.Initialize(Command.Application);
-
-                var t = await RevitTask.RunAsync(
-                  () =>
-                  {
-
-                      //var howler = new DocumentHowler(commandData.Application.ActiveUIDocument.Document);
-                      //howler.CreateWolf(new GenericWolf(), new DocumentInfoHowl(commandData.Application.ActiveUIDocument.Document));
-                      //howler.Dispatch();
-                      //var r = new Dictionary<string, object>()
-                      //{
-                      //    ["result"] = howler.ToString() ?? string.Empty
-                      //};
-                      //Catch c = new(r);
-
-                      TaskDialog t = new("TestResult");
-                      t.MainContent = JsonSerializer.Serialize(c);
-                      t.Show();
-                      return 0;
-                  }
-          );
+                GetDocumentInfo h = new(revitDoc);
+                CreateWolf(new Wolf(), h);
+                //Dispatch();
             }
         }
-    }
-    
-    //public class Reap : ICommand
-    //{
-    //    public bool CanExecute(object parameter) => true;
-    //    public event EventHandler CanExecuteChanged;
-    //    public async void Execute(object parameter)
-    //    {
-    //        var doc = parameter as Document;
-    //        Direwolf dw = new();
-    //        dw.AsyncFetch(new DocumentHowler(doc)); 
-    //        TaskDialog t = new("Result");
-    //        t.MainContent = dw.GetData();
-    //        t.Show();
 
-    //    }
-    //}
-
-    public record DocumentHowler : Howler
-    {
-        public DocumentHowler(Document revitDoc)
+        public record class GetDocumentInfo(Document RevitDocument) : Howl
         {
-            DocumentInfoHowl h = new(revitDoc);
-            CreateWolf(new Wolf(), h);
-            //Dispatch();
-        }
-    }
-
-    public record DocumentInfoHowl(Document RevitDocument) : Howl
-    {
-        public override bool Execute()
-        {
-            try
+            public override bool Execute()
             {
-                PushCatchesToWolf(new Catch(new Dictionary<string, object>()
+                try
                 {
-                    ["DocumentPath"] = RevitDocument.PathName,
-                    ["DocumentTitle"] = RevitDocument.Title
-                }));
-                return true;
-            }
-            catch
-            {
-                return false;
+                    if (Callback is not null)
+                    {
+                        if (RevitDocument is not null)
+                        {
+                            var r = new Dictionary<string, object>()
+                            {
+                                ["DocumentPath"] = RevitDocument.PathName,
+                                ["DocumentTitle"] = RevitDocument.Title
+                            };
+                            SendCatchToCallback(new Catch(r));
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                catch
+                {
+                    return false;
+                }
             }
         }
     }

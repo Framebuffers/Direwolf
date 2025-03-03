@@ -9,9 +9,9 @@ namespace Direwolf.Contracts
 {
     public interface IHowler
     {
-        public List<Catch> Den { get; set; }
+        public Stack<Catch> Den { get; set; }
         public List<IWolf> Wolfpack { get; set; }
         public void CreateWolf(IWolf runner, IHowl instruction);
-        public void Dispatch();
+        public Wolfpack Howl();
     }
 }
