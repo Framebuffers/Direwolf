@@ -10,9 +10,6 @@ namespace Direwolf.Definitions
 {
     public readonly record struct Catch([property: JsonExtensionData] Dictionary<string, object> Result)
     {
-        public override string ToString()
-        {
-            return JsonSerializer.Serialize(Result).ToString();
-        }
+        
     }
   }

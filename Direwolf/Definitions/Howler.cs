@@ -14,7 +14,7 @@ namespace Direwolf.Definitions
     /// Howler creates wolves, taking a prototype Wolf, attaching a Howl (an instruction) and itself as a callback.
     /// Then, to dispatch wolves, it executes a function inside each Wolf.
     /// </summary>
-    [JsonSerializable(typeof(Howler))] 
+    //[JsonSerializable(typeof(Howler))] 
     public record class Howler : IHowler
     {
         [JsonPropertyName("Response")]
@@ -33,7 +33,6 @@ namespace Direwolf.Definitions
         {
             try
             {
-
                 foreach (var wolf in Wolfpack)
                 {
                     wolf.Run();

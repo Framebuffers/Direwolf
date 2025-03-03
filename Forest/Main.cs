@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -20,7 +21,12 @@ namespace Forest.MockAttributesTest
 
         public static void Main(string[] args)
         {
-            RecursiveLoad.Execute();
+            //RecursiveLoad.Execute();
+            string fileName = Path.Combine(
+         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+         "wolfpack.json");
+            Console.WriteLine(fileName);
+
             //var a = new(typeof(Program));
             //Console.WriteLine();
             //TestClass t = new();

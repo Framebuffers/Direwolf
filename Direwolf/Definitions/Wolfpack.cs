@@ -14,7 +14,7 @@ namespace Direwolf.Definitions
         public DateTime Timestamp { get; init; } = DateTime.Now;
         public Guid GUID { get; init; } = Guid.NewGuid();
         public int ResultCount { get => Howler.Den.Count; }
-        public string Results { get => JsonSerializer.Serialize(Howler.Den); }
+        public Stack<Catch> Results => Howler.Den;
         public override string ToString()
         {
             return JsonSerializer.Serialize(new Dictionary<string, object>()
@@ -22,7 +22,7 @@ namespace Direwolf.Definitions
                 ["DateTime"] = Timestamp,
                 ["GUID"] = GUID,
                 ["ResultCount"] = ResultCount,
-                ["Results"] = JsonSerializer.Serialize(Howler.Den)
+                ["Results"] = Howler
             });
         }
     }

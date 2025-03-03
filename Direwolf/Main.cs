@@ -32,13 +32,11 @@ namespace Direwolf
             //Reap r = new();
             //r.Execute(commandData.Application.ActiveUIDocument.Document);
             //var r = dw.AsyncFetch(new RevitDocumentDispatch(commandData.Application.ActiveUIDocument.Document));
-            using StringWriter s = new();
             Document d = commandData.Application.ActiveUIDocument.Document;
-            //Direwolf dw = new();
-            Direwolf.WriteToFile(
-                Direwolf.ExecuteQuery(
-                    new RevitDocumentDispatch(d), new GetDocumentInfo(d), null, "DocumentInfo")
-                );
+            Direwolf dw = new();
+            dw.ExecuteQuery(new RevitDocumentDispatch(d), out var result);
+            Direwolf.ShowResultToGUI(result);
+            dw.WriteToFile();
 
             //dw.ExecuteRevitQueryAsync(commandData, new RevitDocumentDispatch(d), new GetDocumentInfo(d), "DocumentInfo");
             //dw.ExecuteQuery(new RevitDocumentDispatch(d), new GetDocumentInfo(d), null, "GetDocumentInfo");
@@ -148,27 +146,13 @@ namespace Direwolf
             {
                 try
                 {
-                    if (Callback is not null)
+                    SendCatchToCallback(new Catch(
+                    new Dictionary<string, object>()
                     {
-                        if (RevitDocument is not null)
-                        {
-                            var r = new Dictionary<string, object>()
-                            {
-                                ["DocumentPath"] = RevitDocument.PathName,
-                                ["DocumentTitle"] = RevitDocument.Title
-                            };
-                            SendCatchToCallback(new Catch(r));
-                            return true;
-                        }
-                        else
-                        {
-                            return false;
-                        }
-                    }
-                    else
-                    {
-                        return false;
-                    }
+                        ["DocumentPath"] = RevitDocument.PathName,
+                        ["DocumentTitle"] = RevitDocument.Title
+                    }));
+                    return true;
                 }
                 catch
                 {

@@ -20,7 +20,7 @@ namespace Direwolf.Definitions
             {
                 ["Timestamp"] = DateTime.Now,
                 ["GUID"] = RequestIdentification.ToString(),
-                ["Result"] = c.ToString()
+                [GetType().Name] = c
             };
             Callback?.Catches.Push(new Catch(d));
         }

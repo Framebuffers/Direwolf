@@ -17,32 +17,26 @@ namespace Direwolf
 {
     public sealed class Direwolf
     {
-        //private List<Wolfpack> Results { get; set; } = [];
-        //private List<Catch> Catches { get; set; } = [];
-        public static Wolfpack ExecuteQuery(IHowler dispatch, IHowl instruction, IWolf? runner = null, string queryName = "Query")
+        [JsonExtensionData]
+        private Dictionary<string, Wolfpack> Queries { get; set; } = [];
+        public void ExecuteQuery(IHowler dispatch, out Wolfpack result, string queryName = "Query")
         {
             try
             {
-                var wolf = runner ?? new Wolf();
-                dispatch.CreateWolf(wolf, instruction);
-                //var r = dispatch.Howl()
-                //dispatch.Dispatch();
-                return dispatch.Howl();
-                //return JsonSerializer.Serialize(dispatch.ToString());
-                //Catches.AddRange(dispatch.Den);
+                result = dispatch.Howl();
+                Queries.Add(queryName, result);
             }
             catch
             {
                 throw new Exception();
-                //return Howler.CreateFailedQueryHowler(e);
             }
         }
 
-        public static void WriteToFile(Wolfpack w)
+        public void WriteToFile()
         {
-            File.WriteAllText("""%HOMEDRIVE%HOMEPATH\Desktop\wolfpack.json""", w.ToString());
+            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "wolfpack.json");
+            File.WriteAllText(fileName, JsonSerializer.Serialize(Queries));
         }
-
 
         public static void ShowResultToGUI(Wolfpack w)
         {
@@ -58,7 +52,5 @@ namespace Direwolf
             };
             t.Show();
         }
-
-        //public string GetResultsAsJson() => JsonSerializer.Serialize(res);
     }
 }
