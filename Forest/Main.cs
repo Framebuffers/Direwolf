@@ -20,9 +20,10 @@ namespace Forest.MockAttributesTest
 
         public static void Main(string[] args)
         {
+            RecursiveLoad.Execute();
             //var a = new(typeof(Program));
             //Console.WriteLine();
-            TestClass t = new();
+            //TestClass t = new();
             //Console.WriteLine(nameof(TestClass));
             //TestClass t = new();
             //t.HelloWorld();
