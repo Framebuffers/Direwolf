@@ -12,7 +12,7 @@ namespace Direwolf.Definitions
 {
     /// <summary>
     /// Inside a wolf there is two things: who summoned you, and what you need to do.
-    /// When the Howler calls Howl(), the Wolf attaches itself to the howl and executes the instruction inside the Howl.
+    /// When the Howler calls Howls(), the Wolf attaches itself to the howl and executes the instruction inside the Howls.
     /// </summary>
     public record struct Wolf() : IWolf
     {

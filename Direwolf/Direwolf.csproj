@@ -17,6 +17,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="ManifestGenerator\**" />
+    <EmbeddedResource Remove="ManifestGenerator\**" />
+    <None Remove="ManifestGenerator\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Autodesk.Revit.SDK" Version="2025.0.2.419" />
     <PackageReference Include="Microsoft.XmlSerializer.Generator" Version="9.0.2" />
     <PackageReference Include="Revit.Async" Version="2.1.1" />
