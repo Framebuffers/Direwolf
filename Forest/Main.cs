@@ -1,35 +1,57 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Transactions;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace Forest.MockAttributesTest
 {
     public class Program
     {
+
         public static void Main(string[] args)
         {
-            TestClass t = new();
-            t.HelloWorld();
+            //RecursiveLoad.Execute();
+            string fileName = Path.Combine(
+         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+         "wolfpack.json");
+            Console.WriteLine(fileName);
+
+            //var a = new(typeof(Program));
+            //Console.WriteLine();
+            //TestClass t = new();
+            //Console.WriteLine(nameof(TestClass));
+            //TestClass t = new();
+            //t.HelloWorld();
         }
 
         // Mocks
         [Transaction(TransactionMode.Manual)]
-        [Construction(TransactionMode.Manual)]
-        internal class TestClass
+        [RevitCommand("Test", "11037623-EDDC-42FC-AD0E-ACBE3FE52B96", typeof(TransactionAttribute), "this", "path")]
+        //[Construction(TransactionMode.Manual)]
+        public class TestClass
         {
+     
             public void HelloWorld() => System.Console.WriteLine("Hello, from within the test class!");
             
             // code from within the attributes is ran first.
             public TestClass()
             {
+                
                 Console.WriteLine("Listing all custom attributes:");
                 foreach (var attr in typeof(TestClass).GetCustomAttributes())
                 {
-                    Console.WriteLine(attr.ToString());
+                    
                 }
 
 
@@ -70,4 +92,6 @@ namespace Forest.MockAttributesTest
             Console.WriteLine($"Running inside the attribute: Construction Attached! Mode is {t}");
         }
     }
+
+   
 }

@@ -7,7 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NUnit" Version="4.3.2" />
+    <PackageReference Include="Revit.Async" Version="2.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="RevitAddInUtility">
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2025\RevitAddInUtility.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 
