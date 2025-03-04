@@ -32,23 +32,36 @@ namespace Direwolf
             }
         }
 
+        public async void ExecuteQueryAsync(IHowler dispatch, string queryName = "Query")
+        {
+            TaskDialog t = new("Inside Async");
+            await RevitTask.RunAsync(() =>
+            {
+                t.MainContent = "Inside the function";
+                t.Show();
+                ExecuteQuery(dispatch, out _, queryName);
+                //ShowResultToGUI();
+                WriteToFile();
+            });
+        }
+
         public void WriteToFile()
         {
             string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "wolfpack.json");
             File.WriteAllText(fileName, JsonSerializer.Serialize(Queries));
         }
 
-        public static void ShowResultToGUI(Wolfpack w)
+        public void ShowResultToGUI()
         {
-            //using StringWriter s = new();
-            //foreach (var c in h.Den)
-            //{
-            //    s.WriteLine(c.ToString());
-            //}
+            using StringWriter s = new();
+            foreach(var result in Queries)
+            {
+                s.WriteLine(result.Value.ToString());
+            }
 
             TaskDialog t = new("Direwolf Query Results")
             {
-                MainContent = $"ToString():\n{w}\n\nSerializer:\n{JsonSerializer.Serialize(w)}"
+                MainContent = s.ToString()
             };
             t.Show();
         }

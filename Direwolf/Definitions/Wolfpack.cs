@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Direwolf.Definitions
 {
-    public readonly record struct Wolfpack([property: JsonIgnore]IHowler Howler, string QueryName = "Query")
+    public readonly record struct Wolfpack([property: JsonIgnore]IHowler Howler, string DispatcherName = "Query")
     {
         public DateTime Timestamp { get; init; } = DateTime.Now;
         public Guid GUID { get; init; } = Guid.NewGuid();

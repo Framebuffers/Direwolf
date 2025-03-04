@@ -10,6 +10,8 @@ using System.Windows.Input;
 using Autodesk.Revit.DB.Mechanical;
 using System.Threading.Tasks;
 using System.Text.Json;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace Direwolf
 {
@@ -27,54 +29,9 @@ namespace Direwolf
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             RevitTask.Initialize(commandData.Application);
-
-            //Direwolf dw = new();
-            //Reap r = new();
-            //r.Execute(commandData.Application.ActiveUIDocument.Document);
-            //var r = dw.AsyncFetch(new RevitDocumentDispatch(commandData.Application.ActiveUIDocument.Document));
-            Document d = commandData.Application.ActiveUIDocument.Document;
+            Document doc = commandData.Application.ActiveUIDocument.Document;
             Direwolf dw = new();
-            dw.ExecuteQuery(new RevitDocumentDispatch(d), out var result);
-            Direwolf.ShowResultToGUI(result);
-            dw.WriteToFile();
-
-            //dw.ExecuteRevitQueryAsync(commandData, new RevitDocumentDispatch(d), new GetDocumentInfo(d), "DocumentInfo");
-            //dw.ExecuteQuery(new RevitDocumentDispatch(d), new GetDocumentInfo(d), null, "GetDocumentInfo");
-            //dw.ShowResultToGUI();
-            //var howler = new RevitDocumentDispatch(d);
-            //s.WriteLine($"Den before dispatch: {JsonSerializer.Serialize(howler.Den)}\n");
-            ////s.WriteLine($"First wolf: {howler.Wolfpack[0]}\n");
-            //howler.Dispatch();
-            //s.WriteLine("Dispatched\n");
-            //s.WriteLine($"Den after dispatch: {JsonSerializer.Serialize(howler.Den)}\n");
-            //s.WriteLine($"Wolf: {JsonSerializer.Serialize(howler.Den)}\n");
-            //TaskDialog t = new("Direwolf Query Results")
-            //{
-            //    MainContent = s.ToString()
-            //};
-            //t.Show();
-            
-            //UIApplication uiapp = commandData.Application;
-            //Document doc = uiapp.ActiveUIDocument.Document;
-
-            ////Define a reference Object to accept the pick result  
-            //Reference pickedref;
-
-            ////Pick a group  
-            //Selection sel = uiapp.ActiveUIDocument.Selection;
-            //pickedref = sel.PickObject(ObjectType.Element, "Please select a group");
-
-            //Element elem = doc.GetElement(pickedref);
-            //Group? group = elem as Group;
-
-            ////Pick point  
-            //XYZ point = sel.PickPoint("Please pick a point to place group");
-
-            ////Place the group  
-            //Transaction trans = new Transaction(doc);
-            //trans.Start("Lab");
-            //doc.Create.PlaceGroup(point, group?.GroupType);
-            //trans.Commit();
+            dw.ExecuteQueryAsync(new RevitDocumentDispatch(doc), "DocumentInformation");
 
             return Result.Succeeded;
         }
@@ -94,18 +51,14 @@ namespace Direwolf
         //            var t = await RevitTask.RunAsync(
         //              () =>
         //              {
-
-        //                  //var howler = new RevitDocumentDispatch(commandData.Application.ActiveUIDocument.Document);
-        //                  //howler.CreateWolf(new GenericWolf(), new GetDocumentInfo(commandData.Application.ActiveUIDocument.Document));
-        //                  //howler.Dispatch();
-        //                  //var r = new Dictionary<string, object>()
-        //                  //{
-        //                  //    ["result"] = howler.ToString() ?? string.Empty
-        //                  //};
-        //                  //Catch c = new(r);
+        //                    Document d = Command.Application.ActiveUIDocument.Document;
+        //                    Direwolf dw = new();
+        //                    dw.ExecuteQueryAsync(new RevitDocumentDispatch(d), "DocumentInformation");
+        //                    dw.ShowResultToGUI();
+        //                    dw.WriteToFile();
 
         //                  TaskDialog t = new("TestResult");
-        //                  t.MainContent = JsonSerializer.Serialize(c);
+        //                  t.MainContent = "Executed";
         //                  t.Show();
         //                  return 0;
         //              }
@@ -134,23 +87,43 @@ namespace Direwolf
         {
             public RevitDocumentDispatch(Document revitDoc)
             {
-                GetDocumentInfo h = new(revitDoc);
+                GetEditableFamilies h = new(revitDoc);
                 CreateWolf(new Wolf(), h);
                 //Dispatch();
             }
         }
 
-        public record class GetDocumentInfo(Document RevitDocument) : Howl
+        public record class GetEditableFamilies(Document RevitDocument) : Howl
         {
             public override bool Execute()
             {
                 try
                 {
-                    SendCatchToCallback(new Catch(
-                    new Dictionary<string, object>()
+                    ICollection<Element> allValidElements = new FilteredElementCollector(RevitDocument)
+                        .WhereElementIsNotElementType()
+                        .WhereElementIsViewIndependent()
+                        .ToElements();
+
+                    var elementsSortedByFamily = new Dictionary<string, List<long>>();
+
+                    Catch c = new();
+                    foreach ((Element e, string familyName) in from Element e in allValidElements // create two variables, Element e and string familyType
+                                                               let f = e as FamilyInstance // cast each element as a FamilyInstance
+                                                               where f is not null // check if it's not null
+                                                               let familyName = f.Symbol.Family.Name // assign the family name to the variable familyName
+                                                               select (e, familyName)) // get the variables back
                     {
-                        ["DocumentPath"] = RevitDocument.PathName,
-                        ["DocumentTitle"] = RevitDocument.Title
+                        if (!elementsSortedByFamily.TryGetValue(familyName, out List<long>? value))
+                        {
+                            value = [];
+                            elementsSortedByFamily[familyName] = value;
+                        }
+                        value.Add(e.Id.Value);
+                    }
+
+                    SendCatchToCallback(new Catch(new Dictionary<string, object>()
+                    {
+                        ["ElementsByFamily"] = elementsSortedByFamily
                     }));
                     return true;
                 }
