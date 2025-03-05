@@ -7,6 +7,7 @@ using Revit.Async;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -37,8 +38,13 @@ namespace Direwolf
             await RevitTask.RunAsync(() =>
             {
                 ExecuteQuery(dispatch, out _, queryName);
-                WriteToFile(dispatch.GetType().Name);
+                WriteToFile(queryName);
             });
+        }
+
+        public async Task WriteAsyncQueries(IEnumerable<(IHowler, string)> queries)
+        {
+            //foreach
         }
 
         public void WriteToFile(string fn)
@@ -46,6 +52,7 @@ namespace Direwolf
             string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), $"{fn}.json");
             File.WriteAllText(fileName, JsonSerializer.Serialize(Queries));
         }
+
 
         public void ShowResultToGUI()
         {
