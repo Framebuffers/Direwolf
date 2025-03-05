@@ -19,38 +19,44 @@ namespace Direwolf
         {
             Document doc = commandData.Application.ActiveUIDocument.Document;
             Dictionary<string, Dictionary<string, double>> FinalResults = [];
+            double cumulativeNative = 0;
             Dictionary<string, double> Results = [];
             Stopwatch s1 = new();
             s1.Start();
             WriteToFile("ElementIdByFamily_Native.json", GetElementIdByFamily_Native(doc));
             s1.Stop();
-            Results.Add("Get Element Id by Family - Revit Native", s1.Elapsed.TotalSeconds);
+            cumulativeNative += s1.Elapsed.TotalSeconds;
+            Results.Add("Test: Get Element Id by Family - Revit Native Command. Time in seconds.", s1.Elapsed.TotalSeconds);
 
             s1.Restart();
             WriteToFile("ElementInformationByFamily_Native.json", GetRevitElementInformation_Native(doc));
             s1.Stop();
-            Results.Add("Get Element Parameters - Revit Native", s1.Elapsed.TotalSeconds);
+            cumulativeNative += s1.Elapsed.TotalSeconds;
+            Results.Add("Test: Get all Element Parameters - Revit Native Command. Time in seconds", s1.Elapsed.TotalSeconds);
             
-            FinalResults.Add("NativeRevit", Results);
+            FinalResults.Add($"NativeRevit = {cumulativeNative}", Results);
 
 
             Dictionary<string, double> DirewolfResults = [];
             Stopwatch direwolf = new();
-
+            double cumulativeDirewolf = 0;
             direwolf.Start();
             RevitTask.Initialize(commandData.Application);
             Direwolf dw = new();
             dw.ExecuteQueryAsync(new RevitElementDispatch(doc), "ElementIdByFamilyInformation");
             direwolf.Stop();
-            DirewolfResults.Add("Get Element Id by Family - Direwolf", direwolf.Elapsed.TotalSeconds);
+            cumulativeDirewolf += direwolf.Elapsed.TotalSeconds;
+            DirewolfResults.Add("Test: Get Element Id by Family - Direwolf Command. Time in seconds.", direwolf.Elapsed.TotalSeconds);
             
-            direwolf.Reset();
+            direwolf.Restart();
             dw.ExecuteQueryAsync(new RevitParameterDispatch(doc), "ParameterDataInformation");
             direwolf.Stop();
-            DirewolfResults.Add("Get Element Parameters - Direwolf", direwolf.Elapsed.TotalSeconds);
-
+            cumulativeDirewolf += direwolf.Elapsed.TotalSeconds;
+            DirewolfResults.Add("Test: Get all Element Parameters - Direwolf Command. Time in seconds.", direwolf.Elapsed.TotalSeconds);
+            FinalResults.Add($"Direwolf = {cumulativeDirewolf}", DirewolfResults);
+            FinalResults.Add("Final", new Dictionary<string, double>() { ["TotalTime"] =  (cumulativeNative + cumulativeDirewolf) });
             // Show final results
-            string serializeResults() => JsonSerializer.Serialize(Results, new JsonSerializerOptions() { WriteIndented = true });
+            string serializeResults() => JsonSerializer.Serialize(FinalResults, new JsonSerializerOptions() { WriteIndented = true });
             WriteToFile("final_results.json", serializeResults());
 
             TaskDialog t = new("Results")

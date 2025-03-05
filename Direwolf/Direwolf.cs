@@ -34,11 +34,8 @@ namespace Direwolf
 
         public async void ExecuteQueryAsync(IHowler dispatch, string queryName = "Query")
         {
-            TaskDialog t = new("Inside Async");
             await RevitTask.RunAsync(() =>
             {
-                t.MainContent = "Inside the function";
-                t.Show();
                 ExecuteQuery(dispatch, out _, queryName);
                 WriteToFile(dispatch.GetType().Name);
             });
@@ -46,7 +43,7 @@ namespace Direwolf
 
         public void WriteToFile(string fn)
         {
-            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), fn);
+            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), $"{fn}.json");
             File.WriteAllText(fileName, JsonSerializer.Serialize(Queries));
         }
 
