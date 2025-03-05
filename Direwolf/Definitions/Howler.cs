@@ -21,12 +21,12 @@ namespace Direwolf.Definitions
         public Stack<Catch> Den { get; set; } = [];
 
         [JsonIgnore]
-        public List<IWolf> Wolfpack { get; set; } = [];
+        public Queue<IWolf> Wolfpack { get; set; } = [];
         public void CreateWolf(IWolf runner, IHowl instruction) // wolf factory
         {
             runner.Instruction = instruction;
             runner.Callback = this;
-            Wolfpack.Add(runner);
+            Wolfpack.Enqueue(runner);
         }
         
         public Wolfpack Howl()

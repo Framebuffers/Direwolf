@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <RevitAddIn>
 	<AddIn Type="Command">
-		<Text>Async Data Fetch</Text>
-		<Description>Gets data</Description>
+		<AddinName>Direwolf</AddinName>
+		<Text>Direwolf Benchmark</Text>
+		<Description>Benchmarks Revit and Direwolf's parameter serialization performance.</Description>
 		<Assembly>"C:\ProgramData\Autodesk\Revit\Addins\2025\Direwolf.dll"</Assembly>
 		<FullClassName>Direwolf.Main</FullClassName>
-		<ClientId>835d6ad1-1a99-4039-95dc-e752ff635928</ClientId>
+		<ClientId>9C481634-1E2F-4D35-9D08-4C4E188204E1</ClientId>
+		<VendorId>Framebuffer</VendorId>
+		<VendorDescription>
+			<![CDATA[https://github.com/framebuffers]]>
+		</VendorDescription>
+		<VisibilityMode>AlwaysVisible</VisibilityMode>
 	</AddIn>
 </RevitAddIn>

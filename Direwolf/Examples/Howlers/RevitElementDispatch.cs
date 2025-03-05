@@ -4,9 +4,9 @@ using Direwolf.Examples.Howls;
 
 namespace Direwolf.Examples.Howlers
 {
-    public record class RevitDocumentDispatch : Howler
+    public record class RevitElementDispatch : Howler
     {
-        public RevitDocumentDispatch(Document revitDoc)
+        public RevitElementDispatch(Document revitDoc)
         {
             GetElementIdByFamily h = new(revitDoc);
             CreateWolf(new Wolf(), h);

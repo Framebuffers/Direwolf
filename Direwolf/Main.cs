@@ -5,6 +5,7 @@ using Revit.Async;
 using System.Text.Json;
 using System.Diagnostics;
 using Direwolf.Examples.Howlers;
+using Direwolf.Definitions;
 
 namespace Direwolf
 {
@@ -16,13 +17,59 @@ namespace Direwolf
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            // This is a benchmark of data extraction between a native syncronous Revit Command, and a Direwolf asyncronous Command.
+            Document doc = commandData.Application.ActiveUIDocument.Document;
+            Dictionary<string, Dictionary<string, double>> FinalResults = [];
+            Dictionary<string, double> Results = [];
+            Stopwatch s1 = new();
+            s1.Start();
+            WriteToFile("ElementIdByFamily_Native.json", GetElementIdByFamily_Native(doc));
+            s1.Stop();
+            Results.Add("Get Element Id by Family - Revit Native", s1.Elapsed.TotalSeconds);
+
+            s1.Restart();
+            WriteToFile("ElementInformationByFamily_Native.json", GetRevitElementInformation_Native(doc));
+            s1.Stop();
+            Results.Add("Get Element Parameters - Revit Native", s1.Elapsed.TotalSeconds);
+            
+            FinalResults.Add("NativeRevit", Results);
+
+
+            Dictionary<string, double> DirewolfResults = [];
+            Stopwatch direwolf = new();
+
+            direwolf.Start();
+            RevitTask.Initialize(commandData.Application);
+            Direwolf dw = new();
+            dw.ExecuteQueryAsync(new RevitElementDispatch(doc), "ElementIdByFamilyInformation");
+            direwolf.Stop();
+            DirewolfResults.Add("Get Element Id by Family - Direwolf", direwolf.Elapsed.TotalSeconds);
+            
+            direwolf.Reset();
+            dw.ExecuteQueryAsync(new RevitParameterDispatch(doc), "ParameterDataInformation");
+            direwolf.Stop();
+            DirewolfResults.Add("Get Element Parameters - Direwolf", direwolf.Elapsed.TotalSeconds);
+
+            // Show final results
+            string serializeResults() => JsonSerializer.Serialize(Results, new JsonSerializerOptions() { WriteIndented = true });
+            WriteToFile("final_results.json", serializeResults());
+
+            TaskDialog t = new("Results")
+            {
+                MainContent = serializeResults()
+            };
+            t.Show();
+            return Result.Succeeded;
+        }
+
+        public Result Execute_1(ExternalCommandData commandData, ref string message, ElementSet elements)
+        {
+            // This is a benchmark of data extraction between a s1 syncronous Revit Command, and a Direwolf asyncronous Command.
             // The one difference from any other Revit.Async command, is that Direwolf has a special data structure.
-            // Here's a native Revit command:
+            // Here's a s1 Revit command:
 
             Document doc = commandData.Application.ActiveUIDocument.Document;
             Dictionary<string, double> Results = [];
-            
+
             Stopwatch native = new();
             native.Start();
             // Here's the command that will run in both cases:
@@ -46,9 +93,9 @@ namespace Direwolf
                 }
                 value.Add(e.Id.Value);
             }
-            WriteToFile("elementsByFamily-native.json", elementsSortedByFamilyNative);
+            WriteToFile("elementsByFamily-s1.json", elementsSortedByFamilyNative);
 
-            // Add results from native Revit command.
+            // Add results from s1 Revit command.
             native.Stop();
             Results.Add("Native Revit Command", native.Elapsed.TotalSeconds);
 
@@ -77,25 +124,163 @@ namespace Direwolf
             //  Howler <-> Wolf -> Howls <-> Endpoint
             //             + Catches<-|
             Direwolf dw = new();
-            dw.ExecuteQueryAsync(new RevitDocumentDispatch(doc), "DocumentInformation");
-            
+            dw.ExecuteQueryAsync(new RevitElementDispatch(doc), "DocumentInformation");
+
             // Add results from Direwolf
             direwolf.Stop();
             Results.Add("Direwolf Revit Command", direwolf.Elapsed.TotalSeconds);
-            
+
             // Show final results
+            JsonSerializerOptions opt = new()
+            {
+                WriteIndented = true
+            };
+
             TaskDialog t = new("Results")
             {
-                MainContent = JsonSerializer.Serialize(Results)
+                MainContent = JsonSerializer.Serialize(Results, opt)
             };
             t.Show();
             return Result.Succeeded;
         }
 
-        public void WriteToFile(string filename, object obj)
+        public static void WriteToFile(string filename, object obj)
         {
             string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), filename);
             File.WriteAllText(fileName, JsonSerializer.Serialize(obj));
         }
+
+        private static Dictionary<string, object> ProcessParameterMap(Element element)
+        {
+            try
+            {
+                Dictionary<string, object> results = [];
+                ParameterSet ps = element.Parameters;
+                foreach (Parameter p in ps)
+                {
+                   string GetValue()
+                    {
+                        return p.StorageType switch
+                        {
+                            StorageType.None => "None",
+                            StorageType.Integer => p.AsInteger().ToString(),
+                            StorageType.Double => p.AsDouble().ToString(),
+                            StorageType.String => p.AsString(),
+                            StorageType.ElementId => p.AsElementId().ToString(),
+                            _ => "None",
+                        };
+                    }
+
+                    Dictionary<string, string> data = new()
+                    {
+                        ["GUID"] = p.GUID.ToString(),
+                        ["Type"] = p.GetTypeId().TypeId,
+                        ["HasValue"] = p.HasValue.ToString(),
+                        ["Value"] = GetValue()
+
+                    };
+                    results.Add(p.Definition.Name, results);
+                }
+                return results;
+            }
+            catch
+            {
+                return [];
+            }
+        }
+
+        private static Dictionary<string, object> ExtractElementData(Element element) => new(new Dictionary<string, object>
+        {
+            [element.Id.ToString()] = new Dictionary<string, object>()
+            {
+                ["UniqueId"] = element.UniqueId ?? 0.ToString(),
+                ["VersionGuid"] = element.VersionGuid.ToString(),
+                ["IsPinned"] = element.Pinned.ToString(),
+                ["Data"] = ProcessParameterMap(element)
+            }
+        });
+
+        public static Dictionary<string, object> GetElementIdByFamily_Native(Document RevitDocument)
+        {
+            ICollection<Element> allValidElements = new FilteredElementCollector(RevitDocument)
+                        .WhereElementIsNotElementType()
+                        .WhereElementIsViewIndependent()
+                        .ToElements();
+
+            var elementsSortedByFamilyNative = new Dictionary<string, List<long>>();
+            foreach ((Element e, string familyName) in from Element e in allValidElements // create two variables, Element e and string familyType
+                                                       let f = e as FamilyInstance // cast each element as a FamilyInstance
+                                                       where f is not null // check if it's not null
+                                                       let familyName = f.Symbol.Family.Name // assign the family name to the variable familyName
+                                                       select (e, familyName)) // get the variables back
+            {
+                if (!elementsSortedByFamilyNative.TryGetValue(familyName, out List<long>? value))
+                {
+                    value = [];
+                    elementsSortedByFamilyNative[familyName] = value;
+                }
+                value.Add(e.Id.Value);
+            }
+            return new Dictionary<string, object>()
+            {
+                ["ElementsByFamily"] = elementsSortedByFamilyNative
+            };
+        }
+
+        public static Dictionary<string, object> GetRevitElementInformation_Native(Document RevitDocument)
+        {
+            try
+            {
+                Dictionary<string, List<Dictionary<string, object>>> Catches = [];
+                ICollection<Element> allValidElements = new FilteredElementCollector(RevitDocument)
+                    .WhereElementIsNotElementType()
+                    .WhereElementIsViewIndependent()
+                    .ToElements();
+                Dictionary<string, List<Element>> elementsSortedByFamily = [];
+
+                foreach ((Element e, string familyName) in from Element e in allValidElements
+                                                           let f = e as FamilyInstance
+                                                           where f is not null
+                                                           let familyName = f.Symbol.Family.Name
+                                                           select (e, familyName))
+                {
+                    if (!elementsSortedByFamily.TryGetValue(familyName, out List<Element>? value))
+                    {
+                        value = new List<Element>();
+                        elementsSortedByFamily[familyName] = value;
+                    }
+                    value.Add(e);
+                }
+
+                foreach (KeyValuePair<string, List<Element>> family in elementsSortedByFamily)
+                {
+                    List<Dictionary<string, object>> elementData = [];
+                    elementData.AddRange(family.Value.Select(ExtractElementData));
+
+                    if (Catches.TryGetValue(family.Key, out List<Dictionary<string, object>>? existingElementData))
+                    {
+                        existingElementData.AddRange(elementData);
+                    }
+                    else
+                    {
+                        Catches[family.Key] = elementData;
+                    }
+                }
+
+                return new Dictionary<string, object>(new Dictionary<string, object>()
+                {
+                    ["ElementData"] = Catches
+                });
+            }
+            catch (Exception e)
+            {
+                TaskDialog t = new("error")
+                {
+                    MainContent = e.Message + "\n" + e.StackTrace
+                };
+                return [];
+            }
+        } 
     }
+
 }

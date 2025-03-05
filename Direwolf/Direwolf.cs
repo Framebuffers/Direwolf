@@ -40,14 +40,13 @@ namespace Direwolf
                 t.MainContent = "Inside the function";
                 t.Show();
                 ExecuteQuery(dispatch, out _, queryName);
-                //ShowResultToGUI();
-                WriteToFile();
+                WriteToFile(dispatch.GetType().Name);
             });
         }
 
-        public void WriteToFile()
+        public void WriteToFile(string fn)
         {
-            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "wolfpack.json");
+            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), fn);
             File.WriteAllText(fileName, JsonSerializer.Serialize(Queries));
         }
 
