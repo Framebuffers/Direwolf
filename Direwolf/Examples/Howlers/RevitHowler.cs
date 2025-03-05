@@ -1,15 +1,15 @@
 ﻿using Direwolf.Contracts;
-using System.Text.Json;
+using Direwolf.Definitions;
 using System.Text.Json.Serialization;
+using System.Text.Json;
 
-namespace Direwolf.Definitions
+namespace Direwolf.Examples.Howlers
 {
     /// <summary>
-    /// Howler creates wolves, taking a prototype Wolf, attaching a Howls (an instruction) and itself as a callback.
-    /// Then, to dispatch wolves, it executes a function inside each Wolf.
+    /// Exactly the same as a regular Howler, except that it checks if the Howl implements IDynamicRevitHowl.
+    /// A bit of a hack but works.
     /// </summary>
-    //[JsonSerializable(typeof(Howler))] 
-    public record class Howler : IHowler
+    public record class RevitHowler : IHowler
     {
         [JsonPropertyName("Response")]
         public Stack<Catch> Den { get; set; } = [];
@@ -18,11 +18,18 @@ namespace Direwolf.Definitions
         public Queue<IWolf> Wolfpack { get; set; } = [];
         public virtual void CreateWolf(IWolf runner, IHowl instruction) // wolf factory
         {
-            runner.Instruction = instruction;
-            runner.Callback = this;
-            Wolfpack.Enqueue(runner);
+            if (instruction is IRevitHowl)
+            {
+                runner.Instruction = instruction;
+                runner.Callback = this;
+                Wolfpack.Enqueue(runner);
+            }
+            else
+            {
+                throw new ArgumentException("Howl is not a valid Revit Howl.");
+            }
         }
-        
+
         public Wolfpack Howl()
         {
             try
@@ -45,3 +52,4 @@ namespace Direwolf.Definitions
         }
     }
 }
+

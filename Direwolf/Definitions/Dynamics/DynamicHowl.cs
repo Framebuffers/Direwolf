@@ -1,14 +1,14 @@
-﻿using Direwolf.Contracts;
+﻿using Direwolf.Contracts.Dynamics;
 using System.Text.Json.Serialization;
 
-namespace Direwolf.Definitions
+namespace Direwolf.Definitions.Dynamics
 {
-    public record class Howl : IHowl
+    public record class DynamicHowl: IDynamicHowl
     {
         private Guid RequestIdentification { get; init; } = Guid.NewGuid();
-        [JsonIgnore] public IWolf? Callback { get; set; }
+        [JsonIgnore] public IDynamicWolf? Callback { get; set; }
 
-        public void SendCatchToCallback(Catch c)
+        public void SendCatchToCallback(DynamicCatch c)
         {
             var d = new Dictionary<string, object>()
             {
@@ -16,7 +16,7 @@ namespace Direwolf.Definitions
                 ["GUID"] = RequestIdentification.ToString(),
                 [GetType().Name] = c
             };
-            Callback?.Catches.Push(new Catch(d));
+            Callback?.Catches.Push(new DynamicCatch(d));
         }
 
         public virtual bool Execute()

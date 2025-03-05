@@ -1,18 +1,20 @@
 ﻿using Autodesk.Revit.DB;
 using Direwolf.Definitions;
+using Direwolf.Definitions.Dynamics;
 using Microsoft.Scripting.Utils;
+using System.Dynamic;
 
 namespace Direwolf.Examples.Howls
 {
-    public record class GetElementInformation : RevitHowl
+    public record class DynamicElementInformation : DynamicRevitHowl
     {
-        public GetElementInformation(Document doc) => SetRevitDocument(doc);
-        
-        private static Catch ProcessParameterMap(Element element)
+        public DynamicElementInformation(Document doc) => SetRevitDocument(doc);
+
+        private static DynamicCatch ProcessParameterMap(Element element)
         {
             try
             {
-                Dictionary<string, object> results = [];
+                dynamic results = new DynamicCatch();
                 ParameterSet ps = element.Parameters;
                 foreach (Parameter p in ps)
                 {
@@ -39,30 +41,29 @@ namespace Direwolf.Examples.Howls
                     };
                     results.Add(p.Definition.Name, results);
                 }
-                return new Catch(results);
+                return new DynamicCatch(results);
             }
             catch
             {
-                return new Catch();
+                return new DynamicCatch();
             }
         }
 
-        private static Catch ExtractElementData(Element element) => new(new Dictionary<string, object>
+        private static DynamicCatch ExtractElementData(Element element)
         {
-            [element.Id.ToString()] = new Dictionary<string, object>()
-            {
-                ["UniqueId"] = element.UniqueId ?? 0.ToString(),
-                ["VersionGuid"] = element.VersionGuid.ToString(),
-                ["IsPinned"] = element.Pinned.ToString(),
-                ["Data"] = ProcessParameterMap(element)
-            }
-        });
+            dynamic x = new DynamicCatch();
+            x.UniqueId = element.UniqueId ?? 0.ToString();
+            x.VersionGuid = element.VersionGuid.ToString();
+            x.IsPinned = element.Pinned.ToString();
+            x.Data = ProcessParameterMap(element);
+            return x;
+        }
 
         public override bool Execute()
         {
             try
             {
-                Dictionary<string, List<Catch>> Catches = [];
+                dynamic Catches = new DynamicCatch();
                 ICollection<Element> allValidElements = new FilteredElementCollector(GetRevitDocument())
                     .WhereElementIsNotElementType()
                     .WhereElementIsViewIndependent()
@@ -85,12 +86,12 @@ namespace Direwolf.Examples.Howls
 
                 foreach (KeyValuePair<string, List<Element>> family in elementsSortedByFamily)
                 {
-                    List<Catch> elementData = [];
+                    List<DynamicCatch> elementData = [];
                     elementData.AddRange(family.Value.Select(ExtractElementData));
 
-                    if (Catches.TryGetValue(family.Key, out List<Catch>? existingElementData))
+                    if (Catches.TryGetValue(family.Key, out List<DynamicCatch>? existingElementData))
                     {
-                        existingElementData.AddRange(elementData);
+                        existingElementData?.AddRange(elementData);
                     }
                     else
                     {
@@ -98,16 +99,16 @@ namespace Direwolf.Examples.Howls
                     }
                 }
 
-               SendCatchToCallback(new Catch(new Dictionary<string, object>()
-                {
-                    ["ElementData"] = Catches
-                }));
+                dynamic final = new DynamicCatch();
+                final.ElementData = Catches;
+                SendCatchToCallback(final);
                 return true;
             }
-            catch (Exception e)
+            catch
             {
                 return false;
             }
         }
     }
 }
+

@@ -1,18 +1,18 @@
-﻿using Direwolf.Contracts;
+﻿using System.Text.Json.Serialization;
 using System.Text.Json;
-using System.Text.Json.Serialization;
+using Direwolf.Contracts.Dynamics;
 
-namespace Direwolf.Definitions
+namespace Direwolf.Definitions.Dynamics
 {
     /// <summary>
     /// Inside a wolf there is two things: who summoned you, and what you need to do.
     /// When the Howler calls Howls(), the Wolf attaches itself to the howl and executes the instruction inside the Howls.
     /// </summary>
-    public record struct Wolf() : IWolf
+    public record struct DynamicWolf() : IDynamicWolf
     {
-        [JsonIgnore] public IHowler? Callback { get; set; }
-        [JsonIgnore] public IHowl? Instruction { get; set; }
-        [JsonPropertyName("Results")] public Stack<Catch> Catches { get; set; } = []; // this is a cache for results *for a particular Wolf*
+        [JsonIgnore] public IDynamicHowler? Callback { get; set; }
+        [JsonIgnore] public IDynamicHowl? Instruction { get; set; }
+        [JsonPropertyName("Results")] public Stack<DynamicCatch> Catches { get; set; } = []; // this is a cache for results *for a particular Wolf*
         public bool Run()
         {
             if (Instruction is not null)

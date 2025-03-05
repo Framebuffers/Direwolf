@@ -1,9 +1,10 @@
-﻿using Direwolf.Contracts;
+﻿using Autodesk.Revit.DB;
+using Direwolf.Contracts;
 using System.Text.Json.Serialization;
 
 namespace Direwolf.Definitions
 {
-    public record class Howl : IHowl
+    public record class RevitHowl : IRevitHowl
     {
         private Guid RequestIdentification { get; init; } = Guid.NewGuid();
         [JsonIgnore] public IWolf? Callback { get; set; }
@@ -50,6 +51,18 @@ namespace Direwolf.Definitions
                 { "Timestamp", DateTime.Now.ToString() }
             };
             return new Catch(d).ToString();
+        }
+
+        private Document? _rvtDoc; // it should never be null though, unless *directly* done so.
+        public Document GetRevitDocument()
+        {
+            ArgumentNullException.ThrowIfNull(_rvtDoc);
+            return _rvtDoc;
+        }
+        public void SetRevitDocument(Document value)
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            _rvtDoc = value;
         }
     }
 }
