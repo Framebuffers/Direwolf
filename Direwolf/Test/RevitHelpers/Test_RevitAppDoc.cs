@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using static Direwolf.Helpers;
 
 namespace Direwolf.Test.RevitHelpers;
 
@@ -19,7 +20,7 @@ public class Test_RevitAppDoc : IExternalCommand
             // write
             try
             {
-                Autodesk.Revit.DB.Transaction t = new(doc, "Set new units");
+                Transaction t = new(doc, "Set new units");
                 t.Start();
                 try
                 {
