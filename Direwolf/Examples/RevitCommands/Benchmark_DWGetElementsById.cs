@@ -1,6 +1,9 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Direwolf.Definitions;
+using Direwolf.Examples.Howlers;
+using Direwolf.Examples.Howls;
 using Revit.Async;
 using System.Diagnostics;
 using static Direwolf.Helpers;
@@ -21,7 +24,9 @@ namespace Direwolf.Examples.RevitCommands
             {
                 var doc = RevitAppDoc.GetDocument(commandData);
                 Direwolf dw = new();
-                dw.ExecuteQueryAsync(new RevitElementDispatch(doc), $"{GetType().Name}");
+                RevitHowler rh = new();
+                rh.CreateWolf(new Wolf(), new GetElementIdByFamily(doc));
+                dw.HuntAsync(rh, $"{GetType().Name}");
                 benchmarkTimer.Stop();
                 TimeTaken += benchmarkTimer.Elapsed.TotalSeconds;
             }

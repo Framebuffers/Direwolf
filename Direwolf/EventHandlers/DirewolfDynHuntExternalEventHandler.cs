@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Direwolf.EventHandlers
 {
-    public class DirewolfDynHuntExternalEventHandler : SyncGenericExternalEventHandler<DynamicWolfpack, bool>
+    public class DirewolfDynHuntExternalEventHandler : SyncGenericExternalEventHandler<IDynamicHowler, DynamicWolfpack>
     {
         public override object Clone()
         {
@@ -25,14 +25,15 @@ namespace Direwolf.EventHandlers
             return "DynamicDirewolfHunter";
         }
 
-        protected override bool Handle(UIApplication app, DynamicWolfpack parameter)
+        protected override DynamicWolfpack Handle(UIApplication app, IDynamicHowler parameter)
         {
+            var result = parameter.Howl();
             TaskDialog t = new("Hunt Complete")
             {
                 MainContent = $"The task has been ran successfully"
             };
             t.Show();
-            return true;  
+            return result;  
         }
     }
 }

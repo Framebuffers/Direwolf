@@ -31,6 +31,7 @@ namespace Direwolf.Definitions
                 {
                     wolf.Run();
                 }
+
                 return new Wolfpack(this, GetType().Name);
             }
             catch

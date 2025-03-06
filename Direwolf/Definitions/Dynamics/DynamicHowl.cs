@@ -1,4 +1,5 @@
 ﻿using Direwolf.Contracts.Dynamics;
+using System.Dynamic;
 using System.Text.Json.Serialization;
 
 namespace Direwolf.Definitions.Dynamics
@@ -10,12 +11,12 @@ namespace Direwolf.Definitions.Dynamics
 
         public void SendCatchToCallback(DynamicCatch c)
         {
-            var d = new Dictionary<string, object>()
-            {
-                ["Timestamp"] = DateTime.Now,
-                ["GUID"] = RequestIdentification.ToString(),
-                [GetType().Name] = c
-            };
+            dynamic d = new ExpandoObject();
+
+            d["Timestamp"] = DateTime.Now;
+            d["GUID"] = RequestIdentification.ToString();
+            d[GetType().Name] = c;
+
             Callback?.Catches.Push(new DynamicCatch(d));
         }
 

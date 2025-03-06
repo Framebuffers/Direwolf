@@ -20,17 +20,22 @@ namespace Direwolf
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-
             Stopwatch s = new();
             s.Start();
             Document doc = commandData.Application.ActiveUIDocument.Document;
             try
             {
-                Direwolf dw = new();
                 DynamicRevitHowler drw = new();
-                drw.CreateWolf(new DynamicWolf(), new DynamicElementInformation(doc));
                 drw.CreateWolf(new DynamicWolf(), new DynamicIdByFamily(doc));
-                dw.ExecuteDynamicAsyncHunt(drw, $"{doc.Title}");
+                drw.CreateWolf(new DynamicWolf(), new DynamicElementInformation(doc));
+
+                Direwolf dw = new(drw);
+                Helpers.GenerateNewWindow("Direwolf Queue", dw.GetQueueInfo());
+
+                dw.HuntAsync("RevitInformation");
+                Helpers.GenerateNewWindow("Direwolf Queries", dw.GetQueryInfo());
+
+                dw.WriteDynamicQueriesToJson();
             }
             catch
             {
