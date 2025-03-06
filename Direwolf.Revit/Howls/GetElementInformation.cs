@@ -2,7 +2,7 @@
 using Direwolf.Definitions;
 using Microsoft.Scripting.Utils;
 
-namespace Direwolf.Examples.Howls
+namespace Direwolf.Revit.Howls
 {
     public record class GetElementInformation : RevitHowl
     {

@@ -1,7 +1,7 @@
 ﻿using Autodesk.Revit.UI;
 using Autodesk.Revit.DB;
 
-namespace Direwolf;
+namespace Direwolf.Revit.Utilities;
 public static class Helpers
 {
     public static void GenerateNewWindow(string title, string content)

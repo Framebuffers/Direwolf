@@ -1,25 +1,25 @@
-﻿using Direwolf.Definitions;
+﻿using Direwolf.Contracts;
+using Direwolf.Definitions;
 using System.Text.Json.Serialization;
 using System.Text.Json;
-using Direwolf.Definitions.Dynamics;
-using Direwolf.Contracts.Dynamics;
+using Direwolf.Revit.Contracts;
 
-namespace Direwolf.Examples.Howlers.Dynamics
+namespace Direwolf.Revit.Howlers
 {
     /// <summary>
     /// Exactly the same as a regular Howler, except that it checks if the Howl implements IDynamicRevitHowl.
     /// A bit of a hack but works.
     /// </summary>
-    public record class DynamicRevitHowler : IDynamicHowler
+    public record class RevitHowler : IHowler
     {
         [JsonPropertyName("Response")]
-        public Stack<DynamicCatch> Den { get; set; } = [];
+        public Stack<Catch> Den { get; set; } = [];
 
         [JsonIgnore]
-        public Queue<IDynamicWolf> Wolfpack { get; set; } = [];
-        public virtual void CreateWolf(IDynamicWolf runner, IDynamicHowl instruction) // wolf factory
+        public Queue<IWolf> Wolfpack { get; set; } = [];
+        public virtual void CreateWolf(IWolf runner, IHowl instruction) // wolf factory
         {
-            if (instruction is IDynamicRevitHowl)
+            if (instruction is IRevitHowl)
             {
                 runner.Instruction = instruction;
                 runner.Callback = this;
@@ -31,7 +31,7 @@ namespace Direwolf.Examples.Howlers.Dynamics
             }
         }
 
-        public DynamicWolfpack Howl()
+        public Wolfpack Howl()
         {
             try
             {
@@ -39,7 +39,7 @@ namespace Direwolf.Examples.Howlers.Dynamics
                 {
                     wolf.Run();
                 }
-                return new DynamicWolfpack(this, GetType().Name);
+                return new Wolfpack(this, GetType().Name);
             }
             catch
             {
@@ -52,6 +52,5 @@ namespace Direwolf.Examples.Howlers.Dynamics
             return JsonSerializer.Serialize(Den);
         }
     }
-
-
 }
+

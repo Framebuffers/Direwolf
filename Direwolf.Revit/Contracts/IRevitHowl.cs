@@ -1,8 +1,9 @@
 ﻿using Autodesk.Revit.DB;
+using Direwolf.Contracts;
 
-namespace Direwolf.Contracts.Dynamics
+namespace Direwolf.Revit.Contracts
 {
-    public interface IDynamicRevitHowl : IDynamicHowl
+    public interface IRevitHowl : IHowl
     {
         public Document GetRevitDocument();
         public void SetRevitDocument(Document value);

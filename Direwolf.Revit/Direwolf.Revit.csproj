@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Wolves\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autodesk.Revit.SDK" Version="2025.0.2.419" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Direwolf\Direwolf.csproj" />
+  </ItemGroup>
+
+</Project>

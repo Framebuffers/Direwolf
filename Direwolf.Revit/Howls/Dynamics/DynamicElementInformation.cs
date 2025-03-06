@@ -1,10 +1,9 @@
 ﻿using Autodesk.Revit.DB;
-using Direwolf.Definitions;
 using Direwolf.Definitions.Dynamics;
 using Microsoft.Scripting.Utils;
 using System.Dynamic;
 
-namespace Direwolf.Examples.Howls
+namespace Direwolf.Revit.Howls.Dynamics
 {
     public record class DynamicElementInformation : DynamicRevitHowl
     {

@@ -1,12 +1,12 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using static Direwolf.Helpers;
+using static Direwolf.Revit.Utilities.Helpers;
 
-namespace Direwolf.Test.RevitHelpers;
+namespace Direwolf.Revit.Commands.NativeCommands;
 
 [Transaction(TransactionMode.Manual)]
-public class Test_RevitAppDoc : IExternalCommand
+public class SanityCheck : IExternalCommand
 {
     public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
     {
@@ -43,12 +43,12 @@ public class Test_RevitAppDoc : IExternalCommand
 
         try
         {
-            Helpers.GenerateNewWindow("Command succeded!", test(RevitAppDoc.GetDocument(commandData)));
+            GenerateNewWindow("Command succeded!", test(RevitAppDoc.GetDocument(commandData)));
             return Result.Succeeded;
         }
         catch
         {
-            Helpers.GenerateNewWindow("Command failed!", "Cannot access the Document using this struct.");
+            GenerateNewWindow("Command failed!", "Cannot access the Document using this struct.");
             return Result.Failed;
         }
     }

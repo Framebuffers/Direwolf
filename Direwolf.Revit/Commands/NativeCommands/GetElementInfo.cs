@@ -2,12 +2,12 @@
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using System.Diagnostics;
-using static Direwolf.Helpers;
+using static Direwolf.Revit.Utilities.Helpers;
 
-namespace Direwolf.Examples.RevitCommands;
+namespace Direwolf.Revit.Commands.NativeCommands;
 
 [Transaction(TransactionMode.Manual)]
-public class Benchmark_GetElementInfo : IExternalCommand
+public class GetElementInfo : IExternalCommand
 {
     public double TimeTaken { get; private set; } = 0;
 
@@ -19,7 +19,7 @@ public class Benchmark_GetElementInfo : IExternalCommand
         try
         {
             var doc = RevitAppDoc.GetDocument(commandData);
-            Benchmark_Common.WriteToFile($"{GetType().Name}_Native.json", RunBenchmark(doc));
+            Common.WriteToFile($"{GetType().Name}_Native.json", RunBenchmark(doc));
             benchmarkTimer.Stop();
             TimeTaken += benchmarkTimer.Elapsed.TotalSeconds;
         }
@@ -59,7 +59,7 @@ public class Benchmark_GetElementInfo : IExternalCommand
             foreach (KeyValuePair<string, List<Element>> family in elementsSortedByFamily)
             {
                 List<Dictionary<string, object>> elementData = [];
-                elementData.AddRange(family.Value.Select(Benchmark_Common.ExtractElementData));
+                elementData.AddRange(family.Value.Select(Common.ExtractElementData));
 
                 if (Catches.TryGetValue(family.Key, out List<Dictionary<string, object>>? existingElementData))
                 {

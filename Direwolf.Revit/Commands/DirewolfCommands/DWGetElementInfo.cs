@@ -2,16 +2,16 @@
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Direwolf.Definitions;
-using Direwolf.Examples.Howlers;
-using Direwolf.Examples.Howls;
+using Direwolf.Revit.Howlers;
+using Direwolf.Revit.Howls;
 using Revit.Async;
 using System.Diagnostics;
-using static Direwolf.Helpers;
+using static Direwolf.Revit.Utilities.Helpers;
 
-namespace Direwolf.Examples.RevitCommands
+namespace Direwolf.Revit.Commands.DirewolfCommands
 {
     [Transaction(TransactionMode.Manual)]
-    public class Benchmark_DWGetElementsById: IExternalCommand
+    public class DWGetElementInfo : IExternalCommand
     {
         public double TimeTaken { get; private set; } = 0;
 
@@ -25,8 +25,8 @@ namespace Direwolf.Examples.RevitCommands
                 var doc = RevitAppDoc.GetDocument(commandData);
                 Direwolf dw = new(commandData.Application);
                 RevitHowler rh = new();
-                rh.CreateWolf(new Wolf(), new GetElementIdByFamily(doc));
-                dw.HuntAsync(rh, $"{GetType().Name}");
+                rh.CreateWolf(new Wolf(), new GetElementInformation(doc));
+                dw.HuntAsync(rh, doc.Title);
                 benchmarkTimer.Stop();
                 TimeTaken += benchmarkTimer.Elapsed.TotalSeconds;
             }

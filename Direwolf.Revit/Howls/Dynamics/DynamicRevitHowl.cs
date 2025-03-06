@@ -1,9 +1,12 @@
 ﻿using Autodesk.Revit.DB;
 using Direwolf.Contracts.Dynamics;
+using Direwolf.Definitions;
+using Direwolf.Definitions.Dynamics;
+using Direwolf.Revit.Contracts.Dynamics;
 using System.Dynamic;
 using System.Text.Json.Serialization;
 
-namespace Direwolf.Definitions.Dynamics;
+namespace Direwolf.Revit.Howls.Dynamics;
 public record class DynamicRevitHowl : IDynamicRevitHowl
 {
     private Guid RequestIdentification { get; init; } = Guid.NewGuid();

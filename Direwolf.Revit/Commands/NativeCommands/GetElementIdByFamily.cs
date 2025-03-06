@@ -3,12 +3,12 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using System.Diagnostics;
 using System.Transactions;
-using static Direwolf.Helpers;
+using static Direwolf.Revit.Utilities.Helpers;
 
-namespace Direwolf.Examples.RevitCommands;
+namespace Direwolf.Revit.Commands.NativeCommands;
 
 [Transaction(TransactionMode.Manual)]
-public class Benchmark_GetElementIdByFamily : IExternalCommand
+public class GetElementIdByFamily : IExternalCommand
 {
     public double TimeTaken { get; private set; } = 0;
     public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
@@ -18,7 +18,7 @@ public class Benchmark_GetElementIdByFamily : IExternalCommand
         try
         {
             var doc = RevitAppDoc.GetDocument(commandData);
-            Benchmark_Common.WriteToFile($"{GetType().Name}_Native.json", RunBenchmark(doc));
+            Common.WriteToFile($"{GetType().Name}_Native.json", RunBenchmark(doc));
             benchmarkTimer.Stop();
             TimeTaken += benchmarkTimer.Elapsed.TotalSeconds;
         }
@@ -32,7 +32,7 @@ public class Benchmark_GetElementIdByFamily : IExternalCommand
 
     public static Dictionary<string, object> RunBenchmark(Document RevitDocument)
     {
-        ICollection<Element> allValidElements = Benchmark_Common.GetAllValidElements(RevitDocument);
+        ICollection<Element> allValidElements = Common.GetAllValidElements(RevitDocument);
         
         var elementsSortedByFamilyNative = new Dictionary<string, List<long>>();
         foreach ((Element e, string familyName) in from Element e in allValidElements

@@ -1,8 +1,10 @@
 ﻿using Autodesk.Revit.DB;
 using Direwolf.Contracts;
+using Direwolf.Definitions;
+using Direwolf.Revit.Contracts;
 using System.Text.Json.Serialization;
 
-namespace Direwolf.Definitions
+namespace Direwolf.Revit.Howls
 {
     public record class RevitHowl : IRevitHowl
     {

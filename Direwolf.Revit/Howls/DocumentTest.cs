@@ -1,13 +1,9 @@
 ﻿using Autodesk.Revit.DB;
 using Direwolf.Definitions;
 using Direwolf.Definitions.Dynamics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Direwolf.Revit.Howls.Dynamics;
 
-namespace Direwolf.Examples.Howls
+namespace Direwolf.Revit.Howls
 {
     public record class DocumentTest(Document doc) : RevitHowl
     {

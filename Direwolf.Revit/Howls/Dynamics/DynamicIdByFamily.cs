@@ -2,7 +2,7 @@
 using Direwolf.Definitions.Dynamics;
 using System.Dynamic;
 
-namespace Direwolf.Examples.Howls.Dynamics
+namespace Direwolf.Revit.Howls.Dynamics
 {
     public record class DynamicIdByFamily : DynamicRevitHowl
     {

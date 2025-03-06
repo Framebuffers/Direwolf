@@ -230,8 +230,13 @@ namespace Direwolf
                     {
                         foreach (var dynamicHowler in DynamicHowlers)
                         {
-                            Hunt(dynamicHowler, out _, queryName);
+                            var result = dynamicHowler.Howl();
+                            //Debug.Print(result.ToString());
+                            DynamicQueries.Add(queryName, result);
+                            WriteDataToJson(result, "dyn_async", Desktop);
                         }
+                        
+
                     }
                 }
                 catch

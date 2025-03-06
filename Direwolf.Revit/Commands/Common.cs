@@ -1,9 +1,9 @@
 ﻿using Autodesk.Revit.DB;
 using System.Text.Json;
 
-namespace Direwolf.Examples.RevitCommands
+namespace Direwolf.Revit.Commands
 {
-    internal static class Benchmark_Common
+    internal static class Common
     {
         internal static ICollection<Element> GetAllValidElements(Document doc) => new FilteredElementCollector(doc)
                     .WhereElementIsNotElementType()
@@ -63,7 +63,7 @@ namespace Direwolf.Examples.RevitCommands
                 ["UniqueId"] = element.UniqueId ?? 0.ToString(),
                 ["VersionGuid"] = element.VersionGuid.ToString(),
                 ["IsPinned"] = element.Pinned.ToString(),
-                ["Data"] = Benchmark_Common.ProcessParameterMap(element)
+                ["Data"] = ProcessParameterMap(element)
             }
         });
 
