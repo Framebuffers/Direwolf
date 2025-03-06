@@ -14,7 +14,7 @@ namespace Direwolf.Examples.Howls
         {
             try
             {
-                dynamic results = new DynamicCatch();
+                dynamic results = new ExpandoObject();
                 ParameterSet ps = element.Parameters;
                 foreach (Parameter p in ps)
                 {
@@ -51,19 +51,19 @@ namespace Direwolf.Examples.Howls
 
         private static DynamicCatch ExtractElementData(Element element)
         {
-            dynamic x = new DynamicCatch();
+            dynamic x = new ExpandoObject();
             x.UniqueId = element.UniqueId ?? 0.ToString();
             x.VersionGuid = element.VersionGuid.ToString();
             x.IsPinned = element.Pinned.ToString();
             x.Data = ProcessParameterMap(element);
-            return x;
+            return new DynamicCatch(x);
         }
 
         public override bool Execute()
         {
             try
             {
-                dynamic Catches = new DynamicCatch();
+                dynamic Catches = new ExpandoObject();
                 ICollection<Element> allValidElements = new FilteredElementCollector(GetRevitDocument())
                     .WhereElementIsNotElementType()
                     .WhereElementIsViewIndependent()
@@ -99,9 +99,9 @@ namespace Direwolf.Examples.Howls
                     }
                 }
 
-                dynamic final = new DynamicCatch();
+                dynamic final = new ExpandoObject();
                 final.ElementData = Catches;
-                SendCatchToCallback(final);
+                SendCatchToCallback(new DynamicCatch(final));
                 return true;
             }
             catch

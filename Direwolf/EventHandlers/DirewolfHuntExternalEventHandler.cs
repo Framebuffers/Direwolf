@@ -17,7 +17,7 @@ namespace Direwolf.EventHandlers
     {
         public override object Clone()
         {
-            return new Direwolf();
+            throw new NotImplementedException();
         }
 
         public override string GetName()

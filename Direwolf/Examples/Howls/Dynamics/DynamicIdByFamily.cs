@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Direwolf.Definitions.Dynamics;
+using System.Dynamic;
 
 namespace Direwolf.Examples.Howls.Dynamics
 {
@@ -16,7 +17,7 @@ namespace Direwolf.Examples.Howls.Dynamics
                     .WhereElementIsViewIndependent()
                     .ToElements();
 
-                dynamic elementsSortedByFamily = new DynamicCatch();
+                dynamic elementsSortedByFamily = new ExpandoObject();
 
                 foreach ((Element e, string familyName) in from Element e in allValidElements
                                                            let f = e as FamilyInstance
@@ -31,7 +32,7 @@ namespace Direwolf.Examples.Howls.Dynamics
                     }
                     value?.Add(e.Id.Value);
                 }
-                SendCatchToCallback(elementsSortedByFamily);
+                SendCatchToCallback(new DynamicCatch(elementsSortedByFamily));
                 return true;
             }
             catch

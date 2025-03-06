@@ -23,7 +23,7 @@ namespace Direwolf.Examples.RevitCommands
             try
             {
                 var doc = RevitAppDoc.GetDocument(commandData);
-                Direwolf dw = new();
+                Direwolf dw = new(commandData.Application);
                 RevitHowler rh = new();
                 rh.CreateWolf(new Wolf(), new GetElementInformation(doc));
                 dw.HuntAsync(rh, doc.Title);
