@@ -17,6 +17,11 @@ namespace Direwolf.Revit.Benchmarking
 {
     public record class ModelHealthReaper : RevitHowl
     {
+        public ModelHealthReaper(Document doc)
+        {
+            SetRevitDocument(doc);
+        }
+
         private readonly record struct ElementInformation()
         {
 
@@ -78,35 +83,9 @@ namespace Direwolf.Revit.Benchmarking
             List<Element> isFlipped = [];
             Dictionary<string, int> worksetElementCount = [];
 
-            var dataCounts = new Dictionary<string, object>
-            {
-                { "viewsInsideDocument", viewsInsideDocument.Count },
-                { "notInSheets", notInSheets.Count },
-                { "annotativeElements", annotativeElements.Count },
-                { "externalRefs", externalRefs.Count },
-                { "modelGroups", modelGroups.Count },
-                { "detailGroups", detailGroups.Count },
-                { "designOptions", designOptions.Count },
-                { "levels", levels.Count },
-                { "grids", grids.Count },
-                { "warns", warns.Count },
-                { "unenclosedRoom", unenclosedRoom.Count },
-                { "viewports", viewports.Count },
-                { "unconnectedDucts", unconnectedDucts.Count },
-                { "unconnectedPipes", unconnectedPipes.Count },
-                { "unconnectedElectrical", unconnectedElectrical.Count },
-                { "nonNativeStyles", nonNativeStyles.Count },
-                { "isFlipped", isFlipped.Count },
-                { "worksetElementCount", worksetElementCount.Count }
-            };
 
 
             Stack<ElementInformation> individualElementInfo = [];
-            Prey genericInformation = new(new Dictionary<string, object>()
-            {
-                ["counts"] = dataCounts,
-                ["elements"] = individualElementInfo
-            });
 
 
             foreach (Element e in collector)
@@ -422,6 +401,33 @@ namespace Direwolf.Revit.Benchmarking
                 Element ext = doc.GetElement(reference);
                 externalRefs.Add((ext.GetExternalFileReference().ExternalFileReferenceType, ext.GetExternalFileReference()));
             }
+            var dataCounts = new Dictionary<string, object>
+            {
+                { "viewsInsideDocument", viewsInsideDocument.Count },
+                { "notInSheets", notInSheets.Count },
+                { "annotativeElements", annotativeElements.Count },
+                { "externalRefs", externalRefs.Count },
+                { "modelGroups", modelGroups.Count },
+                { "detailGroups", detailGroups.Count },
+                { "designOptions", designOptions.Count },
+                { "levels", levels.Count },
+                { "grids", grids.Count },
+                { "warns", warns.Count },
+                { "unenclosedRoom", unenclosedRoom.Count },
+                { "viewports", viewports.Count },
+                { "unconnectedDucts", unconnectedDucts.Count },
+                { "unconnectedPipes", unconnectedPipes.Count },
+                { "unconnectedElectrical", unconnectedElectrical.Count },
+                { "nonNativeStyles", nonNativeStyles.Count },
+                { "isFlipped", isFlipped.Count },
+                { "worksetElementCount", worksetElementCount.Count }
+            };
+            Prey genericInformation = new(new Dictionary<string, object>()
+            {
+                ["counts"] = dataCounts,
+                ["elements"] = individualElementInfo
+            });
+
             return genericInformation;
         }
 

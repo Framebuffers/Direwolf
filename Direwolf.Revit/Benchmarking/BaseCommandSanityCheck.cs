@@ -5,7 +5,9 @@ using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.UI;
 using Direwolf.Definitions;
+using Direwolf.Revit.Howlers;
 using Direwolf.Revit.Howls;
+using Revit.Async;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,6 +16,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -26,7 +29,30 @@ namespace Direwolf.Revit.Benchmarking
         {
             var doc = commandData.Application.ActiveUIDocument.Document;
             using StringWriter s = new();
+            Stopwatch st = new();
+            st.Start();
+            Debug.Print(JsonSerializer.Serialize(DateTime.Now));
             string lastCommand = string.Empty;
+            try
+            {
+                RevitTask.Initialize(commandData.Application);
+                RevitHowler rh = new();
+                rh.CreateWolf(new Wolf(), new ModelHealthReaper(doc));
+
+                Direwolf dw = new(commandData.Application);
+                dw.QueueHowler(rh);
+                dw.Hunt("Model Health");
+
+                st.Stop();
+                Debug.WriteLine($"TimeTakenSync: {st.Elapsed.TotalSeconds}.");
+                Debug.Print(JsonSerializer.Serialize(DateTime.Now));
+                dw.WriteQueriesToJson();
+
+            }
+            catch
+            {
+                return Result.Failed;
+            }
 
             //try
             //{
@@ -150,54 +176,54 @@ namespace Direwolf.Revit.Benchmarking
             //}
 
             // Get a very generic collector
-            ICollection<Element> collector = [.. new FilteredElementCollector(doc).WhereElementIsNotElementType()];
+            //ICollection<Element> collector = [.. new FilteredElementCollector(doc).WhereElementIsNotElementType()];
 
 
             // GetViewsInsideDocument
-            List<View> viewsInsideDocument = [];
-            foreach (Element e in collector)
-            {
-                try
-                {
-                    switch (e)
-                    {
-                        case (View):
-                            Debug.Print(e.Name + "\t" + typeof(View).Name);
-                            break;
-                        case (ImportInstance):
-                            Debug.Print(e.Name + "\t" + typeof(ImportInstance).Name);
-                            break;
-                        case (Group):
-                            Debug.Print(e.Name + "\t" + typeof(Group).Name);
-                            break;
-                        case (DesignOption):
-                            Debug.Print(e.Name + "\t" + typeof(DesignOption).Name);
-                            break;
-                        case (Level):
-                            Debug.Print(e.Name + "\t" + typeof(Level).Name);
-                            break;
-                        case (Grid):
-                            Debug.Print(e.Name + "\t" + typeof(Grid).Name);
-                            break;
-                        case (Family):
-                            Debug.Print(e.Name + "\t" + typeof(Family).Name);
-                            break;
-                        case (GraphicsStyle):
-                            Debug.Print(e.Name + "\t" + typeof(GraphicsStyle).Name);
-                            break;
-                        case (FamilyInstance):
-                            Debug.Print(e.Name + "\t" + typeof(FamilyInstance).Name);
-                            break;
-                        default:
-                            //Debug.Print(e.Name + "" + typeof(Element).Name);
-                            break;
-                    }
-                }
-                catch
-                {
-                    continue;
-                }
-            }
+            //List<View> viewsInsideDocument = [];
+            //foreach (Element e in collector)
+            //{
+            //    try
+            //    {
+            //        switch (e)
+            //        {
+            //            case (View):
+            //                Debug.Print(e.Name + "\t" + typeof(View).Name);
+            //                break;
+            //            case (ImportInstance):
+            //                Debug.Print(e.Name + "\t" + typeof(ImportInstance).Name);
+            //                break;
+            //            case (Group):
+            //                Debug.Print(e.Name + "\t" + typeof(Group).Name);
+            //                break;
+            //            case (DesignOption):
+            //                Debug.Print(e.Name + "\t" + typeof(DesignOption).Name);
+            //                break;
+            //            case (Level):
+            //                Debug.Print(e.Name + "\t" + typeof(Level).Name);
+            //                break;
+            //            case (Grid):
+            //                Debug.Print(e.Name + "\t" + typeof(Grid).Name);
+            //                break;
+            //            case (Family):
+            //                Debug.Print(e.Name + "\t" + typeof(Family).Name);
+            //                break;
+            //            case (GraphicsStyle):
+            //                Debug.Print(e.Name + "\t" + typeof(GraphicsStyle).Name);
+            //                break;
+            //            case (FamilyInstance):
+            //                Debug.Print(e.Name + "\t" + typeof(FamilyInstance).Name);
+            //                break;
+            //            default:
+            //                //Debug.Print(e.Name + "" + typeof(Element).Name);
+            //                break;
+            //        }
+            //    }
+            //    catch
+            //    {
+            //        continue;
+            //    }
+            //}
 
 
             //Debug.Print(s.ToString());
@@ -232,7 +258,7 @@ namespace Direwolf.Revit.Benchmarking
 
             ICollection<Element> annotativeElements = collector
                 .WhereElementIsNotElementType()
-                .Where(e => e.Category != null && e.Category.CategoryType == CategoryType.Annotation) 
+                .Where(e => e.Category != null && e.Category.CategoryType == CategoryType.Annotation)
                 .ToList();
 
 
@@ -252,7 +278,7 @@ namespace Direwolf.Revit.Benchmarking
             FilteredElementCollector collector = new(doc);
 
             ICollection<Element> importedImages = collector
-                .OfClass(typeof(ImportInstance)) 
+                .OfClass(typeof(ImportInstance))
                 .WhereElementIsNotElementType()
                 .ToList();
 
@@ -295,7 +321,7 @@ namespace Direwolf.Revit.Benchmarking
             FilteredElementCollector collector = new(doc);
 
             ICollection<Element> importedElements = collector
-                .OfClass(typeof(ImportInstance)) 
+                .OfClass(typeof(ImportInstance))
                 .WhereElementIsNotElementType()
                 .ToList();
 
@@ -315,7 +341,7 @@ namespace Direwolf.Revit.Benchmarking
             FilteredElementCollector collector = new(doc);
 
             ICollection<Element> modelGroups = collector
-                .OfClass(typeof(Group)) 
+                .OfClass(typeof(Group))
                 .WhereElementIsNotElementType()
                 .ToList();
 
@@ -336,9 +362,9 @@ namespace Direwolf.Revit.Benchmarking
             FilteredElementCollector collector = new(doc);
 
             ICollection<Element> detailGroups = collector
-                .OfClass(typeof(Group)) 
-                .WhereElementIsNotElementType() 
-                .Where(e => e.Category != null && e.Category.Name == "Detail Groups") 
+                .OfClass(typeof(Group))
+                .WhereElementIsNotElementType()
+                .Where(e => e.Category != null && e.Category.Name == "Detail Groups")
                 .ToList();
             var results = new Dictionary<string, string>();
             foreach (Element element in detailGroups)
@@ -351,8 +377,8 @@ namespace Direwolf.Revit.Benchmarking
         private string GetDesignOptions(Document doc)
         {
             FilteredElementCollector collector = new FilteredElementCollector(doc)
-                .OfClass(typeof(DesignOption)) 
-                .WhereElementIsNotElementType(); 
+                .OfClass(typeof(DesignOption))
+                .WhereElementIsNotElementType();
 
             List<string> designOptionNames = [];
             foreach (Element element in collector)
@@ -370,7 +396,7 @@ namespace Direwolf.Revit.Benchmarking
         private string GetLevelCount(Document doc)
         {
             FilteredElementCollector levelCollector = new FilteredElementCollector(doc)
-                .OfClass(typeof(Level)); 
+                .OfClass(typeof(Level));
 
             return levelCollector.Count().ToString();
 
@@ -379,7 +405,7 @@ namespace Direwolf.Revit.Benchmarking
         private string GetGridLineCount(Document doc)
         {
             FilteredElementCollector gridCollector = new FilteredElementCollector(doc)
-                .OfClass(typeof(Grid)); 
+                .OfClass(typeof(Grid));
 
             return gridCollector.Count().ToString();
 
@@ -410,7 +436,7 @@ namespace Direwolf.Revit.Benchmarking
                 try
                 {
                     FilteredElementCollector instanceCollector = new FilteredElementCollector(doc)
-                        .OfCategory(family.Category.BuiltInCategory) 
+                        .OfCategory(family.Category.BuiltInCategory)
                         .WhereElementIsNotElementType();
 
                     if (!instanceCollector.Any())
@@ -504,11 +530,11 @@ namespace Direwolf.Revit.Benchmarking
         private string GetViewsNotInSheets(Document doc)
         {
             FilteredElementCollector viewCollector = new FilteredElementCollector(doc)
-                .OfClass(typeof(View)) 
-                .WhereElementIsNotElementType(); 
+                .OfClass(typeof(View))
+                .WhereElementIsNotElementType();
 
             FilteredElementCollector viewportCollector = new FilteredElementCollector(doc)
-                .OfClass(typeof(Viewport)); 
+                .OfClass(typeof(Viewport));
 
             HashSet<ElementId> viewsOnSheets = [.. viewportCollector.Select(vp => (vp as Viewport).ViewId)];
 
@@ -532,8 +558,8 @@ namespace Direwolf.Revit.Benchmarking
         private string GetUnconnectedDucts(Document doc)
         {
             FilteredElementCollector ductCollector = new FilteredElementCollector(doc)
-                .OfCategory(BuiltInCategory.OST_DuctCurves) 
-                .WhereElementIsNotElementType();           
+                .OfCategory(BuiltInCategory.OST_DuctCurves)
+                .WhereElementIsNotElementType();
 
             List<string> unconnectedDucts = [];
 
@@ -568,8 +594,8 @@ namespace Direwolf.Revit.Benchmarking
         private string GetUnconnectedPipes(Document doc)
         {
             FilteredElementCollector pipeCollector = new FilteredElementCollector(doc)
-                .OfCategory(BuiltInCategory.OST_PipeCurves) 
-                .WhereElementIsNotElementType();           
+                .OfCategory(BuiltInCategory.OST_PipeCurves)
+                .WhereElementIsNotElementType();
 
             List<string> unconnectedPipes = [];
 
@@ -604,8 +630,8 @@ namespace Direwolf.Revit.Benchmarking
         private string GetUnconnectedElectrical(Document doc)
         {
             FilteredElementCollector electricalCollector = new FilteredElementCollector(doc)
-                .OfCategory(BuiltInCategory.OST_ElectricalFixtures) 
-                .WhereElementIsNotElementType();                   
+                .OfCategory(BuiltInCategory.OST_ElectricalFixtures)
+                .WhereElementIsNotElementType();
 
             List<string> unconnectedConnections = [];
 
@@ -706,7 +732,7 @@ namespace Direwolf.Revit.Benchmarking
         private string GetLargestFamilies(Document doc)
         {
             FilteredElementCollector familyCollector = new FilteredElementCollector(doc)
-                .OfClass(typeof(Family)); 
+                .OfClass(typeof(Family));
 
             List<string> largeFamilies = [];
 
@@ -714,7 +740,7 @@ namespace Direwolf.Revit.Benchmarking
             {
                 int typeCount = family.GetFamilySymbolIds().Count;
 
-                if (typeCount > 50) 
+                if (typeCount > 50)
                 {
                     largeFamilies.Add($"Family Name: {family.Name}, Types: {typeCount}");
                 }
@@ -728,7 +754,7 @@ namespace Direwolf.Revit.Benchmarking
         private string GetInPlaceFamilies(Document doc)
         {
             FilteredElementCollector familyInstanceCollector = new FilteredElementCollector(doc)
-                .OfClass(typeof(FamilyInstance)); 
+                .OfClass(typeof(FamilyInstance));
             List<string> inPlaceFamilies = [];
 
             foreach (Element element in familyInstanceCollector)
@@ -766,7 +792,7 @@ namespace Direwolf.Revit.Benchmarking
             var desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             Directory.CreateDirectory(Path.Combine(desktop, "rvt"));
 
-            string folderPath = Path.GetFullPath(Path.Combine(desktop, "rvt")); 
+            string folderPath = Path.GetFullPath(Path.Combine(desktop, "rvt"));
             double totalSizeInMB = 0;
 
             SortedDictionary<long, string> sorted = [];
@@ -774,7 +800,7 @@ namespace Direwolf.Revit.Benchmarking
             if (Directory.Exists(folderPath))
             {
                 FilteredElementCollector familyCollector = new FilteredElementCollector(doc)
-                    .OfClass(typeof(Family)); 
+                    .OfClass(typeof(Family));
 
                 foreach (Family family in familyCollector.Cast<Family>())
                 {
@@ -786,7 +812,7 @@ namespace Direwolf.Revit.Benchmarking
                             doc.EditFamily(family).SaveAs(familyPath);
                             long length = new FileInfo(familyPath).Length / (1024);
                             if (!sorted.TryGetValue(length, out string familyName))
-                            sorted.Add(length, familyName);
+                                sorted.Add(length, familyName);
                         }
                         else
                         {
@@ -800,7 +826,7 @@ namespace Direwolf.Revit.Benchmarking
 
                 if (sorted.Count != 0) totalSizeInMB = sorted.FirstOrDefault().Key;
 
-                           
+
                 return $"Total Size of All Families: {totalSizeInMB} KB";
             }
             else
@@ -812,7 +838,7 @@ namespace Direwolf.Revit.Benchmarking
         private string LargestFamilies(Document doc)
         {
             FilteredElementCollector familyCollector = new FilteredElementCollector(doc)
-                .OfClass(typeof(Family)); 
+                .OfClass(typeof(Family));
 
             Dictionary<string, int> familySizes = [];
 
@@ -849,7 +875,7 @@ namespace Direwolf.Revit.Benchmarking
         {
 
             FilteredElementCollector collector = new FilteredElementCollector(doc)
-                .WhereElementIsNotElementType(); 
+                .WhereElementIsNotElementType();
 
             Dictionary<string, int> worksetElementCount = [];
 
