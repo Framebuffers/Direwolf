@@ -19,10 +19,6 @@ using System.Xml.Linq;
 
 namespace Direwolf.Revit.Benchmarking
 {
-    public record class GetRevitModelHealth : RevitHowl
-    {
-    }
-
     [Transaction(TransactionMode.Manual)]
     public class BaseCommandSanityCheck : IExternalCommand
     {
@@ -32,128 +28,179 @@ namespace Direwolf.Revit.Benchmarking
             using StringWriter s = new();
             string lastCommand = string.Empty;
 
-            try
+            //try
+            //{
+            //    s.WriteLine(GetViews(doc));
+            //    lastCommand = "GetViews";
+            //    Debug.Print(s.ToString());
+
+            //    s.WriteLine(GetAnnotativeElements(doc));
+            //    lastCommand = "GetAnnotativeElements";
+            //    Debug.Print(s.ToString());
+
+            //    s.WriteLine(GetImportedImages(doc));
+            //    lastCommand = "GetImportedImages";
+            //    Debug.Print(s.ToString());
+
+            //    s.WriteLine(GetDWGFiles(doc));
+            //    lastCommand = "GetDWGFiles";
+            //    Debug.Print(s.ToString());
+
+            //    s.WriteLine(GetSKPFiles(doc));
+            //    lastCommand = "GetSKPFiles";
+            //    Debug.Print(s.ToString());
+
+            //    s.WriteLine(GetModelGroups(doc));
+            //    lastCommand = "GetModelGroups";
+            //    Debug.Print(s.ToString());
+
+            //    s.WriteLine(GetDetailGroups(doc));
+            //    lastCommand = "GetDetailGroups";
+            //    Debug.Print(s.ToString());
+
+            //    s.WriteLine(GetDesignOptions(doc));
+            //    lastCommand = "GetDesignOptions";
+            //    Debug.Print(s.ToString());
+
+            //    s.WriteLine(GetLevelCount(doc));
+            //    lastCommand = "GetLevelCount";
+            //    Debug.Print(s.ToString());
+
+            //    s.WriteLine(GetGridLineCount(doc));
+            //    lastCommand = "GetGridLineCount";
+            //    Debug.Print(s.ToString());
+
+            //    s.WriteLine(GetErrorsAndWarnings(doc));
+            //    lastCommand = "GetErrorsAndWarnings";
+            //    Debug.Print(s.ToString());
+
+            //    s.WriteLine(GetUnusedFamilies(doc));
+            //    lastCommand = "GetUnusedFamilies";
+
+            //    s.WriteLine(GetUnenclosedRooms(doc));
+            //    lastCommand = "GetUnenclosedRooms";
+            //    Debug.Print(s.ToString());
+
+            //    s.WriteLine(GetDuplicateElements(doc));
+            //    lastCommand = "GetDuplicateElements";
+            //    Debug.Print(s.ToString());
+
+            //    s.WriteLine(GetViewsNotInSheets(doc));
+            //    lastCommand = "GetViewsNotInSheets";
+            //    Debug.Print(s.ToString());
+
+            //    s.WriteLine(GetUnconnectedDucts(doc));
+            //    lastCommand = "GetUnconnectedDucts";
+            //    Debug.Print(s.ToString());
+
+            //    s.WriteLine(GetUnconnectedPipes(doc));
+            //    lastCommand = "GetUnconnectedPipes";
+            //    Debug.Print(s.ToString());
+
+            //    s.WriteLine(GetUnconnectedElectrical(doc));
+            //    lastCommand = "GetUnconnectedElectrical";
+            //    Debug.Print(s.ToString());
+
+            //    s.WriteLine(GetNonNativeObjectStyles(doc));
+            //    lastCommand = "GetNonNativeObjectStyles";
+            //    Debug.Print(s.ToString());
+
+            //    s.WriteLine(GetMirroredObjects(doc));
+            //    lastCommand = "GetMirroredObjects";
+            //    Debug.Print(s.ToString());
+
+            //    s.WriteLine(GetElementsByWorkset(doc));
+            //    lastCommand = "GetElementsByWorkset";
+            //    Debug.Print(s.ToString());
+
+            //    s.WriteLine(GetFamilyCount(doc));
+            //    lastCommand = "GetFamilyCount";
+            //    s.WriteLine(lastCommand);
+            //    Debug.Print(s.ToString());
+
+            //    s.WriteLine(GetFamilyCountBySize(doc));
+            //    lastCommand = "GetFamilyCountBySize";
+            //    s.WriteLine(lastCommand);
+            //    Debug.Print(s.ToString());
+
+            //    s.WriteLine(GetLargestFamilies(doc));
+            //    lastCommand = "GetLargestFamilies";
+            //    s.WriteLine(lastCommand);
+            //    Debug.Print(s.ToString());
+
+            //    s.WriteLine(GetInPlaceFamilies(doc));
+            //    lastCommand = "GetInPlaceFamilies";
+            //    s.WriteLine(lastCommand);
+            //    Debug.Print(s.ToString());
+
+            //    s.WriteLine(TotalSizeOfFamiliesByMB(doc));
+            //    lastCommand = "TotalSizeByMB";
+            //    s.WriteLine(lastCommand);
+            //    Debug.Print(s.ToString());
+
+            //    s.WriteLine(GetElementsByWorkset(doc));
+            //    lastCommand = "Elements by Workset";
+            //    s.WriteLine(lastCommand);
+            //    Debug.Print(s.ToString());
+
+            //}
+            //catch
+            //{
+            //    Debug.Print(lastCommand);
+            //}
+
+            // Get a very generic collector
+            ICollection<Element> collector = [.. new FilteredElementCollector(doc).WhereElementIsNotElementType()];
+
+
+            // GetViewsInsideDocument
+            List<View> viewsInsideDocument = [];
+            foreach (Element e in collector)
             {
-                s.WriteLine(GetViews(doc));
-                lastCommand = "GetViews";
-                Debug.Print(s.ToString());
-
-                s.WriteLine(GetAnnotativeElements(doc));
-                lastCommand = "GetAnnotativeElements";
-                Debug.Print(s.ToString());
-
-                s.WriteLine(GetImportedImages(doc));
-                lastCommand = "GetImportedImages";
-                Debug.Print(s.ToString());
-
-                s.WriteLine(GetDWGFiles(doc));
-                lastCommand = "GetDWGFiles";
-                Debug.Print(s.ToString());
-
-                s.WriteLine(GetSKPFiles(doc));
-                lastCommand = "GetSKPFiles";
-                Debug.Print(s.ToString());
-
-                s.WriteLine(GetModelGroups(doc));
-                lastCommand = "GetModelGroups";
-                Debug.Print(s.ToString());
-
-                s.WriteLine(GetDetailGroups(doc));
-                lastCommand = "GetDetailGroups";
-                Debug.Print(s.ToString());
-
-                s.WriteLine(GetDesignOptions(doc));
-                lastCommand = "GetDesignOptions";
-                Debug.Print(s.ToString());
-
-                s.WriteLine(GetLevelCount(doc));
-                lastCommand = "GetLevelCount";
-                Debug.Print(s.ToString());
-
-                s.WriteLine(GetGridLineCount(doc));
-                lastCommand = "GetGridLineCount";
-                Debug.Print(s.ToString());
-
-                s.WriteLine(GetErrorsAndWarnings(doc));
-                lastCommand = "GetErrorsAndWarnings";
-                Debug.Print(s.ToString());
-
-                s.WriteLine(GetUnusedFamilies(doc));
-                lastCommand = "GetUnusedFamilies";
-
-                s.WriteLine(GetUnenclosedRooms(doc));
-                lastCommand = "GetUnenclosedRooms";
-                Debug.Print(s.ToString());
-
-                s.WriteLine(GetDuplicateElements(doc));
-                lastCommand = "GetDuplicateElements";
-                Debug.Print(s.ToString());
-
-                s.WriteLine(GetViewsNotInSheets(doc));
-                lastCommand = "GetViewsNotInSheets";
-                Debug.Print(s.ToString());
-
-                s.WriteLine(GetUnconnectedDucts(doc));
-                lastCommand = "GetUnconnectedDucts";
-                Debug.Print(s.ToString());
-
-                s.WriteLine(GetUnconnectedPipes(doc));
-                lastCommand = "GetUnconnectedPipes";
-                Debug.Print(s.ToString());
-
-                s.WriteLine(GetUnconnectedElectrical(doc));
-                lastCommand = "GetUnconnectedElectrical";
-                Debug.Print(s.ToString());
-
-                s.WriteLine(GetNonNativeObjectStyles(doc));
-                lastCommand = "GetNonNativeObjectStyles";
-                Debug.Print(s.ToString());
-
-                s.WriteLine(GetMirroredObjects(doc));
-                lastCommand = "GetMirroredObjects";
-                Debug.Print(s.ToString());
-
-                s.WriteLine(GetElementsByWorkset(doc));
-                lastCommand = "GetElementsByWorkset";
-                Debug.Print(s.ToString());
-
-                s.WriteLine(GetFamilyCount(doc));
-                lastCommand = "GetFamilyCount";
-                s.WriteLine(lastCommand);
-                Debug.Print(s.ToString());
-
-                s.WriteLine(GetFamilyCountBySize(doc));
-                lastCommand = "GetFamilyCountBySize";
-                s.WriteLine(lastCommand);
-                Debug.Print(s.ToString());
-
-                s.WriteLine(GetLargestFamilies(doc));
-                lastCommand = "GetLargestFamilies";
-                s.WriteLine(lastCommand);
-                Debug.Print(s.ToString());
-
-                s.WriteLine(GetInPlaceFamilies(doc));
-                lastCommand = "GetInPlaceFamilies";
-                s.WriteLine(lastCommand);
-                Debug.Print(s.ToString());
-
-                s.WriteLine(TotalSizeOfFamiliesByMB(doc));
-                lastCommand = "TotalSizeByMB";
-                s.WriteLine(lastCommand);
-                Debug.Print(s.ToString());
-
-                s.WriteLine(GetElementsByWorkset(doc));
-                lastCommand = "Elements by Workset";
-                s.WriteLine(lastCommand);
-                Debug.Print(s.ToString());
-
-            }
-            catch
-            {
-                Debug.Print(lastCommand);
+                try
+                {
+                    switch (e)
+                    {
+                        case (View):
+                            Debug.Print(e.Name + "\t" + typeof(View).Name);
+                            break;
+                        case (ImportInstance):
+                            Debug.Print(e.Name + "\t" + typeof(ImportInstance).Name);
+                            break;
+                        case (Group):
+                            Debug.Print(e.Name + "\t" + typeof(Group).Name);
+                            break;
+                        case (DesignOption):
+                            Debug.Print(e.Name + "\t" + typeof(DesignOption).Name);
+                            break;
+                        case (Level):
+                            Debug.Print(e.Name + "\t" + typeof(Level).Name);
+                            break;
+                        case (Grid):
+                            Debug.Print(e.Name + "\t" + typeof(Grid).Name);
+                            break;
+                        case (Family):
+                            Debug.Print(e.Name + "\t" + typeof(Family).Name);
+                            break;
+                        case (GraphicsStyle):
+                            Debug.Print(e.Name + "\t" + typeof(GraphicsStyle).Name);
+                            break;
+                        case (FamilyInstance):
+                            Debug.Print(e.Name + "\t" + typeof(FamilyInstance).Name);
+                            break;
+                        default:
+                            //Debug.Print(e.Name + "" + typeof(Element).Name);
+                            break;
+                    }
+                }
+                catch
+                {
+                    continue;
+                }
             }
 
-            Debug.Print(s.ToString());
+
+            //Debug.Print(s.ToString());
             return Result.Succeeded;
         }
 
@@ -187,6 +234,7 @@ namespace Direwolf.Revit.Benchmarking
                 .WhereElementIsNotElementType()
                 .Where(e => e.Category != null && e.Category.CategoryType == CategoryType.Annotation) 
                 .ToList();
+
 
             var results = new List<string>();
             foreach (Element element in annotativeElements)
