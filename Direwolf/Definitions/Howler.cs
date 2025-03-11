@@ -12,7 +12,7 @@ namespace Direwolf.Definitions
     public record class Howler : IHowler
     {
         [JsonPropertyName("Response")]
-        public Stack<Catch> Den { get; set; } = [];
+        public Stack<Prey> Den { get; set; } = [];
 
         [JsonIgnore]
         public Queue<IWolf> Wolfpack { get; set; } = [];

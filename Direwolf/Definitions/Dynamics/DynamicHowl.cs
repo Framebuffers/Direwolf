@@ -50,7 +50,7 @@ namespace Direwolf.Definitions.Dynamics
                 { "Callback", Callback?.GetType().Name ?? "unknown" },
                 { "Timestamp", DateTime.Now.ToString() }
             };
-            return new Catch(d).ToString();
+            return new Prey(d).ToString();
         }
     }
 }

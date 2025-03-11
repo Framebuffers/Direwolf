@@ -32,7 +32,7 @@ namespace Direwolf.Revit.Howls
                     value.Add(e.Id.Value);
                 }
 
-                SendCatchToCallback(new Catch(new Dictionary<string, object>()
+                SendCatchToCallback(new Prey(new Dictionary<string, object>()
                 {
                     ["ElementsByFamily"] = elementsSortedByFamily
                 }));

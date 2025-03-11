@@ -13,7 +13,7 @@ namespace Direwolf.Revit.Howlers
     public record class RevitHowler : IHowler
     {
         [JsonPropertyName("Response")]
-        public Stack<Catch> Den { get; set; } = [];
+        public Stack<Prey> Den { get; set; } = [];
 
         [JsonIgnore]
         public Queue<IWolf> Wolfpack { get; set; } = [];

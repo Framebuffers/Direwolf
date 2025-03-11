@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <RevitAddIn>
 	<AddIn Type="Command">
-		<AddinName>Direwolf</AddinName>
-		<Text>Direwolf Benchmark</Text>
+		<AddinName>Direwolf Reaper</AddinName>
+		<Text>Main</Text>
 		<Description>Benchmarks Revit and Direwolf's parameter serialization performance.</Description>
-		<Assembly>"C:\ProgramData\Autodesk\Revit\Addins\2025\Direwolf.dll"</Assembly>
-		<FullClassName>Direwolf.Main</FullClassName>
+		<Assembly>"C:\ProgramData\Autodesk\Revit\Addins\2025\Direwolf\Direwolf.Revit.dll"</Assembly>
+		<FullClassName>Direwolf.Revit.Benchmarking.BaseCommandSanityCheck</FullClassName>
 		<ClientId>9C481634-1E2F-4D35-9D08-4C4E188204E1</ClientId>
 		<VendorId>Framebuffer</VendorId>
 		<VendorDescription>

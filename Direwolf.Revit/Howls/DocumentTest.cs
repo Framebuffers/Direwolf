@@ -14,7 +14,7 @@ namespace Direwolf.Revit.Howls
             {
                 ["Title"] = rvtdoc.Title
             };
-            SendCatchToCallback(new Catch(data));
+            SendCatchToCallback(new Prey(data));
             return true;
         }
     }

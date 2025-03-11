@@ -28,51 +28,41 @@ namespace Direwolf.Revit
             Document doc = commandData.Application.ActiveUIDocument.Document;
             try
             {
-                Revit.Async.RevitTask.Initialize(commandData.Application);
-                //Helpers.GenerateNewWindow("test", "test");
+                RevitTask.Initialize(commandData.Application);
+
+                //DynamicRevitHowler drh = new();
+                //drh.CreateWolf(new DynamicWolf(), new DynamicDocumentTest(doc));
+                //drh.CreateWolf(new DynamicWolf(), new DynamicElementInformation(doc));
+                //drh.CreateWolf(new DynamicWolf(), new DynamicIdByFamily(doc));
+
                 //RevitHowler rh = new();
-
-                //Debug.Print("hi");
-
-                DynamicRevitHowler drh = new();
-                drh.CreateWolf(new DynamicWolf(), new DynamicDocumentTest(doc));
-                drh.CreateWolf(new DynamicWolf(), new DynamicElementInformation(doc));
-                drh.CreateWolf(new DynamicWolf(), new DynamicIdByFamily(doc));
-
-                RevitHowler rh = new();
-                rh.CreateWolf(new Wolf(), new GetElementIdByFamily(doc));
-                rh.CreateWolf(new Wolf(), new DocumentTest(doc));
-                rh.CreateWolf(new Wolf(), new GetElementInformation(doc));
-
-                //Direwolf dw = new(commandData.Application);
-                ////dw.QueueHowler(drh);
-                //dw.QueueHowler(rh);
-
-                ////Console.WriteLine(dw.GetQueueInfo());
-
-                //dw.Hunt("Dynamic and Static queries");
-
-                //Debug.Print(JsonSerializer.Serialize(dw.Queries));
-                ////Console.WriteLine(JsonSerializer.Serialize(dw.DynamicQueries));
-                //dw.WriteQueriesToJson();
+                //rh.CreateWolf(new Wolf(), new GetElementIdByFamily(doc));
+                //rh.CreateWolf(new Wolf(), new DocumentTest(doc));
+                //rh.CreateWolf(new Wolf(), new GetElementInformation(doc));
 
                 Direwolf dw2 = new(commandData.Application);
-                dw2.QueueHowler(drh);
-                dw2.QueueHowler(rh);
-                dw2.HuntAsync("Async Dynamic and Static Queries");
-                //s.Stop();
+                //foreach (var v in dw2.Database)
+                //{
+                //    foreach (var k in v.Result)
+                //    {
+                //        Debug.Print(k.Key);
+                //    }
+                //}
 
-            Helpers.GenerateNewWindow("Completed complete async request", $"Time Taken: {s.Elapsed.TotalSeconds}s");
+                //dw2.QueueHowler(drh);
+                //dw2.QueueHowler(rh);
+                //dw2.HuntAsync("Async Dynamic and Static Queries");
+                s.Stop();
 
-                Debug.Print(JsonSerializer.Serialize(dw2.Queries));
-                //Console.WriteLine(JsonSerializer.Serialize(dw2.DynamicQueries));
-                //dw2.WriteQueriesToJson();
+                //Helpers.GenerateNewWindow("Request", $"{dw2.Database.Length}");
+
+                //Debug.Print(JsonSerializer.Serialize(dw2.Queries));
             }
             catch
             {
                 return Result.Failed;
             }
-    
+
             return Result.Succeeded;
         }
     }

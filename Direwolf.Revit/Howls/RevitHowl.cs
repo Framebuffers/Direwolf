@@ -11,7 +11,7 @@ namespace Direwolf.Revit.Howls
         private Guid RequestIdentification { get; init; } = Guid.NewGuid();
         [JsonIgnore] public IWolf? Callback { get; set; }
 
-        public void SendCatchToCallback(Catch c)
+        public void SendCatchToCallback(Prey c)
         {
             var d = new Dictionary<string, object>()
             {
@@ -19,7 +19,7 @@ namespace Direwolf.Revit.Howls
                 ["GUID"] = RequestIdentification.ToString(),
                 [GetType().Name] = c
             };
-            Callback?.Catches.Push(new Catch(d));
+            Callback?.Catches.Push(new Prey(d));
         }
 
         public virtual bool Execute()
@@ -52,7 +52,7 @@ namespace Direwolf.Revit.Howls
                 { "Callback", Callback?.GetType().Name ?? "unknown" },
                 { "Timestamp", DateTime.Now.ToString() }
             };
-            return new Catch(d).ToString();
+            return new Prey(d).ToString();
         }
 
         private Document? _rvtDoc; // it should never be null though, unless *directly* done so.

@@ -9,7 +9,7 @@ namespace Direwolf.Definitions
         public DateTime Timestamp { get; init; } = DateTime.Now;
         public Guid GUID { get; init; } = Guid.NewGuid();
         public int ResultCount { get => Howler.Den.Count; }
-        public Stack<Catch> Results => Howler.Den;
+        public Stack<Prey> Results => Howler.Den;
         public override string ToString()
         {
             return JsonSerializer.Serialize(new Dictionary<string, object>()

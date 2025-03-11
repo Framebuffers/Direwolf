@@ -11,10 +11,10 @@ namespace Forest.MockAttributesTest
         public static void Main(string[] args)
         {
             //RecursiveLoad.Execute();
-            string fileName = Path.Combine(
-         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-         "wolfpack.json");
-            Console.WriteLine(fileName);
+
+            //Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            //"wolfpack.json");
+            var x = new System.IO.FileInfo("""C:\Users\Framebuffer\Desktop\async.json""").Length;
 
             //var a = new(typeof(Program));
             //Console.WriteLine();

@@ -1,4 +1,5 @@
-﻿using Autodesk.Revit.DB.Analysis;
+﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Analysis;
 using Autodesk.Revit.UI;
 using Direwolf.Contracts;
 using Direwolf.Contracts.Dynamics;
@@ -13,12 +14,57 @@ using System.Dynamic;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Linq;
 
 namespace Direwolf
 {
-    public sealed class Direwolf
+    public class Direwolf
     {
-        private readonly UIApplication _app;
+        private readonly UIApplication? _app;
+        public Prey[] Database
+        {
+            get
+            {
+                Stack<Prey> results = [];
+                try
+                {
+                    ICollection<Element> allValidElements = new FilteredElementCollector(_app?.ActiveUIDocument.Document)
+                        .WhereElementIsNotElementType()
+                        .WhereElementIsViewIndependent()
+                        .ToElements();
+
+                    var elementsSortedByFamily = new Dictionary<string, object>();
+
+                    foreach ((Element e, string familyName) in from Element e in allValidElements
+                                                               let f = e as FamilyInstance
+                                                               where f is not null
+                                                               let familyName = f.Symbol.Family.Name
+                                                               select (e, familyName))
+                    {
+                        if (!elementsSortedByFamily.TryGetValue(familyName, out dynamic? value))
+                        { 
+                            value = new ExpandoObject();
+                            elementsSortedByFamily[familyName] = value;
+                        }
+                        value.Add(e);
+                    }
+                    results.Push(new Prey(elementsSortedByFamily));
+                }
+                catch
+                {
+                    throw new Exception("Could not get DB snapshot.");
+                }
+                return [.. results];
+            }
+        }
+
+
+        public IEnumerable<Element> GetElementsFromFamily(string familyName) => Database
+            .SelectMany(e => e.Result
+            .Where(r => r.Key
+            .Equals(familyName, StringComparison.Ordinal))
+            .SelectMany(r => (List<Element>)r.Value));
+
         public Direwolf(UIApplication app) { _app = app; }
         public Direwolf(IHowler howler, UIApplication app)
         {
@@ -235,7 +281,7 @@ namespace Direwolf
                             DynamicQueries.Add(queryName, result);
                             WriteDataToJson(result, "dyn_async", Desktop);
                         }
-                        
+
 
                     }
                 }
@@ -318,5 +364,9 @@ namespace Direwolf
             };
             t.Show();
         }
+
+
+
     }
+
 }

@@ -6,7 +6,7 @@ namespace Direwolf.Contracts
     {
         public IWolf? Callback { get; set; } // making it nullable sounds like a bad idea
         public bool Execute();
-        public void SendCatchToCallback(Catch c);
+        public void SendCatchToCallback(Prey c);
     }
 
 }

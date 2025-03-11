@@ -54,7 +54,7 @@ public record class DynamicRevitHowl : IDynamicRevitHowl
                 { "Callback", Callback?.GetType().Name ?? "unknown" },
                 { "Timestamp", DateTime.Now.ToString() }
             };
-        return new Catch(d).ToString();
+        return new Prey(d).ToString();
     }
 
     private Document? _rvtDoc; // it should never be null though, unless *directly* done so.

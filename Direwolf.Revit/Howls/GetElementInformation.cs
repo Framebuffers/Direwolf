@@ -8,7 +8,7 @@ namespace Direwolf.Revit.Howls
     {
         public GetElementInformation(Document doc) => SetRevitDocument(doc);
         
-        private static Catch ProcessParameterMap(Element element)
+        private static Prey ProcessParameterMap(Element element)
         {
             try
             {
@@ -39,15 +39,15 @@ namespace Direwolf.Revit.Howls
                     };
                     results.Add(p.Definition.Name, results);
                 }
-                return new Catch(results);
+                return new Prey(results);
             }
             catch
             {
-                return new Catch();
+                return new Prey();
             }
         }
 
-        private static Catch ExtractElementData(Element element) => new(new Dictionary<string, object>
+        private static Prey ExtractElementData(Element element) => new(new Dictionary<string, object>
         {
             [element.Id.ToString()] = new Dictionary<string, object>()
             {
@@ -62,7 +62,7 @@ namespace Direwolf.Revit.Howls
         {
             try
             {
-                Dictionary<string, List<Catch>> Catches = [];
+                Dictionary<string, List<Prey>> Catches = [];
                 ICollection<Element> allValidElements = new FilteredElementCollector(GetRevitDocument())
                     .WhereElementIsNotElementType()
                     .WhereElementIsViewIndependent()
@@ -85,10 +85,10 @@ namespace Direwolf.Revit.Howls
 
                 foreach (KeyValuePair<string, List<Element>> family in elementsSortedByFamily)
                 {
-                    List<Catch> elementData = [];
+                    List<Prey> elementData = [];
                     elementData.AddRange(family.Value.Select(ExtractElementData));
 
-                    if (Catches.TryGetValue(family.Key, out List<Catch>? existingElementData))
+                    if (Catches.TryGetValue(family.Key, out List<Prey>? existingElementData))
                     {
                         existingElementData.AddRange(elementData);
                     }
@@ -98,7 +98,7 @@ namespace Direwolf.Revit.Howls
                     }
                 }
 
-               SendCatchToCallback(new Catch(new Dictionary<string, object>()
+               SendCatchToCallback(new Prey(new Dictionary<string, object>()
                 {
                     ["ElementData"] = Catches
                 }));
