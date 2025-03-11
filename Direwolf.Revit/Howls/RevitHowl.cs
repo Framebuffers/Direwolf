@@ -8,15 +8,14 @@ namespace Direwolf.Revit.Howls
 {
     public record class RevitHowl : IRevitHowl
     {
-        private Guid RequestIdentification { get; init; } = Guid.NewGuid();
         [JsonIgnore] public IWolf? Callback { get; set; }
 
         public void SendCatchToCallback(Prey c)
         {
             var d = new Dictionary<string, object>()
             {
-                ["Timestamp"] = DateTime.Now,
-                ["GUID"] = RequestIdentification.ToString(),
+                ["Timestamp"] = DateTime.UtcNow,
+                ["GUID"] = Guid.NewGuid(),
                 [GetType().Name] = c
             };
             Callback?.Catches.Push(new Prey(d));

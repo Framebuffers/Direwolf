@@ -4,56 +4,16 @@ using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
 using Direwolf.Definitions;
 using Direwolf.Revit.Howls;
-using System;
-using System.CodeDom;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
+using Direwolf.Revit.Definitions;
 
 namespace Direwolf.Revit.Benchmarking
 {
-    public record class ModelHealthReaper : RevitHowl
+    public partial record class ModelHealthReaper : RevitHowl
     {
         public ModelHealthReaper(Document doc)
         {
             SetRevitDocument(doc);
         }
-
-        private readonly record struct ElementInformation()
-        {
-
-            public required double ElementIdValue { get; init; }
-            public required string ElementUniqueId { get; init; }
-            public required string ElementVersionId { get; init; }
-            public string? FamilyName { get; init; }
-            public string? Category { get; init; }
-            public string? BuiltInCategory { get; init; }
-            public string? Workset { get; init; }
-            public string[]? Views { get; init; }
-            public string? DesignOption { get; init; }
-            public string? DocumentOwner { get; init; }
-            public string? OwnerViewId { get; init; }
-            public string? WorksetId { get; init; }
-            public string? LevelId { get; init; }
-            public string? CreatedPhaseId { get; init; }
-            public string? DemolishedPhaseId { get; init; }
-            public string? GroupId { get; init; }
-            public string? WorkshareId { get; init; }
-            public bool? IsGrouped { get; init; }
-            public bool? IsModifiable { get; init; }
-            public bool? IsViewSpecific { get; init; }
-            public bool? IsBuiltInCategory { get; init; }
-            public bool? IsAnnotative { get; init; }
-            public bool? IsModel { get; init; }
-            public bool? IsPinned { get; init; }
-            public bool? IsWorkshared { get; init; }
-            public Dictionary<string, string>? Parameters { get; init; }
-        }
-
-
 
         private Prey ProcessInfo()
         {
@@ -61,7 +21,6 @@ namespace Direwolf.Revit.Benchmarking
 
             // Get a very generic collector
             ICollection<Element> collector = [.. new FilteredElementCollector(doc).WhereElementIsNotElementType()];
-
 
             // These are all categories for which information has to be extracted.
             List<View> viewsInsideDocument = [];
@@ -83,10 +42,7 @@ namespace Direwolf.Revit.Benchmarking
             List<Element> isFlipped = [];
             Dictionary<string, int> worksetElementCount = [];
 
-
-
             Stack<ElementInformation> individualElementInfo = [];
-
 
             foreach (Element e in collector)
             {
@@ -120,7 +76,7 @@ namespace Direwolf.Revit.Benchmarking
                     FamilyInstance? fm = e as FamilyInstance;
 
                     // isGrouped
-                    if (e.GroupId is not null)
+                    if (e?.GroupId is not null)
                     {
                         isGrouped = true;
                         groupId = e.GroupId.ToString();
@@ -422,18 +378,18 @@ namespace Direwolf.Revit.Benchmarking
                 { "isFlipped", isFlipped.Count },
                 { "worksetElementCount", worksetElementCount.Count }
             };
-            Prey genericInformation = new(new Dictionary<string, object>()
+
+
+            Dictionary<string, object> results = new()
             {
-                ["counts"] = dataCounts,
-                ["elements"] = individualElementInfo
-            });
-
-            return genericInformation;
+                ["dataCount"] = dataCounts
+            };
+            return new Prey(results);
         }
-
 
         public override bool Execute()
         {
+            //Callback?.Callback?.Den.
             SendCatchToCallback(ProcessInfo());
             return true;
         }

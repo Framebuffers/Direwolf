@@ -1,5 +1,4 @@
-﻿using Direwolf.Definitions;
-using Direwolf.Definitions.Dynamics;
+﻿using Direwolf.Definitions.Dynamics;
 
 namespace Direwolf.Contracts.Dynamics
 {

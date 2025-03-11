@@ -3,6 +3,7 @@ using Direwolf.Definitions;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using Direwolf.Revit.Contracts;
+using Direwolf.EventHandlers;
 
 namespace Direwolf.Revit.Howlers
 {
@@ -12,11 +13,10 @@ namespace Direwolf.Revit.Howlers
     /// </summary>
     public record class RevitHowler : IHowler
     {
-        [JsonPropertyName("Response")]
-        public Stack<Prey> Den { get; set; } = [];
+        public event EventHandler<HuntCompletedEventArgs>? HuntCompleted;
+        [JsonPropertyName("Response")] public Stack<Prey> Den { get; set; } = [];
+        [JsonIgnore] public Queue<IWolf> Wolfpack { get; set; } = [];
 
-        [JsonIgnore]
-        public Queue<IWolf> Wolfpack { get; set; } = [];
         public virtual void CreateWolf(IWolf runner, IHowl instruction) // wolf factory
         {
             if (instruction is IRevitHowl)
@@ -39,10 +39,12 @@ namespace Direwolf.Revit.Howlers
                 {
                     wolf.Run();
                 }
+                HuntCompleted?.Invoke(this, new HuntCompletedEventArgs() { IsSuccessful = true});
                 return new Wolfpack(this, GetType().Name);
             }
             catch
             {
+                HuntCompleted?.Invoke(this, new HuntCompletedEventArgs() { IsSuccessful = false});
                 throw new ApplicationException();
             }
         }

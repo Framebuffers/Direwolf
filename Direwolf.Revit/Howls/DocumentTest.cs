@@ -1,7 +1,5 @@
 ﻿using Autodesk.Revit.DB;
 using Direwolf.Definitions;
-using Direwolf.Definitions.Dynamics;
-using Direwolf.Revit.Howls.Dynamics;
 
 namespace Direwolf.Revit.Howls
 {
@@ -19,17 +17,5 @@ namespace Direwolf.Revit.Howls
         }
     }
 
-    public record class DynamicDocumentTest(Document doc) : DynamicRevitHowl
-    {
-        public override bool Execute()
-        {
-            var rvtdoc = doc;
-            dynamic d = new DynamicCatch();
-            d.Title = rvtdoc.Title;
-            SendCatchToCallback(d);
-            return true;
-
-        }
-    }
-
+    
 }

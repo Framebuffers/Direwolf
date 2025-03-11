@@ -1,4 +1,5 @@
 ﻿using Direwolf.Contracts;
+using Direwolf.EventHandlers;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -11,11 +12,11 @@ namespace Direwolf.Definitions
     //[JsonSerializable(typeof(Howler))] 
     public record class Howler : IHowler
     {
-        [JsonPropertyName("Response")]
-        public Stack<Prey> Den { get; set; } = [];
+        public event EventHandler<HuntCompletedEventArgs>? HuntCompleted;
 
-        [JsonIgnore]
-        public Queue<IWolf> Wolfpack { get; set; } = [];
+        [JsonPropertyName("Response")] public Stack<Prey> Den { get; set; } = [];
+        [JsonIgnore] public Queue<IWolf> Wolfpack { get; set; } = [];
+
         public virtual void CreateWolf(IWolf runner, IHowl instruction) // wolf factory
         {
             runner.Instruction = instruction;
@@ -32,10 +33,12 @@ namespace Direwolf.Definitions
                     wolf.Run();
                 }
 
+                HuntCompleted?.Invoke(this, new HuntCompletedEventArgs() { IsSuccessful = true});
                 return new Wolfpack(this, GetType().Name);
             }
             catch
             {
+                HuntCompleted?.Invoke(this, new HuntCompletedEventArgs() { IsSuccessful = false});
                 throw new ApplicationException();
             }
         }

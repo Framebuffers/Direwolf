@@ -5,15 +5,13 @@ namespace Direwolf.Definitions
 {
     public record class Howl : IHowl
     {
-        private Guid RequestIdentification { get; init; } = Guid.NewGuid();
         [JsonIgnore] public IWolf? Callback { get; set; }
-
         public void SendCatchToCallback(Prey c)
         {
             var d = new Dictionary<string, object>()
             {
-                ["Timestamp"] = DateTime.Now,
-                ["GUID"] = RequestIdentification.ToString(),
+                ["Timestamp"] = DateTime.UtcNow,
+                ["ID"] = Guid.NewGuid(),
                 [GetType().Name] = c
             };
             Callback?.Catches.Push(new Prey(d));

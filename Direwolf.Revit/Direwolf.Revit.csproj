@@ -7,8 +7,17 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Contracts\Dynamics\**" />
+	  <Compile Remove="Howlers\Dynamics\**" />
+	  <Compile Remove="Howls\Dynamics\**" />
 	  <Compile Remove="Testing\**" />
+	  <EmbeddedResource Remove="Contracts\Dynamics\**" />
+	  <EmbeddedResource Remove="Howlers\Dynamics\**" />
+	  <EmbeddedResource Remove="Howls\Dynamics\**" />
 	  <EmbeddedResource Remove="Testing\**" />
+	  <None Remove="Contracts\Dynamics\**" />
+	  <None Remove="Howlers\Dynamics\**" />
+	  <None Remove="Howls\Dynamics\**" />
 	  <None Remove="Testing\**" />
 	</ItemGroup>
 

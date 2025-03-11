@@ -17,9 +17,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Contracts\Dynamics\**" />
+    <Compile Remove="Definitions\Dynamics\**" />
     <Compile Remove="ManifestGenerator\**" />
+    <EmbeddedResource Remove="Contracts\Dynamics\**" />
+    <EmbeddedResource Remove="Definitions\Dynamics\**" />
     <EmbeddedResource Remove="ManifestGenerator\**" />
+    <None Remove="Contracts\Dynamics\**" />
+    <None Remove="Definitions\Dynamics\**" />
     <None Remove="ManifestGenerator\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Reaper.cs" />
   </ItemGroup>
 
   <ItemGroup>

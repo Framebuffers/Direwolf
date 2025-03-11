@@ -9,6 +9,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Forest", "Forest\Forest.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Direwolf.Revit", "Direwolf.Revit\Direwolf.Revit.csproj", "{C9A1B9C1-55DC-4F89-A032-D534B884A05E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Direwolf.Database", "Direwolf.Database\Direwolf.Database.csproj", "{5981BA03-DBBF-4B55-9CA1-48595DDEFA2B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8BEADF2D-7A59-4D88-A1B1-37962D2982AD} = {8BEADF2D-7A59-4D88-A1B1-37962D2982AD}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +32,10 @@ Global
 		{C9A1B9C1-55DC-4F89-A032-D534B884A05E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C9A1B9C1-55DC-4F89-A032-D534B884A05E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C9A1B9C1-55DC-4F89-A032-D534B884A05E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5981BA03-DBBF-4B55-9CA1-48595DDEFA2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5981BA03-DBBF-4B55-9CA1-48595DDEFA2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5981BA03-DBBF-4B55-9CA1-48595DDEFA2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5981BA03-DBBF-4B55-9CA1-48595DDEFA2B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

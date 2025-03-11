@@ -1,4 +1,5 @@
 ﻿using Direwolf.Definitions;
+using Direwolf.EventHandlers;
 
 namespace Direwolf.Contracts
 {
@@ -8,5 +9,6 @@ namespace Direwolf.Contracts
         public Queue<IWolf> Wolfpack { get; set; }
         public void CreateWolf(IWolf runner, IHowl instruction);
         public Wolfpack Howl();
+        public event EventHandler<HuntCompletedEventArgs> HuntCompleted;
     }
 }
