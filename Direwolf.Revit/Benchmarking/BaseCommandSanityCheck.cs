@@ -28,68 +28,68 @@ namespace Direwolf.Revit.Benchmarking
 
             // externalfilereferences = revit files
 
-            using FilteredElementCollector c = new(doc);
-            ICollection<Element> all = c
-                .WhereElementIsNotElementType()
-                .WhereElementIsViewIndependent()
-                .ToList();
-
-            ICollection<RevitLinkInstance> rvtlink = c
-                .WhereElementIsNotElementType()
-                .OfClass(typeof(RevitLinkInstance))
-                .Cast<RevitLinkInstance>()
-                .ToList();
-
-            ICollection<ImageInstance> raster = c
-                .WhereElementIsNotElementType()
-                .OfClass(typeof(ImageInstance))
-                .Cast<ImageInstance>()
-                .ToList();
-
-            //ICollection<ExternalResourceReference> ext = c
-            //    .OfClass(typeof(ExternalResourceReference))
-            //    .Cast<ExternalResourceReference>()
+            //using FilteredElementCollector c = new(doc);
+            //ICollection<Element> all = c
+            //    .WhereElementIsNotElementType()
+            //    .WhereElementIsViewIndependent()
             //    .ToList();
 
+            //ICollection<RevitLinkInstance> rvtlink = c
+            //    .WhereElementIsNotElementType()
+            //    .OfClass(typeof(RevitLinkInstance))
+            //    .Cast<RevitLinkInstance>()
+            //    .ToList();
+
+            //ICollection<ImageInstance> raster = c
+            //    .WhereElementIsNotElementType()
+            //    .OfClass(typeof(ImageInstance))
+            //    .Cast<ImageInstance>()
+            //    .ToList();
+
+            ////ICollection<ExternalResourceReference> ext = c
+            ////    .OfClass(typeof(ExternalResourceReference))
+            ////    .Cast<ExternalResourceReference>()
+            ////    .ToList();
 
 
 
-            ExternalResourceType x = ExternalResourceTypes.BuiltInExternalResourceTypes.CADLink;
 
-            Dictionary<string, object> counts = new()
-            {
-                ["rvtLinks"] = rvtlink.Select(x => x.Name),
-                ["raster"] = rvtlink.Select(x => x.Name)
-            };
+            //ExternalResourceType x = ExternalResourceTypes.BuiltInExternalResourceTypes.CADLink;
 
-            Debug.Print(JsonSerializer.Serialize(counts, new JsonSerializerOptions() { WriteIndented = true }));
+            //Dictionary<string, object> counts = new()
+            //{
+            //    ["rvtLinks"] = rvtlink.Select(x => x.Name),
+            //    ["raster"] = rvtlink.Select(x => x.Name)
+            //};
 
-            //Debug.Print(ext.Count.ToString());
+            //Debug.Print(JsonSerializer.Serialize(counts, new JsonSerializerOptions() { WriteIndented = true }));
+
+            ////Debug.Print(ext.Count.ToString());
 
 
-            Dictionary<string, object> d = [];
+            //Dictionary<string, object> d = [];
 
-            //doc.ProjectInformation.Get
-            foreach (Element e in all)
-            {
-                if (e.IsExternalFileReference())
-                {
-                    var r = e.GetExternalFileReference();
-                    var referenceData = new Dictionary<string, object>
-                    {
-                        ["Name"] = e.Name,
-                        ["LinkedFileStatus"] = r.GetLinkedFileStatus().ToString(),
-                        ["Path"] = r.GetPath().Empty ? r.GetAbsolutePath().CloudPath : doc.PathName,
-                        ["ReferenceType"] = r.ExternalFileReferenceType.ToString(),
-                        ["PathType"] = r.PathType.ToString()
-                    };
+            ////doc.ProjectInformation.Get
+            //foreach (Element e in all)
+            //{
+            //    if (e.IsExternalFileReference())
+            //    {
+            //        var r = e.GetExternalFileReference();
+            //        var referenceData = new Dictionary<string, object>
+            //        {
+            //            ["Name"] = e.Name,
+            //            ["LinkedFileStatus"] = r.GetLinkedFileStatus().ToString(),
+            //            ["Path"] = r.GetPath().Empty ? r.GetAbsolutePath().CloudPath : doc.PathName,
+            //            ["ReferenceType"] = r.ExternalFileReferenceType.ToString(),
+            //            ["PathType"] = r.PathType.ToString()
+            //        };
 
-                    d.Add($"{e.UniqueId}", referenceData);
+            //        d.Add($"{e.UniqueId}", referenceData);
 
-                }
-            }
-            Debug.Print(JsonSerializer.Serialize(d, new JsonSerializerOptions() { WriteIndented = true }));
-            //Debug.Print($"rvtLink={rvtlink.Count}, cadLink={cadlink.Count}");
+            //    }
+            //}
+            //Debug.Print(JsonSerializer.Serialize(d, new JsonSerializerOptions() { WriteIndented = true }));
+            ////Debug.Print($"rvtLink={rvtlink.Count}, cadLink={cadlink.Count}");
 
 
 
@@ -98,18 +98,18 @@ namespace Direwolf.Revit.Benchmarking
             {
 
 
-                //RevitTask.Initialize(commandData.Application);
-                //RevitHowler rh = new();
-                //rh.CreateWolf(new Wolf(), new ModelHealthReaper(doc));
+                RevitTask.Initialize(commandData.Application);
+                RevitHowler rh = new();
+                rh.CreateWolf(new Wolf(), new ModelHealthReaper(doc));
 
-                //Direwolf dw = new(commandData.Application);
-                //dw.QueueHowler(rh);
-                //dw.Hunt("Model Health");
+                Direwolf dw = new(commandData.Application);
+                dw.QueueHowler(rh);
+                dw.Hunt("Model Health");
 
-                //st.Stop();
-                //Debug.WriteLine($"TimeTakenSync: {st.Elapsed.TotalSeconds}.");
-                //Debug.Print(JsonSerializer.Serialize(DateTime.Now));
-                //dw.WriteQueriesToJson();
+                st.Stop();
+                Debug.WriteLine($"TimeTakenSync: {st.Elapsed.TotalSeconds}.");
+                Debug.Print(JsonSerializer.Serialize(DateTime.Now));
+                dw.WriteQueriesToJson();
 
             }
             catch
