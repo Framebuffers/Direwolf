@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: $POSTGRES_DB
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    ports:
+      - 5432:5432
+    expose:
+      - 5432
+
+  frontend:
+    container_name: frontend
+    build: .
+    restart: always
+    environment:
+      - NODE_ENV=production
+    ports:
+      - 3000:3000
+    env_file: .env
+    depends_on:
+      - postgres
