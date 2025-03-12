@@ -10,11 +10,18 @@ class WolfdenService {
     try {
       const wolfdens = await this.prisma.wolfden.findMany({
         select: {
-            id: true,
-            queryName: true,
-            createdAt: true,
-            resultCount: true,
-            results: true
+          id: true,
+          createdAt: true,
+          timeTaken: true,
+          sequenceNumber: true,
+          resultCount: true,
+          howlerName: true,
+          testName: true,
+          fileName: true,
+          fileVersion: true,
+          fileOrigin: true,
+          wasCompleted: true,
+          data: true
         },
       });
       return wolfdens;

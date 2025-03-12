@@ -1,10 +1,14 @@
 services:
   postgres:
+    container_name: postgres
     image: postgres:latest
+    env_file:
+      - .env
     environment:
       POSTGRES_DB: $POSTGRES_DB
       POSTGRES_USER: $POSTGRES_USER
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      PGDATA: $PGDATA
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
       interval: 5s
@@ -16,9 +20,14 @@ services:
       - 5432
     networks:
       - prisma-network
+    volumes:
+      - 
+        type: bind
+        source: /tmp/postgres-data
+        target: /var/lib/postgresql/data
 
   frontend:
-    container_name: frontend-dev
+    container_name: dashboard
     build:
       context: .
       target: dev
@@ -39,23 +48,25 @@ services:
       - prisma-network
     
   prisma-studio:
-      image: node:lts-alpine3.17
-      working_dir: /usr/src/app
-      volumes:
-        - .:/usr/src/app
-      command: npx prisma studio --port 5555 --browser none
-      ports:
-        - "5555:5555"
-      env_file:
-        - .env
-      networks:
-        - prisma-network
-      depends_on:
-        postgres:
-          condition: service_healthy
-        frontend:
-          condition: service_started
+    container_name: prisma
+    image: node:lts-alpine3.17
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+    command: npx prisma studio --port 5555 --browser none
+    ports:
+      - "5555:5555"
+    env_file:
+      - .env
+    networks:
+      - prisma-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      frontend:
+        condition: service_started
 
 networks:
   prisma-network:
     name: prisma-network
+

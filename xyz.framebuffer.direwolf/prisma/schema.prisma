@@ -13,17 +13,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Prey {
+model wolfpack {
   id String @id @default(uuid())
-  key String
-  value String[]
-  Wolfden Wolfden[]
-}
-
-model Wolfden {
-  id String @id @default(uuid())
-  queryName String
   createdAt DateTime @default(now())
-  resultCount Int
-  results Prey[]
+  timeTaken Float @default(0.0)
+  sequenceNumber Int @default(autoincrement())
+  resultCount Int 
+  howlerName String
+  testName String
+  fileName String
+  fileVersion String
+  fileOrigin String
+  wasCompleted Boolean @default(false)
+  data String[]
 }
