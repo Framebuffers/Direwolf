@@ -366,3 +366,6 @@ FodyWeavers.xsd
 /Direwolf.Revit/Libraries/Revit.Async.dll
 xyz.framebuffer.direwolf/.env
 xyz.framebuffer.direwolf/.env.prod
+.web-r1.code-workspace
+.web-r2.code-workspace
+dwolf.code-workspace
