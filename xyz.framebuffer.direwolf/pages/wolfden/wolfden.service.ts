@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 
 class WolfdenService {
   private prisma: PrismaClient;
@@ -6,6 +6,12 @@ class WolfdenService {
   constructor() {
     this.prisma = new PrismaClient();
   }
+
+  async function main()
+  {
+    
+  }
+
   async getAllWolfdens() {
     try {
       const wolfdens = await this.prisma.wolfden.findMany({
