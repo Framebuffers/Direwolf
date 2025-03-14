@@ -106,7 +106,7 @@ namespace Direwolf
                         ["Name"] = query.Key,
                         ["Wolfpack"] = new Dictionary<string, object>
                         {
-                            ["DateTime"] = query.Value.Timestamp,
+                            ["DateTime"] = query.Value.CreatedAt,
                             ["GUID"] = query.Value.GUID,
                             ["ResultCount"] = query.Value.ResultCount
                         }

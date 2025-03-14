@@ -10,7 +10,7 @@ namespace Direwolf.Definitions
         {
             var d = new Dictionary<string, object>()
             {
-                ["Timestamp"] = DateTime.UtcNow,
+                ["CreatedAt"] = DateTime.UtcNow,
                 ["ID"] = Guid.NewGuid(),
                 [GetType().Name] = c
             };
@@ -45,7 +45,7 @@ namespace Direwolf.Definitions
             var d = new Dictionary<string, object>()
             {
                 { "Callback", Callback?.GetType().Name ?? "unknown" },
-                { "Timestamp", DateTime.Now.ToString() }
+                { "CreatedAt", DateTime.Now.ToString() }
             };
             return new Prey(d).ToString();
         }
