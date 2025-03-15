@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace Direwolf.Definitions
 {
-    public readonly record struct Wolfpack([property: JsonIgnore]IHowler Howler, string DocumentName = "", string FileOrigin = "", string DocumentVersion = "", bool WasCompleted = false, string DispatcherName = "Query")
+    public readonly record struct Wolfpack([property: JsonIgnore]IHowler Howler, string DocumentName = "", string FileOrigin = "", string DocumentVersion = "", bool WasCompleted = false, double TimeTaken = 0)
     {
         public DateTime CreatedAt { get; init; } = DateTime.Now;
         public Guid GUID { get; init; } = Guid.NewGuid();
@@ -16,10 +16,9 @@ namespace Direwolf.Definitions
             {
                 ["id"] = GUID,
                 ["createdAt"] = CreatedAt,
-                ["timeTaken"] = 0,
+                ["timeTaken"] = TimeTaken,
                 ["resultCount"] = ResultCount,
                 ["howlerName"] = Howler.GetType().Name,
-                ["testName"] = DispatcherName,
                 ["fileName"] = DocumentName,
                 ["fileVersion"] = DocumentVersion,
                 ["fileOrigin"] = FileOrigin,
@@ -28,6 +27,4 @@ namespace Direwolf.Definitions
             });
         }
     }
-
-
 }
