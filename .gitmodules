@@ -1,3 +1,6 @@
 [submodule "Direwolf.Revit/Revit.Async"]
 	path = Direwolf.Revit/Revit.Async
 	url = https://github.com/KennanChan/Revit.Async.git
+[submodule "direwolf-web"]
+	path = direwolf-web
+	url = https://github.com/Framebuffers/direwolf-web

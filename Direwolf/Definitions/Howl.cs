@@ -1,4 +1,5 @@
 ﻿using Direwolf.Contracts;
+using System.Diagnostics;
 using System.Text.Json.Serialization;
 
 namespace Direwolf.Definitions
@@ -10,12 +11,16 @@ namespace Direwolf.Definitions
         {
             var d = new Dictionary<string, object>()
             {
-                ["Timestamp"] = DateTime.UtcNow,
-                ["ID"] = Guid.NewGuid(),
-                [GetType().Name] = c
+
+                ["id"] = Guid.NewGuid(),
+                ["createdAt"] = DateTime.UtcNow,
+                ["wasCompleted"] = true,
+                ["data"] = c
             };
             Callback?.Catches.Push(new Prey(d));
         }
+
+        protected Stopwatch TimeTaken { get; set; } = new();
 
         public virtual bool Execute()
         {
@@ -45,7 +50,7 @@ namespace Direwolf.Definitions
             var d = new Dictionary<string, object>()
             {
                 { "Callback", Callback?.GetType().Name ?? "unknown" },
-                { "Timestamp", DateTime.Now.ToString() }
+                { "CreatedAt", DateTime.Now.ToString() }
             };
             return new Prey(d).ToString();
         }

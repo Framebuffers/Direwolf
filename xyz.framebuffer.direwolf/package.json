@@ -1,0 +1,29 @@
+{
+  "name": "nextjs-prisma-docker",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "start:migrate:prod": "prisma migrate deploy && node server.js",
+    "lint": "next lint",
+    "docker:dev": "npm run dev",
+    "docker:compose:dev": "docker-compose down && docker compose up -d --build",
+    "docker:compose:prod": "docker-compose down && docker compose -f docker-compose.prod.yml up -d --build"
+  },
+  "dependencies": {
+    "next": "14.0.4",
+    "react": "^18",
+    "react-dom": "^18",
+    "sharp": "0.32.6"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.0.4",
+    "typescript": "^5"
+  }
+}

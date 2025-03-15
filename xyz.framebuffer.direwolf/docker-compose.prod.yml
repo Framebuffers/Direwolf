@@ -1,0 +1,37 @@
+services:
+  postgres:
+    image: postgres:latest
+    env_file:
+      - .env.prod
+    environment:
+      POSTGRES_DB: $POSTGRES_DB
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 5s
+      timeout: 2s
+      retries: 20 
+    ports:
+      - 5432:5432
+    expose:
+      - 5432
+    networks:
+      - prisma-network
+
+  frontend:
+    container_name: dashboard
+    build: .
+    restart: always
+    command: npm run docker
+    environment:
+      - NODE_ENV=production
+    ports:
+      - 3000:3000
+    env_file: .env.prod
+    depends_on:
+      - postgres
+    # volumes:
+    #   - .:/app
+    #   - /app/node_modules
+    #   - /app/.next
