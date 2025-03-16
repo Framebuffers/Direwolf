@@ -29,9 +29,9 @@ namespace Direwolf.Revit.UI
         public Result OnStartup(UIControlledApplication application)
         {
             RibbonPanel rp = application.CreateRibbonPanel("Direwolf");
-            PushButtonData b = new("modelHealth", "Get Model Health", References.DirewolfRevitLocation, "Direwolf.Revit.Benchmarking.BaseCommandSanityCheck");
 
-            PushButton pb = rp.AddItem(b) as PushButton;
+            Buttons.AddGetModelHealthButton(rp);
+            
             return Result.Succeeded;
         }
 
