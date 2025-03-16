@@ -127,8 +127,8 @@ namespace Direwolf.Revit.Benchmarking
             //    lastCommand = "GetAnnotativeElements";
             //    Debug.Print(s.ToString());
 
-            //    s.WriteLine(GetImportedImages(doc));
-            //    lastCommand = "GetImportedImages";
+            //    s.WriteLine(GetImportedInstances(doc));
+            //    lastCommand = "GetImportedInstances";
             //    Debug.Print(s.ToString());
 
             //    s.WriteLine(GetDWGFiles(doc));
@@ -174,8 +174,8 @@ namespace Direwolf.Revit.Benchmarking
             //    lastCommand = "GetDuplicateElements";
             //    Debug.Print(s.ToString());
 
-            //    s.WriteLine(GetViewsNotInSheets(doc));
-            //    lastCommand = "GetViewsNotInSheets";
+            //    s.WriteLine(GetViewsNotOnSheets(doc));
+            //    lastCommand = "GetViewsNotOnSheets";
             //    Debug.Print(s.ToString());
 
             //    s.WriteLine(GetUnconnectedDucts(doc));
@@ -212,13 +212,13 @@ namespace Direwolf.Revit.Benchmarking
             //    s.WriteLine(lastCommand);
             //    Debug.Print(s.ToString());
 
-            //    s.WriteLine(GetLargestFamilies(doc));
-            //    lastCommand = "GetLargestFamilies";
+            //    s.WriteLine(GetFamliesWithMostTypes(doc));
+            //    lastCommand = "GetFamliesWithMostTypes";
             //    s.WriteLine(lastCommand);
             //    Debug.Print(s.ToString());
 
-            //    s.WriteLine(GetInPlaceFamilies(doc));
-            //    lastCommand = "GetInPlaceFamilies";
+            //    s.WriteLine(GetFamiliesWithMostTypes(doc));
+            //    lastCommand = "GetFamiliesWithMostTypes";
             //    s.WriteLine(lastCommand);
             //    Debug.Print(s.ToString());
 

@@ -30,7 +30,7 @@ namespace Direwolf.Revit.Howls
 
             var c = new Dictionary<string, object>()
             {
-                ["AnnotativeElements"] = results
+                ["annotativeElements"] = results
             };
 
             SendCatchToCallback(new Prey(c));

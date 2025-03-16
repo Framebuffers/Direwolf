@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using Direwolf.Definitions;
 using Direwolf.Revit.Contracts;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,23 @@ namespace Direwolf.Revit.Howls
 
         public override bool Execute()
         {
-            
+            using FilteredElementCollector collector = new(GetRevitDocument());
+            ICollection<DesignOption> elements = collector
+                            .WhereElementIsNotElementType()
+                            .OfClass(typeof(DesignOption))
+                            .Cast<DesignOption>()
+                            .ToList();
+
+            List<string> designOptionNames = [];
+            designOptionNames.AddRange(collector.Select(element => element.Name));
+
+            var d = new Dictionary<string, object>()
+            {
+                ["designOptions"] = designOptionNames
+            };
+            SendCatchToCallback(new Prey(d));
+            return true;
+
         }
     }
 

@@ -34,7 +34,7 @@ namespace Direwolf.Revit.Howls
 
                 SendCatchToCallback(new Prey(new Dictionary<string, object>()
                 {
-                    ["ElementsByFamily"] = elementsSortedByFamily
+                    ["elementsByFamily"] = elementsSortedByFamily
                 }));
                 return true;
             }

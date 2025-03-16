@@ -273,7 +273,7 @@ namespace Direwolf.Revit.Benchmarking
                 : "None found";
         }
 
-        public static string GetLargestFamilies(Document doc)
+        public static string GetFamliesWithMostTypes(Document doc)
         {
             using FilteredElementCollector familyCollector = new FilteredElementCollector(doc)
                 .OfClass(typeof(Family));

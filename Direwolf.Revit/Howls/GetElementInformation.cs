@@ -31,10 +31,10 @@ namespace Direwolf.Revit.Howls
 
                     Dictionary<string, string> data = new()
                     {
-                        ["GUID"] = p.GUID.ToString(),
-                        ["Type"] = p.GetTypeId().TypeId,
-                        ["HasValue"] = p.HasValue.ToString(),
-                        ["Value"] = GetValue()
+                        ["id"] = p.GUID.ToString(),
+                        ["type"] = p.GetTypeId().TypeId,
+                        ["hasValue"] = p.HasValue.ToString(),
+                        ["value"] = GetValue()
 
                     };
                     results.Add(p.Definition.Name, results);
@@ -51,10 +51,10 @@ namespace Direwolf.Revit.Howls
         {
             [element.Id.ToString()] = new Dictionary<string, object>()
             {
-                ["UniqueId"] = element.UniqueId ?? 0.ToString(),
-                ["VersionGuid"] = element.VersionGuid.ToString(),
-                ["IsPinned"] = element.Pinned.ToString(),
-                ["Data"] = ProcessParameterMap(element)
+                ["uniqueId"] = element.UniqueId ?? 0.ToString(),
+                ["versionGuid"] = element.VersionGuid.ToString(),
+                ["isPinned"] = element.Pinned.ToString(),
+                ["data"] = ProcessParameterMap(element)
             }
         });
 
@@ -100,7 +100,7 @@ namespace Direwolf.Revit.Howls
 
                SendCatchToCallback(new Prey(new Dictionary<string, object>()
                 {
-                    ["ElementData"] = Catches
+                    ["elementData"] = Catches
                 }));
                 return true;
             }
