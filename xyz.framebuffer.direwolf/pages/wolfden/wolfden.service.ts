@@ -7,11 +7,6 @@ class WolfdenService {
     this.prisma = new PrismaClient();
   }
 
-  async function main()
-  {
-    
-  }
-
   async getAllWolfdens() {
     try {
       const wolfdens = await this.prisma.wolfden.findMany({

@@ -9,15 +9,15 @@ namespace Direwolf.Definitions
         [JsonIgnore] public IWolf? Callback { get; set; }
         public void SendCatchToCallback(Prey c)
         {
-            var d = new Dictionary<string, object>()
-            {
+            //var d = new Dictionary<string, object>()
+            //{
 
-                ["id"] = Guid.NewGuid(),
-                ["createdAt"] = DateTime.UtcNow,
-                ["wasCompleted"] = true,
-                ["data"] = c
-            };
-            Callback?.Catches.Push(new Prey(d));
+            //    ["id"] = Guid.NewGuid(),
+            //    ["createdAt"] = DateTime.UtcNow,
+            //    ["wasCompleted"] = true,
+            //    ["data"] = c
+            //};
+            Callback?.Catches.Push(c);
         }
 
         protected Stopwatch TimeTaken { get; set; } = new();
@@ -49,8 +49,8 @@ namespace Direwolf.Definitions
         {
             var d = new Dictionary<string, object>()
             {
-                { "Callback", Callback?.GetType().Name ?? "unknown" },
-                { "CreatedAt", DateTime.Now.ToString() }
+                { "callback", Callback?.GetType().Name ?? "unknown" },
+                { "createdAt", DateTime.Now.ToString() }
             };
             return new Prey(d).ToString();
         }

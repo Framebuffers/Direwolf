@@ -2,19 +2,21 @@
 using Direwolf;
 using Direwolf.Definitions;
 using Npgsql;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Direwolf.Database
 {
-    public class WolfpackDen
+    public class WolfpackDB
     {
-        private WolfpackDen? Den => this;
+        private WolfpackDB? Den => this;
         private NpgsqlConnection? _connect;
 
-        public async Task<WolfpackDen> Connect(string connectionString = "")
+        public async Task<WolfpackDB> Connect(string connectionString = "")
         {
             try
             {
+                Debug.Print("Connecting");
                 var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
                 var datasource = dataSourceBuilder.Build();
                 _connect = await datasource.OpenConnectionAsync();
@@ -26,7 +28,7 @@ namespace Direwolf.Database
             }
         }
 
-        public async Task<WolfpackDen> CreateDen(Dictionary<string, Wolfpack> queries, string? connection = null)
+        public async Task<WolfpackDB> CreateDen(Dictionary<string, Wolfpack> queries, string? connection = null)
         {
             try
             {

@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="AutoCAD.NET.Interop" Version="2025.25.0.58" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Npgsql" Version="9.0.3" />
     <PackageReference Include="NUnit" Version="4.3.2" />
     <PackageReference Include="Revit.Async" Version="2.1.1" />
   </ItemGroup>

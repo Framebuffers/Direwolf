@@ -12,7 +12,7 @@ namespace Direwolf.Definitions
     {
         [JsonIgnore] public IHowler? Callback { get; set; }
         [JsonIgnore] public IHowl? Instruction { get; set; }
-        [JsonPropertyName("Results")] public Stack<Prey> Catches { get; set; } = []; // this is a cache for results *for a particular Wolf*
+        [JsonPropertyName("results")] public Stack<Prey> Catches { get; set; } = []; // this is a cache for results *for a particular Wolf*
         public bool Run()
         {
             if (Instruction is not null)

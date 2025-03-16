@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <RevitAddIn>
 	<AddIn Type="Application">
-		<AddinName>Direwolf Reaper</AddinName>
-		<Text>Direwolf for Autodesk Revit</Text>
+		<Name>Direwolf</Name>
 		<Description>Benchmarks Revit and Direwolf's parameter serialization performance.</Description>
 		<Assembly>"C:\ProgramData\Autodesk\Revit\Addins\2025\Direwolf\Direwolf.Revit.UI.dll"</Assembly>
 		<FullClassName>Direwolf.Revit.UI.DirewolfUIApp</FullClassName>

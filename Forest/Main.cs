@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Npgsql;
+using System;
+using System.ComponentModel.Design;
 using System.Reflection;
 using System.Transactions;
 
@@ -7,44 +9,37 @@ namespace Forest.MockAttributesTest
     public class Program
     {
 
+            
+        //private const string db = @"postgresql://wolf:awoo@127.0.0.1:5432/direwolf?schema=public";
         public static void Main(string[] args)
         {
-            //RecursiveLoad.Execute();
-
-            //Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            //"wolfpack.json");
-            var x = new System.IO.FileInfo("""C:\Users\Framebuffer\Desktop\async.json""").Length;
-
-            //var a = new(typeof(Program));
-            //Console.WriteLine();
-            //TestClass t = new();
-            //Console.WriteLine(nameof(TestClass));
-            //TestClass t = new();
-            //t.HelloWorld();
+            PostgresConnection p = new();
+            Console.WriteLine(typeof(Program).Assembly.Location);
         }
 
-        // Mocks
-        [Transaction(TransactionMode.Manual)]
-        [RevitCommand("Test", "11037623-EDDC-42FC-AD0E-ACBE3FE52B96", typeof(TransactionAttribute), "this", "path")]
-        //[Construction(TransactionMode.Manual)]
-        public class TestClass
-        {
-     
-            public void HelloWorld() => System.Console.WriteLine("Hello, from within the test class!");
-            
-            // code from within the attributes is ran first.
-            public TestClass()
-            {
-                
-                Console.WriteLine("Listing all custom attributes:");
-                foreach (var attr in typeof(TestClass).GetCustomAttributes())
-                {
-                    
-                }
+
+        //// Mocks
+        //[Transaction(TransactionMode.Manual)]
+        //[RevitCommand("Test", "11037623-EDDC-42FC-AD0E-ACBE3FE52B96", typeof(TransactionAttribute), "this", "path")]
+        ////[Construction(TransactionMode.Manual)]
+        //public class TestClass
+        //{
+
+        //    public void HelloWorld() => System.Console.WriteLine("Hello, from within the test class!");
+
+        //    // code from within the attributes is ran first.
+        //    public TestClass()
+        //    {
+
+        //        Console.WriteLine("Listing all custom attributes:");
+        //        foreach (var attr in typeof(TestClass).GetCustomAttributes())
+        //        {
+
+        //        }
 
 
-            }
-        }
+        //    }
+        //}
     }
 
     // Mocks

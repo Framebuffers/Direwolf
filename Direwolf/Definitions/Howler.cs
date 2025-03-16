@@ -14,7 +14,7 @@ namespace Direwolf.Definitions
     {
         public event EventHandler<HuntCompletedEventArgs>? HuntCompleted;
 
-        [JsonPropertyName("Response")] public Stack<Prey> Den { get; set; } = [];
+        [JsonPropertyName("response")] public Stack<Prey> Den { get; set; } = [];
         [JsonIgnore] public Queue<IWolf> Wolfpack { get; set; } = [];
 
         public virtual void CreateWolf(IWolf runner, IHowl instruction) // wolf factory

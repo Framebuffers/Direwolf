@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Direwolf.Contracts;
+using Direwolf.Database;
 using Direwolf.Definitions;
 using Direwolf.EventHandlers;
 using Revit.Async;
@@ -13,15 +14,29 @@ namespace Direwolf
 {
     public class Direwolf
     {
+        /// <summary>
+        /// This is a proof of concept, not a production-ready solution. Please **CHANGE THIS** if you plan to deploy.
+        /// </summary>
+
+        private const string db = """postgresql://wolf:awoo@postgres:5432/direwolf?schema=public""";
         private readonly UIApplication? _app;
         private List<HowlId> PreviousHowls = [];
 
-        public Direwolf(UIApplication app) { _app = app; }
+        private WolfpackDB? _db;
+
+        public Direwolf(UIApplication app) 
+        {
+            _db?.Connect(db);
+            _app = app;  
+        }
+
         public Direwolf(IHowler howler, UIApplication app)
         {
             Howlers.Enqueue(howler);
             howler.HuntCompleted += OnHuntCompleted;
             _app = app;
+
+            _db?.Connect(db);
         }
         public Direwolf(IHowler howler, IHowl instructions, UIApplication app)
         {
@@ -29,8 +44,8 @@ namespace Direwolf
             Howlers.Enqueue(howler);
             howler.HuntCompleted += OnHuntCompleted;
             _app = app;
+            _db?.Connect(db);
         }
-
 
         public Direwolf(IHowler howler, IHowl instructions, IWolf wolf, UIApplication app)
         {
@@ -38,6 +53,7 @@ namespace Direwolf
             Howlers.Enqueue(howler);
             howler.HuntCompleted += OnHuntCompleted;
             _app = app;
+            _db?.Connect(db);
         }
 
 
@@ -57,7 +73,7 @@ namespace Direwolf
             {
                 var howlers = new Dictionary<string, object>
                 {
-                    ["Count"] = Howlers.Count.ToString() ?? ""
+                    ["count"] = Howlers.Count.ToString() ?? ""
                 };
 
                 foreach (IHowler h in Howlers)
@@ -65,18 +81,18 @@ namespace Direwolf
                     var howler = new Dictionary<string, object>();
                     var hw = new Dictionary<string, object>
                     {
-                        ["Wolves"] = h.Wolfpack.Count,
-                        ["CatchCount"] = h.Den.Count
+                        ["wolves"] = h.Wolfpack.Count,
+                        ["catchCount"] = h.Den.Count
                     };
 
-                    howler["Name"] = h.GetType().Name;
-                    howler["Metadata"] = hw;
-                    howlers["Howler"] = howler;
+                    howler["name"] = h.GetType().Name;
+                    howler["metadata"] = hw;
+                    howlers["howler"] = howler;
                 }
 
                 var total = new Dictionary<string, object>
                 {
-                    ["TotalHowlers"] = howlers
+                    ["totalHowlers"] = howlers
                 };
                 return JsonSerializer.Serialize(new Prey(total));
             }
@@ -87,48 +103,48 @@ namespace Direwolf
         }
 
         [JsonExtensionData]
-        public Dictionary<string, Wolfpack> Queries { get; set; } = [];
+        public Stack<Wolfpack> Queries { get; set; } = [];
 
-        public string GetQueryInfo()
-        {
-            try
-            {
-                var queries = new Dictionary<string, object>
-                {
-                    ["Count"] = Queries.Count
-                };
+        //public string GetQueryInfo()
+        //{
+        //    try
+        //    {
+        //        var queries = new Dictionary<string, object>
+        //        {
+        //            ["count"] = Queries.Count
+        //        };
 
-                var queryInfo = new Dictionary<string, object>();
-                foreach (var query in Queries)
-                {
-                    var queryData = new Dictionary<string, object>
-                    {
-                        ["Name"] = query.Key,
-                        ["Wolfpack"] = new Dictionary<string, object>
-                        {
-                            ["DateTime"] = query.Value.CreatedAt,
-                            ["GUID"] = query.Value.GUID,
-                            ["ResultCount"] = query.Value.ResultCount
-                        }
-                    };
+        //        var queryInfo = new Dictionary<string, object>();
+        //        foreach (var query in Queries)
+        //        {
+        //            var queryData = new Dictionary<string, object>
+        //            {
+        //                ["name"] = query.Key,
+        //                ["wolfpack"] = new Dictionary<string, object>
+        //                {
+        //                    ["dateTime"] = query.Value.CreatedAt,
+        //                    ["id"] = query.Value.GUID,
+        //                    ["resultCount"] = query.Value.ResultCount
+        //                }
+        //            };
 
-                    queryInfo["Query"] = queryData;
-                }
+        //            queryInfo["query"] = queryData;
+        //        }
 
 
-                var totals = new Dictionary<string, object>
-                {
-                    ["Queries"] = queries,
-                    ["TotalQueries"] = Queries.Count
-                };
-                return JsonSerializer.Serialize(new Prey(totals));
-            }
-            catch
-            {
-                return "";
-            }
+        //        var totals = new Dictionary<string, object>
+        //        {
+        //            ["queries"] = queries,
+        //            ["totalQueries"] = Queries.Count
+        //        };
+        //        return JsonSerializer.Serialize(new Prey(totals));
+        //    }
+        //    catch
+        //    {
+        //        return "";
+        //    }
 
-        }
+        //}
 
         public void Hunt(string queryName = "query")
         {
@@ -160,7 +176,7 @@ namespace Direwolf
             try
             {
                 result = dispatch.Howl();
-                Queries.Add(queryName, result);
+                Queries.Push(result);
                 var h = new HowlId()
                 {
                     HowlIdentifier = new Guid(),
@@ -173,7 +189,7 @@ namespace Direwolf
                 throw new Exception();
             }
         }
-        public async void HuntAsync(string? path = null, string queryName = "Query")
+        public async void HuntAsync(string? path = null, string queryName = "query")
         {
             Revit.Async.RevitTask.Initialize(_app);
             await RevitTask.RunAsync(() =>
@@ -183,13 +199,14 @@ namespace Direwolf
                     foreach (var howler in Howlers)
                     {
                         var result = howler.Howl();
-                        Queries.Add(queryName, result);
+                        Queries.Push(result);
                         var h = new HowlId()
                         {
                             HowlIdentifier = new Guid(),
                             Name = howler.GetType().Name
                         };
                         PreviousHowls.Add(h);
+                        WolfpackDB wd = new();
                         WriteDataToJson(result, "async", path ?? Desktop);
                     }
                 }
@@ -200,13 +217,13 @@ namespace Direwolf
             });
         }
 
-        public async void HuntAsync(IHowler howler, string queryName = "Query")
+        public async void HuntAsync(IHowler howler, string queryName = "query")
         {
             Revit.Async.RevitTask.Initialize(_app);
             await RevitTask.RunAsync(() =>
             {
                 var results = howler.Howl();
-                Queries.Add(queryName, results);
+                Queries.Push(results);
                 var h = new HowlId()
                 {
                     HowlIdentifier = new Guid(),

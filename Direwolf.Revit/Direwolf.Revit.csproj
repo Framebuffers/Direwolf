@@ -26,16 +26,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Autodesk.Revit.SDK" Version="2025.0.2.419" />
+	  <PackageReference Include="Autodesk.Revit.SDK" Version="2025.0.2.419" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\Direwolf\Direwolf.csproj" />
 	</ItemGroup>
-
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="@echo off&#xD;&#xA;&#xD;&#xA;set installpath=%25ProgramData%25\Autodesk\Revit\Addins\2025\Direwolf&#xD;&#xA;set revitfolder=%25ProgramData%25\Autodesk\Revit\Addins\2025&#xD;&#xA;&#xD;&#xA;echo Installing Direwolf&#xD;&#xA;echo Target is %25installpath%25&#xD;&#xA;echo $(ProjectDir)&#xD;&#xA;&#xD;&#xA;rmdir /S /Q %25installpath%25&#xD;&#xA;mkdir %25installpath%25&#xD;&#xA;&#xD;&#xA;echo Folder exists or has been created. Proceeding...&#xD;&#xA;&#xD;&#xA;echo Copying files...&#xD;&#xA;xcopy /F /Y /D $(TargetDir)*.* %25installpath%25\*.*&#xD;&#xA;xcopy /F /Y /D $(ProjectDir)*.addin %25revitfolder%25\&#xD;&#xA;xcopy /F /Y /D $(ProjectDir)Libraries\*.dll %25installpath%25\&#xD;&#xA;&#xD;&#xA;echo Build installed! Awoo!&#xD;&#xA;" />
-	</Target>
 
 
 </Project>
