@@ -1,20 +1,15 @@
-﻿using Npgsql;
-using System;
-using System.ComponentModel.Design;
-using System.Reflection;
-using System.Transactions;
+﻿using System;
 
 namespace Forest.MockAttributesTest
 {
     public class Program
     {
 
-            
         //private const string db = @"postgresql://wolf:awoo@127.0.0.1:5432/direwolf?schema=public";
         public static void Main(string[] args)
         {
             PostgresConnection p = new();
-            Console.WriteLine(typeof(Program).Assembly.Location);
+            p.Connect();
         }
 
 

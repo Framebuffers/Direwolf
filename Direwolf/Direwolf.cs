@@ -1,12 +1,9 @@
-﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
+﻿using Autodesk.Revit.UI;
 using Direwolf.Contracts;
-using Direwolf.Database;
 using Direwolf.Definitions;
 using Direwolf.EventHandlers;
 using Revit.Async;
 using System.Diagnostics;
-using System.Dynamic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -17,16 +14,13 @@ namespace Direwolf
         /// <summary>
         /// This is a proof of concept, not a production-ready solution. Please **CHANGE THIS** if you plan to deploy.
         /// </summary>
+        private static readonly DbConnectionString _default = new("direwolf", "wolf", "awoo", "direwolf");
 
-        private const string db = """postgresql://wolf:awoo@postgres:5432/direwolf?schema=public""";
         private readonly UIApplication? _app;
         private List<HowlId> PreviousHowls = [];
 
-        private WolfpackDB? _db;
-
         public Direwolf(UIApplication app) 
         {
-            _db?.Connect(db);
             _app = app;  
         }
 
@@ -35,8 +29,6 @@ namespace Direwolf
             Howlers.Enqueue(howler);
             howler.HuntCompleted += OnHuntCompleted;
             _app = app;
-
-            _db?.Connect(db);
         }
         public Direwolf(IHowler howler, IHowl instructions, UIApplication app)
         {
@@ -44,7 +36,6 @@ namespace Direwolf
             Howlers.Enqueue(howler);
             howler.HuntCompleted += OnHuntCompleted;
             _app = app;
-            _db?.Connect(db);
         }
 
         public Direwolf(IHowler howler, IHowl instructions, IWolf wolf, UIApplication app)
@@ -53,7 +44,6 @@ namespace Direwolf
             Howlers.Enqueue(howler);
             howler.HuntCompleted += OnHuntCompleted;
             _app = app;
-            _db?.Connect(db);
         }
 
 
@@ -63,7 +53,6 @@ namespace Direwolf
             Howlers.Enqueue(howler);
             howler.HuntCompleted += OnHuntCompleted;
         }
-
 
         private Queue<IHowler> Howlers { get; set; } = [];
 
@@ -103,7 +92,9 @@ namespace Direwolf
         }
 
         [JsonExtensionData]
-        public Stack<Wolfpack> Queries { get; set; } = [];
+        private WolfpackDB Queries { get; set; } = new(_default);
+        public async void Push(Wolfpack w) => await Queries.Add(w);
+        public async void SendAllToDB() => await Queries.Flush();
 
         //public string GetQueryInfo()
         //{
@@ -189,6 +180,7 @@ namespace Direwolf
                 throw new Exception();
             }
         }
+
         public async void HuntAsync(string? path = null, string queryName = "query")
         {
             Revit.Async.RevitTask.Initialize(_app);
@@ -206,8 +198,6 @@ namespace Direwolf
                             Name = howler.GetType().Name
                         };
                         PreviousHowls.Add(h);
-                        WolfpackDB wd = new();
-                        WriteDataToJson(result, "async", path ?? Desktop);
                     }
                 }
                 catch
@@ -245,6 +235,11 @@ namespace Direwolf
         {
             string fileName = Path.Combine(Desktop, $"Queries.json");
             File.WriteAllText(fileName, JsonSerializer.Serialize(Queries));
+        }
+
+        public string GetQueriesAsJson()
+        {
+            return JsonSerializer.Serialize(Queries);
         }
 
         private void OnHuntCompleted(object? sender, HuntCompletedEventArgs e)

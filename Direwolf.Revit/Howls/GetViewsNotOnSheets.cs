@@ -1,10 +1,5 @@
 ﻿using Autodesk.Revit.DB;
 using Direwolf.Definitions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Direwolf.Revit.Howls
 {
@@ -13,11 +8,11 @@ namespace Direwolf.Revit.Howls
         public GetViewsNotOnSheets(Document doc) => SetRevitDocument(doc);
         public override bool Execute()
         {
-            using FilteredElementCollector viewCollector = new FilteredElementCollector(doc)
+            using FilteredElementCollector viewCollector = new FilteredElementCollector(GetRevitDocument())
                             .OfClass(typeof(View))
                             .WhereElementIsNotElementType();
 
-            FilteredElementCollector viewportCollector = new FilteredElementCollector(doc)
+            FilteredElementCollector viewportCollector = new FilteredElementCollector(GetRevitDocument())
                 .OfClass(typeof(Viewport));
 
             HashSet<ElementId> viewsOnSheets = [.. viewportCollector.Select(vp => (vp as Viewport).ViewId)];

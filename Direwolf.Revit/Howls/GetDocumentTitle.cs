@@ -3,7 +3,7 @@ using Direwolf.Definitions;
 
 namespace Direwolf.Revit.Howls
 {
-    public record class DocumentTest(Document doc) : RevitHowl
+    public record class GetDocumentTitle(Document doc) : RevitHowl
     {
         public override bool Execute()
         {

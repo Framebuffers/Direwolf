@@ -1,14 +1,6 @@
 ﻿using Autodesk.Revit.UI;
 using System.Reflection;
-using Direwolf.Revit.Benchmarking;
-using Autodesk.Revit.Attributes;
-using Autodesk.Revit.DB;
 using Direwolf.Revit.Howlers;
-using Direwolf.Definitions;
-using Direwolf.Revit.Howls;
-using Revit.Async;
-using System.Diagnostics;
-using System.Text.Json;
 
 namespace Direwolf.Revit.UI
 {
@@ -29,8 +21,8 @@ namespace Direwolf.Revit.UI
         public Result OnStartup(UIControlledApplication application)
         {
             RibbonPanel rp = application.CreateRibbonPanel("Direwolf");
-
             Buttons.AddGetModelHealthButton(rp);
+            //Buttons.AddPushToDBButton(rp);
             
             return Result.Succeeded;
         }

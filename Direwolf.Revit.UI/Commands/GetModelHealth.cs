@@ -8,14 +8,14 @@ using Direwolf.Revit.Howlers;
 using Revit.Async;
 using Direwolf.Revit.Benchmarking;
 
-namespace Direwolf.Revit
+namespace Direwolf.Revit.UI.Commands
 {
     /// <summary>
     /// Benchmark code.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
 
-    public partial class Main : IExternalCommand
+    public partial class GetModelHealth : IExternalCommand
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
@@ -31,9 +31,7 @@ namespace Direwolf.Revit
                 Direwolf dw = new(commandData.Application);
                 dw.QueueHowler(rh);
                 dw.HuntAsync("Model Health");
-                
-                Debug.Print(JsonSerializer.Serialize(dw.GetQueriesAsJson()));
-                dw.WriteQueriesToJson();
+                dw.SendAllToDB();
             }
             catch
             {

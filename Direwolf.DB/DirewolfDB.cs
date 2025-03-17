@@ -1,22 +1,27 @@
-﻿using Microsoft.EntityFrameworkCore.Update;
+﻿using Direwolf.Definitions;
+using Microsoft.EntityFrameworkCore.Storage;
 using Npgsql;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 
-namespace Direwolf.Definitions
+namespace Direwolf.DB
 {
     public readonly record struct DbConnectionString(string Host, string Username, string Password, string Database) { }
 
-    public class WolfpackDB : Stack<Wolfpack>
+    public class DirewolfDB : Stack<Wolfpack>
     {
         private readonly DbConnectionString _str;
         private const string TABLE_NAME = "Wolfpack";
         private NpgsqlConnection _connection;
 
-        public WolfpackDB(DbConnectionString db)
+        public DirewolfDB(DbConnectionString db)
         {
             _str = db;
         }
-        public async Task<int> Add(Wolfpack wolfpack)
+
+
+        public Stack<Wolfpack> Queries { get; set; } = [];
+        public async Task Add(Wolfpack wolfpack)
         {
             using NpgsqlConnection c = new(
                 $"Host={_str.Host};" +
@@ -41,22 +46,11 @@ namespace Direwolf.Definitions
                 cmd.Parameters.AddWithValue("result", wolfpack.Results);
                 cmd.Parameters.AddWithValue("testNumber", RandomNumberGenerator.GetInt32(1000000));
 
-                return await cmd.ExecuteNonQueryAsync();
+                await cmd.ExecuteNonQueryAsync();
             }
+            c.Dispose();
         }
         
-        public async Task Flush()
-        {
-            while (Count > 0)
-            {
-                Wolfpack value = Pop();
-                await Add(value);    
-            }
-        }
-
-        public async Task FlushLast()
-        {
-            await Add(Pop());
-        }
+        
     }
 }

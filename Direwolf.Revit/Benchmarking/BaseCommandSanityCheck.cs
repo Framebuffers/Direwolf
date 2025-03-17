@@ -1,16 +1,11 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Architecture;
-using Autodesk.Revit.DB.Mechanical;
-using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.UI;
 using Direwolf.Definitions;
 using Direwolf.Revit.Howlers;
-using IronPython.Runtime.Exceptions;
 using Revit.Async;
 using System.Diagnostics;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Direwolf.Revit.Benchmarking
 {
@@ -104,13 +99,12 @@ namespace Direwolf.Revit.Benchmarking
 
                 Direwolf dw = new(commandData.Application);
                 dw.QueueHowler(rh);
-                dw.Hunt("Model Health");
+                dw.HuntAsync("Model Health");
 
                 st.Stop();
                 Debug.WriteLine($"TimeTakenSync: {st.Elapsed.TotalSeconds}.");
                 Debug.Print(JsonSerializer.Serialize(DateTime.Now));
                 dw.WriteQueriesToJson();
-
             }
             catch
             {

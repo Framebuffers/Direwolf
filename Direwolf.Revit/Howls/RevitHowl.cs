@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 namespace Direwolf.Revit.Howls
 {
-    public record class RevitHowl : IRevitHowl
+    public abstract record class RevitHowl : IRevitHowl
     {
         [JsonIgnore] public IWolf? Callback { get; set; }
 

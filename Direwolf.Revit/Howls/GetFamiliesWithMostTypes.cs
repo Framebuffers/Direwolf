@@ -1,10 +1,5 @@
 ﻿using Autodesk.Revit.DB;
 using Direwolf.Definitions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Direwolf.Revit.Howls
 {
@@ -13,7 +8,7 @@ namespace Direwolf.Revit.Howls
         public GetFamiliesWithMostTypes(Document doc) => SetRevitDocument(doc);
         public override bool Execute()
         {
-            using FilteredElementCollector familyCollector = new FilteredElementCollector(doc)
+            using FilteredElementCollector familyCollector = new FilteredElementCollector(GetRevitDocument())
                   .OfClass(typeof(Family));
 
             List<string> results = [];

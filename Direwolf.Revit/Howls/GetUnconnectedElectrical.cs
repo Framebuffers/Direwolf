@@ -1,10 +1,5 @@
 ﻿using Autodesk.Revit.DB;
 using Direwolf.Definitions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Direwolf.Revit.Howls
 {
@@ -34,13 +29,14 @@ namespace Direwolf.Revit.Howls
                     }
                 }
 
-                var d = new Dictionary<string, object>()
-                {
-                    ["unconnectedElectrical"] = unconnectedConnections
-                };
-                SendCatchToCallback(new Prey(d));
-                return true;
             }
+            var d = new Dictionary<string, object>()
+            {
+                ["unconnectedElectrical"] = unconnectedConnections
+            };
+            SendCatchToCallback(new Prey(d));
+            return true;
+
         }
     }
 }
