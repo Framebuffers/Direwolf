@@ -60,7 +60,7 @@ namespace Direwolf.Definitions
                         cmd.Parameters.AddWithValue("creation", wolfpack.CreatedAt);
                         cmd.Parameters.AddWithValue("id", wolfpack.GUID);
                         cmd.Parameters.AddWithValue("resCount", wolfpack.ResultCount);
-                        cmd.Parameters.AddWithValue("name", wolfpack.Howler.GetType().ToString());
+                        cmd.Parameters.AddWithValue("name", wolfpack.TestName);
                         cmd.Parameters.Add(resultJson);
                         cmd.Parameters.AddWithValue("testNumber", RandomNumberGenerator.GetInt32(1000000));
 

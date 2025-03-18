@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Npgsql;
+using Autodesk.Windows.ToolBars;
 
 namespace Direwolf
 {
@@ -118,13 +119,13 @@ namespace Direwolf
             try { await Queries.Send(); } catch (Exception e) { Debug.Print(e.Message); }
         }
 
-        public void Hunt()
+        public void Hunt(string testName)
         {
             try
             {
                 foreach (var howler in Howlers)
                 {
-                    Hunt(howler, out _);
+                    Hunt(howler, out _, testName);
                     var h = new HowlId()
                     {
                         HowlIdentifier = new Guid(),
@@ -140,11 +141,11 @@ namespace Direwolf
             }
         }
 
-        public void Hunt(IHowler dispatch, out Wolfpack result)
+        public void Hunt(IHowler dispatch, out Wolfpack result, string testName)
         {
             try
             {
-                result = dispatch.Howl();
+                result = dispatch.Howl(testName);
                 var h = new HowlId()
                 {
                     HowlIdentifier = new Guid(),
@@ -187,7 +188,7 @@ namespace Direwolf
                 Revit.Async.RevitTask.Initialize(_app);
                 await RevitTask.RunAsync(() =>
                 {
-                    var results = howler.Howl();
+                    var results = howler.Howl(queryName);
                     Queries.Push(results);
                     var h = new HowlId()
                     {

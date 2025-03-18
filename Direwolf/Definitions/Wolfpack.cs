@@ -6,6 +6,7 @@ namespace Direwolf.Definitions
 {
     public readonly record struct Wolfpack([property: JsonIgnore]IHowler Howler, string DocumentName = "", string FileOrigin = "", string DocumentVersion = "", bool WasCompleted = false, double TimeTaken = 0)
     {
+        public string TestName { get; init; } = string.Empty;
         public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
         public Guid GUID { get; init; } = Guid.NewGuid();
         public int ResultCount { get => Howler.Den.Count; }
@@ -18,7 +19,7 @@ namespace Direwolf.Definitions
                 ["createdAt"] = CreatedAt,
                 ["timeTaken"] = TimeTaken,
                 ["resultCount"] = ResultCount,
-                ["howlerName"] = Howler.GetType().Name,
+                ["howlerName"] = TestName,
                 ["fileName"] = DocumentName,
                 ["fileVersion"] = DocumentVersion,
                 ["fileOrigin"] = FileOrigin,

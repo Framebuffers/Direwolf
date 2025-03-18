@@ -1,5 +1,6 @@
 ﻿using Direwolf.Contracts;
 using Direwolf.EventHandlers;
+using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -23,22 +24,28 @@ namespace Direwolf.Definitions
             runner.Callback = this;
             Wolfpack.Enqueue(runner);
         }
-        
-        public Wolfpack Howl()
+
+        public virtual Wolfpack Howl(string testName)
         {
             try
             {
+                Stopwatch s = new();
+                s.Start();
                 foreach (var wolf in Wolfpack)
                 {
                     wolf.Run();
                 }
 
-                HuntCompleted?.Invoke(this, new HuntCompletedEventArgs() { IsSuccessful = true});
-                return new Wolfpack(this, GetType().Name);
+                HuntCompleted?.Invoke(this, new HuntCompletedEventArgs() { IsSuccessful = true });
+                s.Stop();
+                return new Wolfpack(this, "", "", "", true, s.Elapsed.TotalSeconds)
+                {
+                    TestName = testName
+                };
             }
             catch
             {
-                HuntCompleted?.Invoke(this, new HuntCompletedEventArgs() { IsSuccessful = false});
+                HuntCompleted?.Invoke(this, new HuntCompletedEventArgs() { IsSuccessful = false });
                 throw new ApplicationException();
             }
         }
