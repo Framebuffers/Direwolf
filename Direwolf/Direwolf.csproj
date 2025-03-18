@@ -6,6 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PlatformTarget>x64</PlatformTarget>
+	<ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+	<CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -34,6 +36,8 @@
 
   <ItemGroup>
     <PackageReference Include="Autodesk.Revit.SDK" Version="2025.0.2.419" />
+    <PackageReference Include="Npgsql" Version="9.0.3">
+    </PackageReference>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
     <PackageReference Include="Revit.Async" Version="2.1.1" />
     <PackageReference Include="System.Xml.XDocument" Version="4.3.0" />

@@ -30,7 +30,6 @@ namespace Direwolf.Revit.UI.Commands
                 Direwolf dw = new(commandData.Application);
                 dw.QueueHowler(rh);
                 dw.HuntAsync("Model Health");
-                dw.SendAllToDB();
             }
             catch
             {

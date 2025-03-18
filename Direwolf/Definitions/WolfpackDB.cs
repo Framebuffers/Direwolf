@@ -1,11 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore.Update;
 using Npgsql;
+using NpgsqlTypes;
 using System.Diagnostics;
 using System.Security.Cryptography;
 
 namespace Direwolf.Definitions
 {
-    public readonly record struct DbConnectionString(string Host, string Username, string Password, string Database) { }
+    public readonly record struct DbConnectionString(string Host, int Port, string Username, string Password, string Database) { }
 
     public class WolfpackDB : Stack<Wolfpack>
     {
@@ -18,7 +19,6 @@ namespace Direwolf.Definitions
             _str = db;
             DatabaseConnectedEventHandler += WolfpackDB_DatabaseConnectedEventHandler;
 
-
         }
 
         private void WolfpackDB_DatabaseConnectedEventHandler(object? sender, EventArgs e)
@@ -28,28 +28,30 @@ namespace Direwolf.Definitions
 
         public async Task Send()
         {
-            Wolfpack wolfpack = Pop();
-            Debug.Print($"Pushing to DB: {wolfpack.GUID}");
             DatabaseConnectedEventHandler?.Invoke(this, new EventArgs());
-
             string sqlQuery =
-                $"INSERT INTO {TABLE_NAME} (documentName, fileOrigin, documentVersion, wasCompleted, timeTaken, createdAt, guid, resultCount, testName, results, testId) VALUES (@docName, @origin, @version, @completed, @time, @creation, @id, @resCount, @name, @result, @testNumber)";
+                """INSERT INTO "Wolfpack" ("documentName", "fileOrigin", "documentVersion", "wasCompleted", "timeTaken", "createdAt", "guid", "resultCount", "testName", "results", "testId") VALUES (@docName, @origin, @version, @completed, @time, @creation, @id, @resCount, @name, @result, @testNumber)""";
 
             try
             {
-                using NpgsqlConnection c = new(
-                $"Host={_str.Host};" +
-                $"Username={_str.Username};" +
-                $"Password={_str.Password};" +
-                $"Database={_str.Database}");
+                using NpgsqlConnection c = new($"Host={_str.Host};Port={_str.Port};Username={_str.Username};Password={_str.Password};Database={_str.Database}");
+                if (c is not null) Debug.Print("connection is not null");
                 DatabaseConnectedEventHandler?.Invoke(this, new EventArgs());
                 c.StateChange += C_StateChange;
                 c.Notice += C_Notice;
                 while (Count > 0)
                 {
-                    await c.OpenAsync();
+
+                    Wolfpack wolfpack = Pop();
+                    Console.WriteLine(c.ConnectionString);
+                    c.Open();
                     await using var cmd = new NpgsqlCommand(sqlQuery, c);
                     {
+                        var resultJson = cmd.CreateParameter();
+                        resultJson.ParameterName = "result";
+                        resultJson.NpgsqlDbType = NpgsqlDbType.Json;
+                        resultJson.Value = wolfpack.Results;
+
                         cmd.Parameters.AddWithValue("docName", wolfpack.DocumentName);
                         cmd.Parameters.AddWithValue("origin", wolfpack.FileOrigin);
                         cmd.Parameters.AddWithValue("version", wolfpack.DocumentVersion);
@@ -59,12 +61,13 @@ namespace Direwolf.Definitions
                         cmd.Parameters.AddWithValue("id", wolfpack.GUID);
                         cmd.Parameters.AddWithValue("resCount", wolfpack.ResultCount);
                         cmd.Parameters.AddWithValue("name", wolfpack.Howler.GetType().ToString());
-                        cmd.Parameters.AddWithValue("result", wolfpack.Results);
+                        cmd.Parameters.Add(resultJson);
                         cmd.Parameters.AddWithValue("testNumber", RandomNumberGenerator.GetInt32(1000000));
 
                         int rowsAffected = await cmd.ExecuteNonQueryAsync();
                         Debug.Print($"Executed query. Added {rowsAffected} rows");
                     }
+                    c.Dispose();
                 }
             }
             catch (Exception e)

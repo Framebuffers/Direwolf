@@ -1,17 +1,45 @@
-﻿using System;
+﻿using Direwolf.Definitions;
+using System;
+using System.Collections.Generic;
+using System.Net.Mail;
+using System.Security.Cryptography;
+using System.Threading.Tasks;
 
 namespace Forest.MockAttributesTest
 {
     public class Program
     {
+        private static readonly DbConnectionString _default = new("direwolf", "wolf", "awoo", "direwolf");
 
         //private const string db = @"postgresql://wolf:awoo@127.0.0.1:5432/direwolf?schema=public";
         public static void Main(string[] args)
         {
-            PostgresConnection p = new();
-            Console.WriteLine(p.GetType().FullName);
+            Stack<Prey> prey = [];
+            Prey p = new(new Dictionary<string, object>()
+            {
+                ["Test"] = "result"
+            });
+            prey.Push(p);
+
+            Howler h = new();
+            h.Den.Push(p);
+            
+            Wolfpack w = new(h, "Document", "Origin", Guid.NewGuid().ToString(), true, 3.1415)
+            {
+            };
+
+
+            WolfpackDB wp = new(_default);
+            wp.Push(w);
+            wp.Send();
+
+
         }
 
+        public async void Send(WolfpackDB d)
+        {
+            await d.Send();
+        }
 
 
         //// Mocks
@@ -72,5 +100,5 @@ namespace Forest.MockAttributesTest
         }
     }
 
-   
+
 }

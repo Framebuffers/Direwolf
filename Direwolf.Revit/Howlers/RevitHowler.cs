@@ -41,15 +41,19 @@ namespace Direwolf.Revit.Howlers
             _timeTaken.Start();
             try
             {
-
                 foreach (var wolf in Wolfpack)
                 {
                     wolf.Run();
                 }
-                HuntCompleted?.Invoke(this, new HuntCompletedEventArgs() { IsSuccessful = true});
-
                 _timeTaken.Stop();
-                return new Wolfpack(this, _doc?.Title ?? string.Empty, _doc?.PathName ?? string.Empty, _doc?.ProjectInformation.VersionGuid.ToString() ?? Guid.Empty.ToString(), true, _timeTaken.Elapsed.TotalSeconds);
+
+                string title = _doc?.Title ?? string.Empty;
+                string path = _doc?.PathName ?? string.Empty;
+                string version = _doc?.ProjectInformation.VersionGuid.ToString() ?? Guid.NewGuid().ToString();
+
+                Wolfpack w = new(this, title, path, version, true, _timeTaken.Elapsed.TotalSeconds);
+                HuntCompleted?.Invoke(this, new HuntCompletedEventArgs() { IsSuccessful = true});
+                return w;
 
             }
             catch
@@ -57,6 +61,7 @@ namespace Direwolf.Revit.Howlers
                 HuntCompleted?.Invoke(this, new HuntCompletedEventArgs() { IsSuccessful = false});
                 throw new ApplicationException();
             }
+
         }
 
         public override string ToString()

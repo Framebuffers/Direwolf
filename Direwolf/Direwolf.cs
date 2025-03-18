@@ -6,16 +6,18 @@ using Revit.Async;
 using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Npgsql;
 
 namespace Direwolf
 {
     public class Direwolf
     {
-        public event EventHandler DatabaseConnectionEventHandler;
+        public event EventHandler? DatabaseConnectionEventHandler;
+        public event EventHandler? AsyncHuntCompletedEventHandler;
         /// <summary>
         /// This is a proof of concept, not a production-ready solution. Please **CHANGE THIS** if you plan to deploy.
         /// </summary>
-        private static readonly DbConnectionString _default = new("direwolf", "wolf", "awoo", "direwolf");
+        private static readonly DbConnectionString _default = new("localhost", 5432, "wolf", "awoo", "direwolf");
 
         private readonly UIApplication? _app;
         private List<HowlId> PreviousHowls = [];
@@ -48,13 +50,20 @@ namespace Direwolf
             _app = app;
         }
 
+        private void Direwolf_AsyncHuntCompletedEventHandler(object? sender, EventArgs e)
+        {
+            SendAllToDB();
+        }
+
         public Direwolf(IHowler howler, IHowl instructions, IWolf wolf, UIApplication app)
         {
             howler.CreateWolf(wolf, instructions);
             Howlers.Enqueue(howler);
             howler.HuntCompleted += OnHuntCompleted;
             Queries.DatabaseConnectedEventHandler += Queries_DatabaseConnectedEventHandler;
+
             _app = app;
+
         }
 
 
@@ -104,7 +113,10 @@ namespace Direwolf
 
         [JsonExtensionData]
         private WolfpackDB Queries { get; set; } = new(_default);
-        public async void SendAllToDB() => await Queries.Send();
+        public async void SendAllToDB()
+        {
+            try { await Queries.Send(); } catch (Exception e) { Debug.Print(e.Message); }
+        }
 
         public void Hunt()
         {
@@ -149,14 +161,22 @@ namespace Direwolf
 
         public async void HuntAsync(string queryName = "query")
         {
+            AsyncHuntCompletedEventHandler += Direwolf_AsyncHuntCompletedEventHandler1;
+            Revit.Async.RevitTask.Initialize(_app);
             foreach (var howler in Howlers)
             {
                 await HuntTask(howler, queryName);
             }
         }
 
+        private void Direwolf_AsyncHuntCompletedEventHandler1(object? sender, EventArgs e)
+        {
+            SendAllToDB();
+        }
+
         public async void HuntAsync(IHowler howler, string queryName = "query")
         {
+            Revit.Async.RevitTask.Initialize(_app);
             await HuntTask(howler, queryName);
         }
 
@@ -175,10 +195,11 @@ namespace Direwolf
                         Name = howler.GetType().Name
                     };
                     PreviousHowls.Add(h);
-                    Debug.Print(Queries.Count.ToString());
                 });
+                AsyncHuntCompletedEventHandler?.Invoke(this, new EventArgs());
             }
             catch (Exception e) { Debug.WriteLine(e.Message); }
+
         }
 
         private readonly string Desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
