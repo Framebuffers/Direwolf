@@ -9,8 +9,9 @@ namespace Forest.MockAttributesTest
         public static void Main(string[] args)
         {
             PostgresConnection p = new();
-            p.Connect();
+            Console.WriteLine(p.GetType().FullName);
         }
+
 
 
         //// Mocks

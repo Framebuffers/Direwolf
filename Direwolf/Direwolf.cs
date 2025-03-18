@@ -11,6 +11,7 @@ namespace Direwolf
 {
     public class Direwolf
     {
+        public event EventHandler DatabaseConnectionEventHandler;
         /// <summary>
         /// This is a proof of concept, not a production-ready solution. Please **CHANGE THIS** if you plan to deploy.
         /// </summary>
@@ -19,22 +20,31 @@ namespace Direwolf
         private readonly UIApplication? _app;
         private List<HowlId> PreviousHowls = [];
 
-        public Direwolf(UIApplication app) 
+        public Direwolf(UIApplication app)
         {
-            _app = app;  
+            Queries.DatabaseConnectedEventHandler += Queries_DatabaseConnectedEventHandler;
+            _app = app;
         }
 
         public Direwolf(IHowler howler, UIApplication app)
         {
             Howlers.Enqueue(howler);
             howler.HuntCompleted += OnHuntCompleted;
+            Queries.DatabaseConnectedEventHandler += Queries_DatabaseConnectedEventHandler;
             _app = app;
         }
+
+        private void Queries_DatabaseConnectedEventHandler(object? sender, EventArgs e)
+        {
+            Debug.Print("Database connected!");
+        }
+
         public Direwolf(IHowler howler, IHowl instructions, UIApplication app)
         {
             howler.CreateWolf(new Wolf(), instructions);
             Howlers.Enqueue(howler);
             howler.HuntCompleted += OnHuntCompleted;
+            Queries.DatabaseConnectedEventHandler += Queries_DatabaseConnectedEventHandler;
             _app = app;
         }
 
@@ -43,6 +53,7 @@ namespace Direwolf
             howler.CreateWolf(wolf, instructions);
             Howlers.Enqueue(howler);
             howler.HuntCompleted += OnHuntCompleted;
+            Queries.DatabaseConnectedEventHandler += Queries_DatabaseConnectedEventHandler;
             _app = app;
         }
 
@@ -93,68 +104,23 @@ namespace Direwolf
 
         [JsonExtensionData]
         private WolfpackDB Queries { get; set; } = new(_default);
-        public async void Push(Wolfpack w) => await Queries.Add(w);
-        public async void SendAllToDB() => await Queries.Flush();
+        public async void SendAllToDB() => await Queries.Send();
 
-        //public string GetQueryInfo()
-        //{
-        //    try
-        //    {
-        //        var queries = new Dictionary<string, object>
-        //        {
-        //            ["count"] = Queries.Count
-        //        };
-
-        //        var queryInfo = new Dictionary<string, object>();
-        //        foreach (var query in Queries)
-        //        {
-        //            var queryData = new Dictionary<string, object>
-        //            {
-        //                ["name"] = query.Key,
-        //                ["wolfpack"] = new Dictionary<string, object>
-        //                {
-        //                    ["dateTime"] = query.Value.CreatedAt,
-        //                    ["id"] = query.Value.GUID,
-        //                    ["resultCount"] = query.Value.ResultCount
-        //                }
-        //            };
-
-        //            queryInfo["query"] = queryData;
-        //        }
-
-
-        //        var totals = new Dictionary<string, object>
-        //        {
-        //            ["queries"] = queries,
-        //            ["totalQueries"] = Queries.Count
-        //        };
-        //        return JsonSerializer.Serialize(new Prey(totals));
-        //    }
-        //    catch
-        //    {
-        //        return "";
-        //    }
-
-        //}
-
-        public void Hunt(string queryName = "query")
+        public void Hunt()
         {
             try
             {
-                if (Howlers is not null)
+                foreach (var howler in Howlers)
                 {
-                    foreach (var howler in Howlers)
+                    Hunt(howler, out _);
+                    var h = new HowlId()
                     {
-                        Hunt(howler, out _, queryName);
-                        var h = new HowlId()
-                        {
-                            HowlIdentifier = new Guid(),
-                            Name = howler.GetType().Name
-                        };
-                        PreviousHowls.Add(h);
-                    }
+                        HowlIdentifier = new Guid(),
+                        Name = howler.GetType().Name
+                    };
+                    PreviousHowls.Add(h);
+                    Debug.Print("Added to queue");
                 }
-
             }
             catch
             {
@@ -162,18 +128,18 @@ namespace Direwolf
             }
         }
 
-        public void Hunt(IHowler dispatch, out Wolfpack result, string queryName = "Query")
+        public void Hunt(IHowler dispatch, out Wolfpack result)
         {
             try
             {
                 result = dispatch.Howl();
-                Queries.Push(result);
                 var h = new HowlId()
                 {
                     HowlIdentifier = new Guid(),
                     Name = dispatch.GetType().Name
                 };
                 PreviousHowls.Add(h);
+                Queries.Push(result);
             }
             catch
             {
@@ -181,46 +147,38 @@ namespace Direwolf
             }
         }
 
-        public async void HuntAsync(string? path = null, string queryName = "query")
+        public async void HuntAsync(string queryName = "query")
         {
-            Revit.Async.RevitTask.Initialize(_app);
-            await RevitTask.RunAsync(() =>
+            foreach (var howler in Howlers)
             {
-                try
-                {
-                    foreach (var howler in Howlers)
-                    {
-                        var result = howler.Howl();
-                        Queries.Push(result);
-                        var h = new HowlId()
-                        {
-                            HowlIdentifier = new Guid(),
-                            Name = howler.GetType().Name
-                        };
-                        PreviousHowls.Add(h);
-                    }
-                }
-                catch
-                {
-                    throw new Exception();
-                }
-            });
+                await HuntTask(howler, queryName);
+            }
         }
 
         public async void HuntAsync(IHowler howler, string queryName = "query")
         {
-            Revit.Async.RevitTask.Initialize(_app);
-            await RevitTask.RunAsync(() =>
+            await HuntTask(howler, queryName);
+        }
+
+        private async Task HuntTask(IHowler howler, string queryName = "query")
+        {
+            try
             {
-                var results = howler.Howl();
-                Queries.Push(results);
-                var h = new HowlId()
+                Revit.Async.RevitTask.Initialize(_app);
+                await RevitTask.RunAsync(() =>
                 {
-                    HowlIdentifier = new Guid(),
-                    Name = howler.GetType().Name
-                };
-                PreviousHowls.Add(h);
-            });
+                    var results = howler.Howl();
+                    Queries.Push(results);
+                    var h = new HowlId()
+                    {
+                        HowlIdentifier = new Guid(),
+                        Name = howler.GetType().Name
+                    };
+                    PreviousHowls.Add(h);
+                    Debug.Print(Queries.Count.ToString());
+                });
+            }
+            catch (Exception e) { Debug.WriteLine(e.Message); }
         }
 
         private readonly string Desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);

@@ -1,4 +1,6 @@
 ﻿using Autodesk.Revit.UI;
+using Direwolf.Revit.UI.Commands;
+using System.Reflection;
 
 namespace Direwolf.Revit.UI
 {
@@ -6,7 +8,7 @@ namespace Direwolf.Revit.UI
     {
         public static PushButton? AddGetModelHealthButton(RibbonPanel? rp)
         {
-            PushButtonData b = new("modelHealth", "Get Model Health", References.DirewolfRevitLocation, "Direwolf.Revit.UI.Commands.GetModelHealth");
+            PushButtonData b = new("modelHealth", "Get Model Health", References.AssemblyLocation, "Direwolf.Revit.UI.Commands.GetModelHealth");
             return rp?.AddItem(b) as PushButton;
         }
 
