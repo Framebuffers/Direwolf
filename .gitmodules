@@ -4,3 +4,6 @@
 [submodule "direwolf-dashboard"]
 	path = direwolf-web/direwolf-dashboard
 	url = https://github.com/Framebuffers/direwolf-dashboard
+[submodule "direwolf-db"]
+	path = direwolf-web/direwolf-db
+	url = https://github.com/Framebuffers/direwolf-db
