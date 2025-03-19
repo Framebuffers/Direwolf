@@ -8,6 +8,8 @@ using Direwolf.Revit.Utilities;
 using System.Diagnostics;
 using System.Net;
 using System.Linq;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using System.Security.Cryptography;
 
 namespace Direwolf.Revit.ElementFilters
 {
@@ -230,9 +232,7 @@ namespace Direwolf.Revit.ElementFilters
                            .WhereElementIsNotElementType()
                            .OfClass(typeof(Family))
                            .Cast<Family>()
-                           .Where(family => new FilteredElementCollector(doc)
-                                            .OfCategory(family.Category.BuiltInCategory)
-                                            .Any())
+                           .Where(x => !x.GetFamilySymbolIds().Any())
                            .AsEnumerable();
         }
 
@@ -263,51 +263,42 @@ namespace Direwolf.Revit.ElementFilters
                    select viewElement;
         }
 
-        public static IEnumerable<Element> TotalSizeOfFamiliesByMB(this Document doc)
+        public static SortedDictionary<long, string> GetFamilyFileNamesSortedByFileSize(this Document doc)
         {
-            var desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            Directory.CreateDirectory(Path.Combine(desktop, "rvt"));
-
-            string folderPath = Path.GetFullPath(Path.Combine(desktop, "rvt"));
-            double totalSizeInMB = 0;
-
-            SortedDictionary<long, string> sorted = [];
-
-            if (Directory.Exists(folderPath))
+            try
             {
-                using FilteredElementCollector familyCollector = new FilteredElementCollector(doc)
-                    .OfClass(typeof(Family));
+                string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                string folderName = $"dw_test_{DateTime.UtcNow.ToFileTimeUtc()}";
+                string fullPath = Path.Combine(appdata, folderName);
 
-                foreach (Family family in familyCollector.Cast<Family>())
+                Directory.CreateDirectory(fullPath);
+                SortedDictionary<long, string> sorted = [];
+
+                HashSet<Family> families = [.. new FilteredElementCollector(doc)
+                                   .WhereElementIsNotElementType()
+                                   .OfClass(typeof(Family))
+                                   .Cast<Family>()
+                                   .Where(x => x.IsEditable && x.IsValidObject && x is not null)
+                                   .AsEnumerable()];
+
+                foreach (Family f in families)
                 {
-                    string familyPath = Path.Combine(folderPath, $"{family.Name}.rfa");
-                    if (family.IsEditable)
+                    var rfa = Path.Combine(fullPath, $"{f.Name}.rfa");
+                    try
                     {
-                        if (!File.Exists(familyPath))
-                        {
-                            doc.EditFamily(family).SaveAs(familyPath);
-                            long length = new FileInfo(familyPath).Length / 1024;
-                            if (!sorted.TryGetValue(length, out string familyName))
-                                sorted.Add(length, familyName);
-                        }
-                        else
-                        {
-                            totalSizeInMB = new DirectoryInfo(folderPath).EnumerateFiles()
-                                .OrderByDescending(x => x.Length)
-                                .FirstOrDefault()
-                                .Length / 1024;
-                        }
+                        doc.EditFamily(f).SaveAs(rfa);
+                        sorted.TryAdd(new FileInfo(rfa).Length, f.Name);
+                    }
+                    catch
+                    {
+                        continue;
                     }
                 }
+                return sorted;
+            }
+            catch (Exception e) { Debug.Print(e.Message); }
 
-                if (sorted.Count != 0) totalSizeInMB = sorted.FirstOrDefault().Key;
-                return $"Total Size of All Families: {totalSizeInMB} KB";
-            }
-            else
-            {
-                return "The specified folder does not exist.";
-            }
+            throw new Exception($"The routine could not be initialized. Reason: Could not get into the try/catch clause.");
         }
-
     }
 }
