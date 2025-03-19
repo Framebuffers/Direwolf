@@ -26,7 +26,7 @@ namespace Direwolf.Revit
             {
                 RevitTask.Initialize(commandData.Application);
                 RevitHowler rh = new();
-                rh.CreateWolf(new Wolf(), new ModelHealthReaper(doc));
+                rh.CreateWolf(new Wolf(), new GetModelSnapshot(doc));
                 
                 Direwolf dw = new(commandData.Application);
                 dw.QueueHowler(rh);

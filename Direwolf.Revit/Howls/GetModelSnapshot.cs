@@ -3,46 +3,38 @@ using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
 using Direwolf.Definitions;
-using Direwolf.Revit.Howls;
 using Direwolf.Revit.Definitions;
 
-namespace Direwolf.Revit.Benchmarking
+namespace Direwolf.Revit.Howls
 {
-    public partial record class ModelHealthReaper : RevitHowl
+    public record class GetModelSnapshot : RevitHowl
     {
-        public ModelHealthReaper(Document doc)
-        {
-            SetRevitDocument(doc);
-        }
+        // These are all categories for which information has to be extracted.
+        private List<View> viewsInsideDocument = [];
+        private List<View> notInSheets = [];
+        private List<Element> annotativeElements = [];
+        private List<(ExternalFileReferenceType, ExternalFileReference)> externalRefs = [];
+        private List<Group> modelGroups = [];
+        private List<Group> detailGroups = [];
+        private List<DesignOption> designOptions = [];
+        private List<Level> levels = [];
+        private List<Grid> grids = [];
+        private List<FailureMessage> warns = [];
+        private List<Room> unenclosedRoom = [];
+        private List<Viewport> viewports = [];
+        private List<Duct> unconnectedDucts = [];
+        private List<Pipe> unconnectedPipes = [];
+        private List<Connector> unconnectedElectrical = [];
+        private List<GraphicsStyle> nonNativeStyles = [];
+        private List<Element> isFlipped = [];
+        private Dictionary<string, int> worksetElementCount = [];
+        private Stack<ElementInformation> individualElementInfo = [];
 
         private Prey ProcessInfo()
         {
             var doc = GetRevitDocument();
-
-            // Get a very generic collector
-            ICollection<Element> collector = [.. new FilteredElementCollector(doc).WhereElementIsNotElementType()];
-
-            // These are all categories for which information has to be extracted.
-            List<View> viewsInsideDocument = [];
-            List<View> notInSheets = [];
-            List<Element> annotativeElements = [];
-            List<(ExternalFileReferenceType, ExternalFileReference)> externalRefs = [];
-            List<Group> modelGroups = [];
-            List<Group> detailGroups = [];
-            List<DesignOption> designOptions = [];
-            List<Level> levels = [];
-            List<Grid> grids = [];
-            List<FailureMessage> warns = doc.GetWarnings().ToList();
-            List<Room> unenclosedRoom = [];
-            List<Viewport> viewports = [];
-            List<Duct> unconnectedDucts = [];
-            List<Pipe> unconnectedPipes = [];
-            List<Connector> unconnectedElectrical = [];
-            List<GraphicsStyle> nonNativeStyles = [];
-            List<Element> isFlipped = [];
-            Dictionary<string, int> worksetElementCount = [];
-
-            Stack<ElementInformation> individualElementInfo = [];
+            warns.AddRange(GetRevitDocument().GetWarnings());
+            ICollection<Element> collector = [.. new FilteredElementCollector(GetRevitDocument()).WhereElementIsNotElementType()];
 
             foreach (Element e in collector)
             {
@@ -127,9 +119,9 @@ namespace Direwolf.Revit.Benchmarking
                     {
                         string worksetName = worksetParam.AsValueString();
 
-                        if (worksetElementCount.ContainsKey(worksetName))
+                        if (worksetElementCount.TryGetValue(worksetName, out int value))
                         {
-                            worksetElementCount[worksetName]++;
+                            worksetElementCount[worksetName] = ++value;
                         }
                         else
                         {
@@ -141,7 +133,7 @@ namespace Direwolf.Revit.Benchmarking
 
                     switch (e)
                     {
-                        case (View):
+                        case View:
                             View? v = e as View;
 
                             if (v is not null && !v.IsTemplate)
@@ -150,12 +142,12 @@ namespace Direwolf.Revit.Benchmarking
                             }
                             builtInCategory = e?.Category?.BuiltInCategory.ToString();
                             break;
-                        case (Viewport):
+                        case Viewport:
                             Viewport? vp = e as Viewport;
                             if (vp is not null) viewports.Add(vp);
                             builtInCategory = e?.Category?.BuiltInCategory.ToString();
                             break;
-                        case (Group):
+                        case Group:
                             Group? g = e as Group;
                             if (g is not null)
                             {
@@ -170,22 +162,22 @@ namespace Direwolf.Revit.Benchmarking
                             }
                             builtInCategory = e?.Category?.BuiltInCategory.ToString();
                             break;
-                        case (DesignOption):
+                        case DesignOption:
                             DesignOption? option = e as DesignOption;
                             if (option is not null) designOptions.Add(option);
                             builtInCategory = e?.Category?.BuiltInCategory.ToString();
                             break;
-                        case (Level):
+                        case Level:
                             Level? l = e as Level;
                             if (l is not null) levels.Add(l);
                             builtInCategory = e?.Category?.BuiltInCategory.ToString();
                             break;
-                        case (Grid):
+                        case Grid:
                             Grid? gr = e as Grid;
                             if (gr is not null) grids.Add(gr);
                             builtInCategory = e?.Category?.BuiltInCategory.ToString();
                             break;
-                        case (GraphicsStyle):
+                        case GraphicsStyle:
                             GraphicsStyle? graphicsStyle = e as GraphicsStyle;
                             if (graphicsStyle is not null)
                             {
@@ -198,7 +190,7 @@ namespace Direwolf.Revit.Benchmarking
                                 }
                             }
                             break;
-                        case (FamilyInstance):
+                        case FamilyInstance:
                             if (fm is not null)
                             {
                                 if (fm.Mirrored) isFlipped.Add(e);
@@ -208,7 +200,7 @@ namespace Direwolf.Revit.Benchmarking
                         default:
                             switch (e?.Category?.BuiltInCategory)
                             {
-                                case (BuiltInCategory.OST_Rooms):
+                                case BuiltInCategory.OST_Rooms:
                                     Room? room = e as Room;
                                     if (room is not null)
                                     {
@@ -222,7 +214,7 @@ namespace Direwolf.Revit.Benchmarking
                                     builtInCategory = e?.Category?.BuiltInCategory.ToString();
 
                                     break;
-                                case (BuiltInCategory.OST_DuctCurves):
+                                case BuiltInCategory.OST_DuctCurves:
                                     if (e is Duct duct)
                                     {
                                         bool isUnconnected = false;
@@ -244,7 +236,7 @@ namespace Direwolf.Revit.Benchmarking
                                     }
                                     builtInCategory = e?.Category?.BuiltInCategory.ToString();
                                     break;
-                                case (BuiltInCategory.OST_PipeCurves):
+                                case BuiltInCategory.OST_PipeCurves:
                                     if (e is Pipe pipe)
                                     {
                                         bool isUnconnected = false;
@@ -266,7 +258,7 @@ namespace Direwolf.Revit.Benchmarking
                                     }
                                     builtInCategory = e?.Category?.BuiltInCategory.ToString();
                                     break;
-                                case (BuiltInCategory.OST_ElectricalFixtures):
+                                case BuiltInCategory.OST_ElectricalFixtures:
                                     MEPModel mepModel = ((FamilyInstance)e).MEPModel;
                                     if (mepModel != null)
                                     {
@@ -293,20 +285,20 @@ namespace Direwolf.Revit.Benchmarking
 
                     switch (e?.Category?.CategoryType)
                     {
-                        case (CategoryType.Model):
+                        case CategoryType.Model:
                             isAnnotative = false;
                             isModel = true;
                             builtInCategory = CategoryType.Model.ToString();
                             break;
-                        case (CategoryType.Annotation):
+                        case CategoryType.Annotation:
                             isAnnotative = true;
                             isModel = false;
                             builtInCategory = CategoryType.Annotation.ToString();
                             annotativeElements.Add(e);
                             break;
-                        case (CategoryType.Invalid):
-                        case (CategoryType.Internal):
-                        case (CategoryType.AnalyticalModel):
+                        case CategoryType.Invalid:
+                        case CategoryType.Internal:
+                        case CategoryType.AnalyticalModel:
                         default:
                             break;
                     }
@@ -357,7 +349,8 @@ namespace Direwolf.Revit.Benchmarking
                 Element ext = doc.GetElement(reference);
                 externalRefs.Add((ext.GetExternalFileReference().ExternalFileReferenceType, ext.GetExternalFileReference()));
             }
-            var dataCounts = new Dictionary<string, object>
+
+            Dictionary<string, object> results = new()
             {
                 { "viewsInsideDocument", viewsInsideDocument.Count },
                 { "notInSheets", notInSheets.Count },
@@ -378,22 +371,13 @@ namespace Direwolf.Revit.Benchmarking
                 { "isFlipped", isFlipped.Count },
                 { "worksetElementCount", worksetElementCount.Count }
             };
-
-
-            Dictionary<string, object> results = new()
-            {
-                ["dataCount"] = dataCounts
-            };
             return new Prey(results);
         }
 
         public override bool Execute()
         {
-            //Callback?.Callback?.Den.
             SendCatchToCallback(ProcessInfo());
             return true;
         }
-
-
     }
 }

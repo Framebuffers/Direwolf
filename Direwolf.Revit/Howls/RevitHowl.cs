@@ -12,13 +12,7 @@ namespace Direwolf.Revit.Howls
 
         public void SendCatchToCallback(Prey c)
         {
-            var d = new Dictionary<string, object>()
-            {
-                ["CreatedAt"] = DateTime.UtcNow,
-                ["GUID"] = Guid.NewGuid(),
-                [GetType().Name] = c
-            };
-            Callback?.Catches.Push(new Prey(d));
+            Callback?.Catches.Push(c);
         }
 
         public virtual bool Execute()

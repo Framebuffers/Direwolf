@@ -7,6 +7,7 @@ using Direwolf.Definitions;
 using Direwolf.Revit.Howlers;
 using Revit.Async;
 using Direwolf.Revit.Benchmarking;
+using Direwolf.Revit.Howls;
 
 namespace Direwolf.Revit.UI.Commands
 {
@@ -26,7 +27,6 @@ namespace Direwolf.Revit.UI.Commands
             {
                 RevitTask.Initialize(commandData.Application);
                 RevitHowler rh = new();
-                rh.CreateWolf(new Wolf(), new ModelHealthReaper(doc));
                 Direwolf dw = new(commandData.Application);
                 dw.QueueHowler(rh);
                 dw.HuntAsync("Model Health");

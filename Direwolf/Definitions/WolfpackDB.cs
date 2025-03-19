@@ -62,7 +62,7 @@ namespace Direwolf.Definitions
                         cmd.Parameters.AddWithValue("resCount", wolfpack.ResultCount);
                         cmd.Parameters.AddWithValue("name", wolfpack.TestName);
                         cmd.Parameters.Add(resultJson);
-                        cmd.Parameters.AddWithValue("testNumber", RandomNumberGenerator.GetInt32(1000000));
+                        cmd.Parameters.AddWithValue("testNumber", 0);
 
                         int rowsAffected = await cmd.ExecuteNonQueryAsync();
                         Debug.Print($"Executed query. Added {rowsAffected} rows");
