@@ -1,6 +1,5 @@
 ﻿using Direwolf.Definitions;
 using Direwolf.EventHandlers;
-using System.Reflection.Metadata;
 
 namespace Direwolf.Contracts
 {

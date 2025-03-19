@@ -363,7 +363,7 @@
 //            List<ElementInformation> views = [];
 //            views.AddRange(from v in viewsInsideDocument
 //                           let e = v as Element
-//                           select Helpers.ExtractElementInfo(e, doc));
+//                           select DirewolfExtensions.GetElementInformation(e, doc));
 
 //            List<ElementInformation> sheets = [];
 
@@ -371,7 +371,7 @@
 
 //            Dictionary<string, object> results = new()
 //            {
-//                { "viewsInsideDocument", viewsInsideDocument.SelectMany(x => Helpers.ExtractElementInfo(x, GetRevitDocument()))},
+//                { "viewsInsideDocument", viewsInsideDocument.SelectMany(x => DirewolfExtensions.GetElementInformation(x, GetRevitDocument()))},
 //                { "notInSheets", notInSheets.Count },
 //                { "annotativeElements", annotativeElements.Count },
 //                { "externalRefs", externalRefs.Count },

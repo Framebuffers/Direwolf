@@ -1,9 +1,6 @@
 ﻿using Direwolf.Definitions;
 using System;
 using System.Collections.Generic;
-using System.Net.Mail;
-using System.Security.Cryptography;
-using System.Threading.Tasks;
 
 namespace Forest.MockAttributesTest
 {

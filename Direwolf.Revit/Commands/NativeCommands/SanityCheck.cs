@@ -1,7 +1,7 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using static Direwolf.Revit.Utilities.Helpers;
+using static Direwolf.Revit.Utilities.DirewolfExtensions;
 
 namespace Direwolf.Revit.Commands.NativeCommands;
 
@@ -43,7 +43,7 @@ public class SanityCheck : IExternalCommand
 
         try
         {
-            GenerateNewWindow("Command succeded!", test(RevitAppDoc.GetDocument(commandData)));
+            GenerateNewWindow("Command succeded!", test(GetRevitApplicationInstances.GetDocument(commandData)));
             return Result.Succeeded;
         }
         catch

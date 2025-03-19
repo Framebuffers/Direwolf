@@ -3,7 +3,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using System.Diagnostics;
 using System.Transactions;
-using static Direwolf.Revit.Utilities.Helpers;
+using static Direwolf.Revit.Utilities.DirewolfExtensions;
 
 namespace Direwolf.Revit.Commands.NativeCommands;
 
@@ -17,7 +17,7 @@ public class GetElementIdByFamily : IExternalCommand
         benchmarkTimer.Start();
         try
         {
-            var doc = RevitAppDoc.GetDocument(commandData);
+            var doc = GetRevitApplicationInstances.GetDocument(commandData);
             Common.WriteToFile($"{GetType().Name}_Native.json", RunBenchmark(doc));
             benchmarkTimer.Stop();
             TimeTaken += benchmarkTimer.Elapsed.TotalSeconds;

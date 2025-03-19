@@ -1,6 +1,4 @@
 ﻿using Autodesk.Revit.UI;
-using Direwolf.Revit.UI.Commands;
-using System.Reflection;
 
 namespace Direwolf.Revit.UI
 {
@@ -21,7 +19,7 @@ namespace Direwolf.Revit.UI
 
         //public static PushButton? AddGetAnnotativeElementsButton(RibbonPanel? rp)
         //{
-        // PushButtonData b = new("modelHealth", "Get Annotative Elements", References.DirewolfRevitLocation, "Direwolf.Revit.Benchmarking.CheckHelpers");
+        // PushButtonData b = new("modelHealth", "Get Annotative Elements", References.DirewolfRevitLocation, "Direwolf.Revit.Benchmarking.DocumentExtensions");
     
         //}
 

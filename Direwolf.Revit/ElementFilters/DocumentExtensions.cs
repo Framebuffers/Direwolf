@@ -2,21 +2,20 @@
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
+using Direwolf.Definitions;
 using System.Diagnostics;
 
-namespace Direwolf.Revit.Benchmarking
+namespace Direwolf.Revit.ElementFilters
 {
-    internal static class CheckHelpers
+    public static class DocumentExtensions
     {
-
-        public static string GetAnnotativeElements(Document doc)
+        public static Stack<Prey> GetAnnotativeElements(this Document doc)
         {
             using FilteredElementCollector collector = new(doc);
             ICollection<Element> annotativeElements = collector
                 .WhereElementIsNotElementType()
                 .Where(e => e.Category != null && e.Category.CategoryType == CategoryType.Annotation)
                 .ToList();
-
 
             var results = new List<string>();
             foreach (Element element in annotativeElements)
@@ -29,7 +28,7 @@ namespace Direwolf.Revit.Benchmarking
                 : "None found";
         }
 
-        public static string GetDesignOptions(Document doc)
+        public static Stack<Prey> GetDesignOptions(this Document doc)
         {
             using FilteredElementCollector collector = new(doc);
             ICollection<DesignOption> elements = collector
@@ -43,7 +42,7 @@ namespace Direwolf.Revit.Benchmarking
             return string.Join("\n", designOptionNames);
         }
 
-        public static string GetDetailGroups(Document doc)
+        public static Stack<Prey> GetDetailGroups(this Document doc)
         {
 
             using FilteredElementCollector collector = new(doc);
@@ -63,7 +62,7 @@ namespace Direwolf.Revit.Benchmarking
         }
 
         // too many false positives because of double precision.
-        public static string GetDuplicateElements(Document doc)
+        public static Stack<Prey> GetDuplicateElements(this Document doc)
         {
             using FilteredElementCollector collector = new(doc);
             ICollection<Element> elements = collector
@@ -119,7 +118,7 @@ namespace Direwolf.Revit.Benchmarking
 
         //public static string GetDWGFiles(Document doc)
         //{
-            
+
         //    //using FilteredElementCollector collector = new(doc);
         //    //ICollection<Element> linkedDWGFiles = collector
         //    //    .OfClass(typeof(ImportInstance))
@@ -145,7 +144,7 @@ namespace Direwolf.Revit.Benchmarking
         //    //return string.Join("\n", results.Select(x => $"{x.Key}: {x.Value}"));
         //}
 
-        public static string GetElementsByWorkset(Document doc)
+        public static Stack<Prey> GetElementsByWorkset(this Document doc)
         {
 
             using FilteredElementCollector collector = new FilteredElementCollector(doc)
@@ -178,7 +177,7 @@ namespace Direwolf.Revit.Benchmarking
 
         }
 
-        public static string GetErrorsAndWarnings(Document doc)
+        public static Stack<Prey> GetErrorsAndWarnings(this Document doc)
         {
             Dictionary<string, string> failures = [];
             foreach (FailureMessage failureMessage in doc.GetWarnings())
@@ -189,14 +188,14 @@ namespace Direwolf.Revit.Benchmarking
             return string.Join("\n", failures.Select(x => $"{x.Key}: {x.Value}"));
         }
 
-        public static int GetFamilyCount(Document doc)
+        public static int GetFamilyCount(this Document doc)
         {
             return new FilteredElementCollector(doc)
                 .OfClass(typeof(Family))
                 .GetElementCount();
         }
 
-        public static string GetFamilyCountBySize(Document doc)
+        public static Stack<Prey> GetFamilyCountBySize(this Document doc)
         {
             using FilteredElementCollector familyCollector = new(doc);
 
@@ -224,14 +223,14 @@ namespace Direwolf.Revit.Benchmarking
             return string.Join("\n", sortedFamilies.Select(pair => $"{pair.Key}: {pair.Value} instances"));
         }
 
-        public static int GetGridLineCount(Document doc)
+        public static Stack<Prey> GetGridLineCount(this Document doc)
         {
             return new FilteredElementCollector(doc)
                 .OfClass(typeof(Grid))
                 .GetElementCount();
         }
 
-        public static string GetImportedImages(Document doc)
+        public static Stack<Prey> GetImportedImages(this Document doc)
         {
             ICollection<Element> importedImages = new FilteredElementCollector(doc)
                 .OfClass(typeof(ImportInstance))
@@ -245,7 +244,7 @@ namespace Direwolf.Revit.Benchmarking
                 : "None found";
         }
 
-        public static string GetInPlaceFamilies(Document doc)
+        public static Stack<Prey> GetInPlaceFamilies(this Document doc)
         {
             using FilteredElementCollector familyInstanceCollector = new FilteredElementCollector(doc)
                 .OfClass(typeof(FamilyInstance));
@@ -270,7 +269,7 @@ namespace Direwolf.Revit.Benchmarking
                 : "None found";
         }
 
-        public static string GetFamliesWithMostTypes(Document doc)
+        public static Stack<Prey> GetFamliesWithMostTypes(this Document doc)
         {
             using FilteredElementCollector familyCollector = new FilteredElementCollector(doc)
                 .OfClass(typeof(Family));
@@ -287,14 +286,14 @@ namespace Direwolf.Revit.Benchmarking
                 : "None found";
         }
 
-        public static int GetLevelCount(Document doc)
+        public static Stack<Prey> GetLevelCount(this Document doc)
         {
             return new FilteredElementCollector(doc)
                 .OfClass(typeof(Level))
                 .GetElementCount();
         }
 
-        public static string GetMirroredObjects(Document doc)
+        public static string GetMirroredObjects(this Document doc)
         {
             List<FamilyInstance> familyInstances = new FilteredElementCollector(doc)
                 .OfClass(typeof(FamilyInstance))
@@ -311,7 +310,7 @@ namespace Direwolf.Revit.Benchmarking
                 : "None found";
         }
 
-        public static string GetModelGroups(Document doc)
+        public static Stack<Prey> GetModelGroups(this Document doc)
         {
 
             ICollection<Element> modelGroups = new FilteredElementCollector(doc)
@@ -328,7 +327,7 @@ namespace Direwolf.Revit.Benchmarking
             return string.Join("\n", results.Select(x => $"{x.Key}: {x.Value}"));
         }
 
-        public static string GetNonNativeObjectStyles(Document doc)
+        public static Stack<Prey> GetNonNativeObjectStyles(this Document doc)
         {
             using FilteredElementCollector collector = new FilteredElementCollector(doc)
                 .OfClass(typeof(GraphicsStyle));
@@ -352,7 +351,7 @@ namespace Direwolf.Revit.Benchmarking
                 : "No non-native object styles found.";
         }
 
-        public static string GetSKPFiles(Document doc)
+        public static Stack<Prey> GetSKPFiles(this Document doc)
         {
             using FilteredElementCollector filteredElementCollector = new(doc);
             ICollection<Element> importedElements = filteredElementCollector
@@ -371,7 +370,7 @@ namespace Direwolf.Revit.Benchmarking
             return string.Join("\n", results.Select(x => $"{x.Key}: {x.Value}"));
         }
 
-        public static string GetUnconnectedDucts(Document doc)
+        public static Stack<Prey> GetUnconnectedDucts(this Document doc)
         {
             using FilteredElementCollector ductCollector = new FilteredElementCollector(doc)
                 .OfCategory(BuiltInCategory.OST_DuctCurves)
@@ -407,7 +406,7 @@ namespace Direwolf.Revit.Benchmarking
                 : "No unconnected ducts found.";
         }
 
-        public static string GetUnconnectedElectrical(Document doc)
+        public static Stack<Prey> GetUnconnectedElectrical(this Document doc)
         {
             using FilteredElementCollector electricalCollector = new FilteredElementCollector(doc)
                 .OfCategory(BuiltInCategory.OST_ElectricalFixtures)
@@ -437,7 +436,7 @@ namespace Direwolf.Revit.Benchmarking
 
         }
 
-        public static string GetUnconnectedPipes(Document doc)
+        public static Stack<Prey> GetUnconnectedPipes(this Document doc)
         {
             using FilteredElementCollector pipeCollector = new FilteredElementCollector(doc)
                 .OfCategory(BuiltInCategory.OST_PipeCurves)
@@ -473,7 +472,7 @@ namespace Direwolf.Revit.Benchmarking
                 : "None found";
         }
 
-        public static string GetUnenclosedRooms(Document doc)
+        public static Stack<Prey> GetUnenclosedRooms(this Document doc)
         {
             using FilteredElementCollector roomCollector = new FilteredElementCollector(doc)
                 .OfCategory(BuiltInCategory.OST_Rooms)
@@ -500,7 +499,7 @@ namespace Direwolf.Revit.Benchmarking
 
         }
 
-        public static string GetUnusedFamilies(Document doc)
+        public static Stack<Prey> GetUnusedFamilies(this Document doc)
         {
             using FilteredElementCollector familyCollector = new FilteredElementCollector(doc)
                 .OfClass(typeof(Family));
@@ -531,7 +530,7 @@ namespace Direwolf.Revit.Benchmarking
                 : "No unused families found.";
         }
 
-        public static string GetViews(Document doc)
+        public static Stack<Prey> GetViews(this Document doc)
         {
             using FilteredElementCollector viewCollector = new FilteredElementCollector(doc)
                 .OfClass(typeof(View))
@@ -552,7 +551,7 @@ namespace Direwolf.Revit.Benchmarking
                 : "None found";
         }
 
-        public static string GetViewsNotInSheets(Document doc)
+        public static Stack<Prey> GetViewsNotInSheets(this Document doc)
         {
             using FilteredElementCollector viewCollector = new FilteredElementCollector(doc)
                 .OfClass(typeof(View))
@@ -579,7 +578,7 @@ namespace Direwolf.Revit.Benchmarking
 
         }
 
-        public static string LargestFamilies(Document doc)
+        public static Stack<Prey> LargestFamilies(this Document doc)
         {
             using FilteredElementCollector familyCollector = new FilteredElementCollector(doc)
                 .OfClass(typeof(Family));
@@ -615,7 +614,7 @@ namespace Direwolf.Revit.Benchmarking
                 : "No families found.";
         }
 
-        public static string TotalSizeOfFamiliesByMB(Document doc)
+        public static Stack<Prey> TotalSizeOfFamiliesByMB(this Document doc)
         {
             var desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             Directory.CreateDirectory(Path.Combine(desktop, "rvt"));
@@ -638,7 +637,7 @@ namespace Direwolf.Revit.Benchmarking
                         if (!File.Exists(familyPath))
                         {
                             doc.EditFamily(family).SaveAs(familyPath);
-                            long length = new FileInfo(familyPath).Length / (1024);
+                            long length = new FileInfo(familyPath).Length / 1024;
                             if (!sorted.TryGetValue(length, out string familyName))
                                 sorted.Add(length, familyName);
                         }
@@ -647,14 +646,12 @@ namespace Direwolf.Revit.Benchmarking
                             totalSizeInMB = new DirectoryInfo(folderPath).EnumerateFiles()
                                 .OrderByDescending(x => x.Length)
                                 .FirstOrDefault()
-                                .Length / (1024);
+                                .Length / 1024;
                         }
                     }
                 }
 
                 if (sorted.Count != 0) totalSizeInMB = sorted.FirstOrDefault().Key;
-
-
                 return $"Total Size of All Families: {totalSizeInMB} KB";
             }
             else

@@ -1,8 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Update;
-using Npgsql;
+﻿using Npgsql;
 using NpgsqlTypes;
 using System.Diagnostics;
-using System.Security.Cryptography;
 
 namespace Direwolf.Definitions
 {

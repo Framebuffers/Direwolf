@@ -3,24 +3,60 @@ using Autodesk.Revit.DB;
 using Direwolf.Revit.Definitions;
 
 namespace Direwolf.Revit.Utilities;
-public static class Helpers
+public static class DirewolfExtensions
 {
-    public static void GenerateNewWindow(string title, string content)
+    public static ICollection<Element>? GetAllValidElements(this Document doc)
     {
-        using TaskDialog t = new(title)
+        return new FilteredElementCollector(doc)
+                .WhereElementIsNotElementType()
+                .WhereElementIsViewIndependent()
+                .ToElements();
+    }
+
+    public static Dictionary<string, object> ExtractParameterMap(this Element e)
+    {
+        Dictionary<string, object> results = [];
+        ParameterSet ps = e.Parameters;
+        foreach (Autodesk.Revit.DB.Parameter p in ps)
         {
-            MainContent = content
-        };
-        t.Show();
+            string GetValue()
+            {
+                return p.StorageType switch
+                {
+                    StorageType.None => "None",
+                    StorageType.Integer => p.AsInteger().ToString(),
+                    StorageType.Double => p.AsDouble().ToString(),
+                    StorageType.String => p.AsString(),
+                    StorageType.ElementId => p.AsElementId().ToString(),
+                    _ => "None",
+                };
+            }
+
+            Dictionary<string, string> data = new()
+            {
+                ["GUID"] = p.GUID.ToString(),
+                ["Type"] = p.GetTypeId().TypeId,
+                ["HasValue"] = p.HasValue.ToString(),
+                ["Value"] = GetValue()
+
+            };
+            results.Add(p.Definition.Name, results);
+        }
+        return results;
     }
 
-    public readonly record struct RevitAppDoc(ExternalCommandData ExternalCommandData)
+    public static Dictionary<string, object> ExtractElementData(this Element element) => new(new Dictionary<string, object>
     {
-        public static UIApplication GetApplication(ExternalCommandData cmd) => cmd.Application;
-        public static Document GetDocument(ExternalCommandData cmd) => cmd.Application.ActiveUIDocument.Document;
-    }
+        [element.Id.ToString()] = new Dictionary<string, object>()
+        {
+            ["UniqueId"] = element.UniqueId ?? 0.ToString(),
+            ["VersionGuid"] = element.VersionGuid.ToString(),
+            ["IsPinned"] = element.Pinned.ToString(),
+            ["Data"] = ExtractParameterMap(element)
+        }
+    });
 
-    public static ElementInformation ExtractElementInfo(Element e, Document d)
+    public static ElementInformation GetElementInformation(this Element e, Document d)
     {
         if (e is not null && e.IsValidObject && e.Category is not null && e.Category.CategoryType is not CategoryType.Invalid || e?.Category?.CategoryType is not CategoryType.Internal)
         {
@@ -141,7 +177,7 @@ public static class Helpers
         }
         else
         {
-            throw new ArgumentNullException();
+            throw new ArgumentNullException($"Could not extract information. Document {d.Title} is invalid, or does not have information about element {e.Name}::{e.Id.Value}");
         }
     }
 }
