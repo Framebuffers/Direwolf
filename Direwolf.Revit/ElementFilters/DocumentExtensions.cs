@@ -2,14 +2,7 @@
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
-using Direwolf.Definitions;
-using Direwolf.Revit.Definitions;
-using Direwolf.Revit.Utilities;
 using System.Diagnostics;
-using System.Net;
-using System.Linq;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
-using System.Security.Cryptography;
 
 namespace Direwolf.Revit.ElementFilters
 {
@@ -68,7 +61,7 @@ namespace Direwolf.Revit.ElementFilters
                 .GetElementCount();
         }
 
-        public static Dictionary<Family, int> GetFamiliesWithMoreInstances(this Document doc)
+        public static Dictionary<Family, int> GetFamiliesWithMostInstances(this Document doc)
         {
             using FilteredElementCollector familyCollector = new(doc);
             Dictionary<Family, int> familyCounts = [];
