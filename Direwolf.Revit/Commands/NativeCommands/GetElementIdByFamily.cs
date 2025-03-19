@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Direwolf.Revit.Utilities;
 using System.Diagnostics;
 using System.Transactions;
 using static Direwolf.Revit.Utilities.DirewolfExtensions;
@@ -17,7 +18,7 @@ public class GetElementIdByFamily : IExternalCommand
         benchmarkTimer.Start();
         try
         {
-            var doc = GetRevitApplicationInstances.GetDocument(commandData);
+            var doc = commandData.GetDocument();
             Common.WriteToFile($"{GetType().Name}_Native.json", RunBenchmark(doc));
             benchmarkTimer.Stop();
             TimeTaken += benchmarkTimer.Elapsed.TotalSeconds;

@@ -3,6 +3,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Direwolf.Definitions;
 using Direwolf.Revit.Howlers;
+using Direwolf.Revit.Utilities;
 using Revit.Async;
 using System.Diagnostics;
 using static Direwolf.Revit.Utilities.DirewolfExtensions;
@@ -18,10 +19,10 @@ namespace Direwolf.Revit.Commands.DirewolfCommands
         {
             Stopwatch benchmarkTimer = new();
             benchmarkTimer.Start();
-            RevitTask.Initialize(GetRevitApplicationInstances.GetApplication(commandData));
+            RevitTask.Initialize(commandData.Application);
             try
             {
-                var doc = GetRevitApplicationInstances.GetDocument(commandData);
+                var doc = commandData.GetDocument();
                 Direwolf dw = new(commandData.Application);
                 RevitHowler rh = new();
                 rh.CreateWolf(new Wolf(), new Howls.GetElementIdByFamily(doc));

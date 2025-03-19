@@ -4,9 +4,12 @@ using Autodesk.Revit.UI;
 using System.Diagnostics;
 using Direwolf.Revit.Howlers;
 using Revit.Async;
+using Direwolf.Definitions;
+using Direwolf.Revit.Howls;
 
 namespace Direwolf.Revit.UI.Commands
 {
+
     /// <summary>
     /// Benchmark code.
     /// </summary>
@@ -23,9 +26,11 @@ namespace Direwolf.Revit.UI.Commands
             {
                 RevitTask.Initialize(commandData.Application);
                 RevitHowler rh = new();
+                rh.CreateWolf(new Wolf(), new GetExtensionTest(doc));
                 Direwolf dw = new(commandData.Application);
                 dw.QueueHowler(rh);
-                dw.HuntAsync("Model Health");
+                dw.HuntAsync("Extension Test");
+                dw.SendAllToDB();
             }
             catch
             {

@@ -3,155 +3,146 @@ using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
 using Direwolf.Definitions;
+using Direwolf.Revit.Definitions;
+using Direwolf.Revit.Utilities;
 using System.Diagnostics;
+using System.Net;
+using System.Linq;
 
 namespace Direwolf.Revit.ElementFilters
 {
     public static class DocumentExtensions
     {
-        public static Stack<Prey> GetAnnotativeElements(this Document doc)
+        public static Prey GetAnnotativeElements(this Document doc)
         {
-            using FilteredElementCollector collector = new(doc);
-            ICollection<Element> annotativeElements = collector
-                .WhereElementIsNotElementType()
-                .Where(e => e.Category != null && e.Category.CategoryType == CategoryType.Annotation)
-                .ToList();
 
-            var results = new List<string>();
-            foreach (Element element in annotativeElements)
+            IEnumerable<ElementInformation> info()
             {
-                results.Add(element.Id.Value.ToString());
+                using FilteredElementCollector collector = new(doc);
+                ICollection<Element> annotativeElements = [.. collector
+                    .WhereElementIsNotElementType()
+                    .Where(e => e.Category != null
+                           && e.Category.CategoryType == CategoryType.Annotation)];
+
+                foreach (var e in annotativeElements)
+                {
+                    yield return e.GetElementInformation(doc);
+                }
             }
 
-            return results.Count != 0
-                ? string.Join("\n", results)
-                : "None found";
+            return new Prey(info());
         }
 
-        public static Stack<Prey> GetDesignOptions(this Document doc)
+        public static Prey GetDesignOptions(this Document doc)
         {
-            using FilteredElementCollector collector = new(doc);
-            ICollection<DesignOption> elements = collector
-                            .WhereElementIsNotElementType()
-                            .OfClass(typeof(DesignOption))
-                            .Cast<DesignOption>()
-                            .ToList();
-
-            List<string> designOptionNames = [];
-            designOptionNames.AddRange(collector.Select(element => element.Name));
-            return string.Join("\n", designOptionNames);
-        }
-
-        public static Stack<Prey> GetDetailGroups(this Document doc)
-        {
-
-            using FilteredElementCollector collector = new(doc);
-            ICollection<Group> detailGroups = collector
-                .WhereElementIsNotElementType()
-                .OfClass(typeof(Group))
-                .Cast<Group>()
-                .Where(e => e.Category != null && e.Category.Name == "Detail Groups")
-                .ToList();
-
-            var results = new Dictionary<string, string>();
-            foreach (Element element in detailGroups)
+            IEnumerable<ElementInformation> info()
             {
-                results[element.UniqueId] = element.Id.ToString();
+                using FilteredElementCollector collector = new(doc);
+                ICollection<DesignOption> elements = collector
+                                .WhereElementIsNotElementType()
+                                .OfClass(typeof(DesignOption))
+                                .Cast<DesignOption>()
+                                .ToList();
+
+                foreach (var e in elements)
+                {
+                    yield return e.GetElementInformation(doc);
+                }
             }
-            return string.Join("\n", results.Select(x => $"{x.Key}: {x.Value}"));
+
+            return new Prey(info());
+        }
+
+        public static Prey GetDetailGroups(this Document doc)
+        {
+            IEnumerable<ElementInformation> info()
+            {
+                using FilteredElementCollector collector = new(doc);
+                ICollection<Group> elements = collector
+                    .WhereElementIsNotElementType()
+                    .OfClass(typeof(Group))
+                    .Cast<Group>()
+                    .Where(e => e.Category != null && e.Category.Name == "Detail Groups")
+                    .ToList();
+                foreach (var e in elements)
+                {
+                    yield return e.GetElementInformation(doc);
+                }
+            }
+            return new Prey(info());
         }
 
         // too many false positives because of double precision.
-        public static Stack<Prey> GetDuplicateElements(this Document doc)
-        {
-            using FilteredElementCollector collector = new(doc);
-            ICollection<Element> elements = collector
-                .WhereElementIsNotElementType()
-                .WhereElementIsViewIndependent()
-                .Cast<Element>()
-                .ToList();
-
-            Dictionary<string, List<Element>> elementGroups = [];
-
-            foreach (Element element in elements)
-            {
-                try
-                {
-                    using Location location = element.Location;
-                    switch (location)
-                    {
-                        case LocationPoint locationPoint:
-                            {
-                                string key = $"{element.GetType().Name}-{double.Round(locationPoint.Point.X)},{double.Round(locationPoint.Point.Y)},{double.Round(locationPoint.Point.Z)}";
-
-                                if (!elementGroups.TryGetValue(key, out List<Element>? value))
-                                {
-                                    value = [];
-                                    elementGroups[key] = value;
-                                }
-                                value.Add(element);
-                                break;
-                            }
-
-                        case LocationCurve locationCurve:
-                            {
-                                string key = $"{element.GetType().Name}-{locationCurve.Curve.GetEndPoint(0)}-{locationCurve.Curve.GetEndPoint(1)}";
-
-                                if (!elementGroups.TryGetValue(key, out List<Element>? value))
-                                {
-                                    value = [];
-                                    elementGroups[key] = value;
-                                }
-                                value.Add(element);
-                                break;
-                            }
-                    }
-                }
-                catch (Exception e)
-                {
-                    Debug.Print(e.Message);
-                    continue;
-                }
-            }
-            return string.Join("\n", elementGroups.Select(pair => $"{pair.Key}: {pair.Value}"));
-        }
-
-        //public static string GetDWGFiles(Document doc)
+        //public static Prey GetDuplicateElements(this Document doc)
         //{
 
-        //    //using FilteredElementCollector collector = new(doc);
-        //    //ICollection<Element> linkedDWGFiles = collector
-        //    //    .OfClass(typeof(ImportInstance))
-        //    //    .WhereElementIsNotElementType()
-        //    //    .ToList();
+        //    IEnumerable<ElementInformation> info()
+        //    {
+        //        using FilteredElementCollector collector = new(doc);
+        //        ICollection<Element> elements = collector
+        //            .WhereElementIsNotElementType()
+        //            .WhereElementIsViewIndependent()
+        //            .Cast<Element>()
+        //            .ToList();
 
-        //    //var dwg = doc.
-        //    //    ProjectInformation.GetExternalResourceReferencesExpanded();
+        //        Dictionary<string, List<Element>> elementGroups = [];
 
+        //        foreach (Element e in elements)
+        //        {
+        //            try
+        //            {
+        //                using Location location = e.Location;
+        //                switch (location)
+        //                {
+        //                    case LocationPoint locationPoint:
+        //                        {
+        //                            string key = $"{e.GetType().Name}-{double.Round(locationPoint.Point.X)},{double.Round(locationPoint.Point.Y)},{double.Round(locationPoint.Point.Z)}";
 
+        //                            if (!elementGroups.TryGetValue(key, out List<Element>? value))
+        //                            {
+        //                                value = [];
+        //                                elementGroups[key] = value;
+        //                            }
+        //                            value.Add(e);
+        //                            break;
+        //                        }
 
-        //    //var results = new Dictionary<string, string>();
-        //    //foreach (Element element in linkedDWGFiles)
-        //    //{
-        //    //    string elementName = element.Name;
-        //    //    ElementId elementId = element.Id;
+        //                    case LocationCurve locationCurve:
+        //                        {
+        //                            string key = $"{e.GetType().Name}-{locationCurve.Curve.GetEndPoint(0)}-{locationCurve.Curve.GetEndPoint(1)}";
 
-        //    //    Parameter pathParam = element.get_Parameter(BuiltInParameter.IMPORT_SYMBOL_NAME);
-        //    //    string filePath = pathParam != null ? pathParam.AsString() : "Unknown Path";
-        //    //    results.Add(element.UniqueId, filePath);
-        //    //}
+        //                            if (!elementGroups.TryGetValue(key, out List<Element>? value))
+        //                            {
+        //                                value = [];
+        //                                elementGroups[key] = value;
+        //                            }
+        //                            value.Add(e);
+        //                            break;
+        //                        }
 
-        //    //return string.Join("\n", results.Select(x => $"{x.Key}: {x.Value}"));
+        //                }
+        //            }
+        //            catch (Exception e)
+        //            {
+        //                Debug.Print(e.Message);
+        //                continue;
+        //            }
+        //        }
+        //        foreach (var e in elementGroups)
+        //        {
+        //            yield return e.GetElementInformation(doc);
+        //        }
+
+        //    }
+        //    return new Prey(info());
         //}
 
-        public static Stack<Prey> GetElementsByWorkset(this Document doc)
+        public static Dictionary<string, int> GetElementsByWorkset(this Document doc)
         {
-
             using FilteredElementCollector collector = new FilteredElementCollector(doc)
-                .WhereElementIsNotElementType();
+                                       .WhereElementIsNotElementType();
 
             Dictionary<string, int> worksetElementCount = [];
-
             foreach (Element element in collector)
             {
                 using Parameter worksetParam = element.get_Parameter(BuiltInParameter.ELEM_PARTITION_PARAM);
@@ -170,22 +161,17 @@ namespace Direwolf.Revit.ElementFilters
                     }
                 }
             }
-
-            return string.Join("\n", worksetElementCount
-                .OrderByDescending(pair => pair.Value)
-                .Select(pair => $"Workset: {pair.Key}, Elements: {pair.Value}"));
-
+            return worksetElementCount;
         }
 
-        public static Stack<Prey> GetErrorsAndWarnings(this Document doc)
+        public static Prey GetErrorsAndWarnings(this Document doc)
         {
             Dictionary<string, string> failures = [];
-            foreach (FailureMessage failureMessage in doc.GetWarnings())
+            foreach (FailureMessage elements in doc.GetWarnings())
             {
-                failures[failureMessage.GetDescriptionText() + " " + Guid.NewGuid()] = failureMessage.GetSeverity().ToString();
+                failures[elements.GetDescriptionText() + " " + Guid.NewGuid()] = elements.GetSeverity().ToString();
             }
-
-            return string.Join("\n", failures.Select(x => $"{x.Key}: {x.Value}"));
+            return new Prey(new Prey(failures));
         }
 
         public static int GetFamilyCount(this Document doc)
@@ -195,13 +181,12 @@ namespace Direwolf.Revit.ElementFilters
                 .GetElementCount();
         }
 
-        public static Stack<Prey> GetFamilyCountBySize(this Document doc)
+        public static Prey GetFamiliesWithMoreInstances(this Document doc)
         {
             using FilteredElementCollector familyCollector = new(doc);
-
             Dictionary<string, int> familyCounts = [];
 
-            foreach (Family family in familyCollector)
+            foreach (Family family in familyCollector.Cast<Family>())
             {
                 ICollection<ElementId> familyTypeIds = family.GetFamilySymbolIds();
                 int count = 0;
@@ -218,320 +203,323 @@ namespace Direwolf.Revit.ElementFilters
 
                 familyCounts[family.Name] = count;
             }
-
-            var sortedFamilies = familyCounts.OrderByDescending(pair => pair.Value);
-            return string.Join("\n", sortedFamilies.Select(pair => $"{pair.Key}: {pair.Value} instances"));
+            return new Prey(familyCounts);
         }
 
-        public static Stack<Prey> GetGridLineCount(this Document doc)
+        public static int GetGridLineCount(this Document doc)
         {
             return new FilteredElementCollector(doc)
-                .OfClass(typeof(Grid))
-                .GetElementCount();
+                 .OfClass(typeof(Grid))
+                 .GetElementCount();
         }
 
-        public static Stack<Prey> GetImportedImages(this Document doc)
+        public static Prey GetImportedImages(this Document doc)
         {
-            ICollection<Element> importedImages = new FilteredElementCollector(doc)
-                .OfClass(typeof(ImportInstance))
-                .WhereElementIsNotElementType()
-                .ToList();
-
-            var results = importedImages.Select(element => element.Id.Value.ToString()).ToList();
-
-            return results.Count != 0
-                ? string.Join("\n", results)
-                : "None found";
-        }
-
-        public static Stack<Prey> GetInPlaceFamilies(this Document doc)
-        {
-            using FilteredElementCollector familyInstanceCollector = new FilteredElementCollector(doc)
-                .OfClass(typeof(FamilyInstance));
-
-            List<string> inPlaceFamilies = [];
-
-            foreach (Element element in familyInstanceCollector)
+            IEnumerable<ElementInformation> info()
             {
-                if (element is FamilyInstance familyInstance)
+                ICollection<Element> importedImages = new FilteredElementCollector(doc)
+                    .OfClass(typeof(ImportInstance))
+                    .WhereElementIsNotElementType()
+                    .ToList();
+                foreach (var img in importedImages)
                 {
-                    using Family family = familyInstance.Symbol.Family;
+                    yield return img.GetElementInformation(doc);
+                }
+            }
+            return new Prey(info());
+        }
 
-                    if (family.IsInPlace)
+        public static Prey GetInPlaceFamilies(this Document doc)
+        {
+            IEnumerable<ElementInformation> info()
+            {
+                using FilteredElementCollector familyInstanceCollector = new FilteredElementCollector(doc)
+                              .OfClass(typeof(FamilyInstance));
+
+                foreach (Element element in familyInstanceCollector)
+                {
+                    if (element is FamilyInstance familyInstance)
                     {
-                        inPlaceFamilies.Add($"In-Place Family Name: {family.Name}, ID: {family.Id}");
+                        using Family family = familyInstance.Symbol.Family;
+
+                        if (family.IsInPlace)
+                        {
+                            yield return element.GetElementInformation(doc);
+                        }
                     }
                 }
             }
-
-            return inPlaceFamilies.Count > 0
-                ? string.Join("\n", inPlaceFamilies)
-                : "None found";
+            return new Prey(info());
         }
 
-        public static Stack<Prey> GetFamliesWithMostTypes(this Document doc)
+        public static Prey GetFamliesWithMostTypes(this Document doc)
         {
-            using FilteredElementCollector familyCollector = new FilteredElementCollector(doc)
-                .OfClass(typeof(Family));
+            IEnumerable<ElementInformation> info()
+            {
+                using FilteredElementCollector familyCollector = new FilteredElementCollector(doc)
+                          .OfClass(typeof(Family));
 
-            List<string> largeFamilies = [];
+                List<Element> largeFamilies = [];
+                largeFamilies.AddRange(from Family family in familyCollector
+                                       let typeCount = family.GetFamilySymbolIds().Count
+                                       where typeCount > 50
+                                       select family);
 
-            largeFamilies.AddRange(from Family family in familyCollector
-                                   let typeCount = family.GetFamilySymbolIds().Count
-                                   where typeCount > 50
-                                   select $"Family Name: {family.Name}, Types: {typeCount}");
-
-            return largeFamilies.Count > 0
-                ? string.Join("\n", largeFamilies)
-                : "None found";
+                foreach (var e in largeFamilies)
+                {
+                    yield return e.GetElementInformation(doc);
+                }
+            }
+            return new Prey(info());
         }
 
-        public static Stack<Prey> GetLevelCount(this Document doc)
+        public static int GetLevelCount(this Document doc)
         {
             return new FilteredElementCollector(doc)
                 .OfClass(typeof(Level))
                 .GetElementCount();
         }
 
-        public static string GetMirroredObjects(this Document doc)
+        public static Prey GetMirroredObjects(this Document doc)
         {
-            List<FamilyInstance> familyInstances = new FilteredElementCollector(doc)
-                .OfClass(typeof(FamilyInstance))
-                .WhereElementIsNotElementType()
-                .Cast<FamilyInstance>()
-                .ToList();
-
-            List<string> mirroredElements = familyInstances.Where(instance => instance.GetTransform().HasReflection)
-                                                           .Select(instance => instance.Id.Value.ToString())
-                                                           .ToList();
-
-            return mirroredElements.Count > 0
-                ? string.Join("\n", mirroredElements)
-                : "None found";
-        }
-
-        public static Stack<Prey> GetModelGroups(this Document doc)
-        {
-
-            ICollection<Element> modelGroups = new FilteredElementCollector(doc)
-                .OfClass(typeof(Group))
-                .WhereElementIsNotElementType()
-                .ToList();
-
-            var results = new Dictionary<string, string>();
-            foreach (Element element in modelGroups)
+            IEnumerable<ElementInformation> info()
             {
-                results[element.UniqueId] = element.Id.Value.ToString();
+                List<FamilyInstance> familyInstances = new FilteredElementCollector(doc)
+                             .OfClass(typeof(FamilyInstance))
+                             .WhereElementIsNotElementType()
+                             .Cast<FamilyInstance>()
+                             .ToList();
+                return familyInstances.Where(e => e.GetTransform().HasReflection).Select(e => e.GetElementInformation(doc));
             }
-
-            return string.Join("\n", results.Select(x => $"{x.Key}: {x.Value}"));
+            return new Prey(info());
         }
 
-        public static Stack<Prey> GetNonNativeObjectStyles(this Document doc)
+        public static Prey GetModelGroups(this Document doc)
         {
-            using FilteredElementCollector collector = new FilteredElementCollector(doc)
-                .OfClass(typeof(GraphicsStyle));
-
-            List<string> nonNativeObjectStyles = [];
-
-            foreach (Element element in collector)
+            IEnumerable<ElementInformation> info()
             {
-                if (element is GraphicsStyle graphicsStyle)
+                ICollection<Element> modelGroups = new FilteredElementCollector(doc)
+                              .OfClass(typeof(Group))
+                              .WhereElementIsNotElementType()
+                              .ToList();
+                return modelGroups.Select(element => element.GetElementInformation(doc));
+            }
+            return new Prey(info());
+        }
+
+        public static Prey GetNonNativeObjectStyles(this Document doc)
+        {
+            IEnumerable<ElementInformation> info()
+            {
+                using FilteredElementCollector collector = new FilteredElementCollector(doc)
+                           .OfClass(typeof(GraphicsStyle));
+
+                List<string> nonNativeObjectStyles = [];
+
+                foreach (Element element in collector)
                 {
-                    using Category category = graphicsStyle.GraphicsStyleCategory;
-                    if (category != null && category.IsCuttable == false && category.CategoryType == CategoryType.Annotation)
+                    if (element is GraphicsStyle graphicsStyle)
                     {
-                        nonNativeObjectStyles.Add($"Style Name: {graphicsStyle.Name}, Category: {category.Name}");
-                    }
-                }
-            }
-
-            return nonNativeObjectStyles.Count > 0
-                ? string.Join("\n", nonNativeObjectStyles)
-                : "No non-native object styles found.";
-        }
-
-        public static Stack<Prey> GetSKPFiles(this Document doc)
-        {
-            using FilteredElementCollector filteredElementCollector = new(doc);
-            ICollection<Element> importedElements = filteredElementCollector
-                .OfClass(typeof(ImportInstance))
-                .WhereElementIsNotElementType()
-                .ToList();
-
-            var results = new Dictionary<string, string>();
-            foreach (Element element in importedElements)
-            {
-                using Parameter pathParam = element.get_Parameter(BuiltInParameter.IMPORT_SYMBOL_NAME);
-                string filePath = pathParam != null ? pathParam.AsString() : "Unknown Path";
-                results[element.UniqueId] = filePath;
-            }
-
-            return string.Join("\n", results.Select(x => $"{x.Key}: {x.Value}"));
-        }
-
-        public static Stack<Prey> GetUnconnectedDucts(this Document doc)
-        {
-            using FilteredElementCollector ductCollector = new FilteredElementCollector(doc)
-                .OfCategory(BuiltInCategory.OST_DuctCurves)
-                .WhereElementIsNotElementType();
-
-            List<string> unconnectedDucts = [];
-
-            foreach (Element ductElement in ductCollector)
-            {
-                if (ductElement is Duct duct)
-                {
-                    bool isUnconnected = false;
-
-                    ConnectorSet connectors = duct.ConnectorManager.Connectors;
-                    foreach (Connector connector in connectors)
-                    {
-                        if (!connector.IsConnected)
+                        using Category category = graphicsStyle.GraphicsStyleCategory;
+                        if (category != null && category.IsCuttable == false && category.CategoryType == CategoryType.Annotation)
                         {
-                            isUnconnected = true;
-                            break;
-                        }
-                    }
-
-                    if (isUnconnected)
-                    {
-                        unconnectedDucts.Add($"Duct Name: {duct.Name}, Duct ID: {duct.Id}");
-                    }
-                }
-            }
-
-            return unconnectedDucts.Count > 0
-                ? string.Join("\n", unconnectedDucts)
-                : "No unconnected ducts found.";
-        }
-
-        public static Stack<Prey> GetUnconnectedElectrical(this Document doc)
-        {
-            using FilteredElementCollector electricalCollector = new FilteredElementCollector(doc)
-                .OfCategory(BuiltInCategory.OST_ElectricalFixtures)
-                .WhereElementIsNotElementType();
-
-            List<string> unconnectedConnections = [];
-
-            foreach (Element electricalElement in electricalCollector)
-            {
-                using MEPModel mepModel = ((FamilyInstance)electricalElement).MEPModel;
-                if (mepModel != null)
-                {
-                    using ConnectorSet connectors = mepModel.ConnectorManager.Connectors;
-                    foreach (Connector connector in connectors)
-                    {
-                        if (!connector.IsConnected)
-                        {
-                            unconnectedConnections.Add($"Element Name: {electricalElement.Name}, ID: {electricalElement.Id}, Connector ID: {connector.Id}");
+                            yield return element.GetElementInformation(doc);
                         }
                     }
                 }
             }
-
-            return unconnectedConnections.Count > 0
-                ? string.Join("\n", unconnectedConnections)
-                : "No unconnected found";
-
+            return new Prey(info());
         }
 
-        public static Stack<Prey> GetUnconnectedPipes(this Document doc)
+        public static Prey GetSKPFiles(this Document doc)
         {
-            using FilteredElementCollector pipeCollector = new FilteredElementCollector(doc)
-                .OfCategory(BuiltInCategory.OST_PipeCurves)
-                .WhereElementIsNotElementType();
-
-            List<string> unconnectedPipes = [];
-
-            foreach (Element pipeElement in pipeCollector)
+            IEnumerable<ElementInformation> info()
             {
-                if (pipeElement is Pipe pipe)
-                {
-                    bool isUnconnected = false;
+                using FilteredElementCollector filteredElementCollector = new(doc);
+                ICollection<Element> importedElements = filteredElementCollector
+                    .OfClass(typeof(ImportInstance))
+                    .WhereElementIsNotElementType()
+                    .ToList();
 
-                    ConnectorSet connectors = pipe.ConnectorManager.Connectors;
-                    foreach (Connector connector in connectors)
+                var results = new Dictionary<string, string>();
+                foreach (Element element in importedElements)
+                {
+                    yield return element.GetElementInformation(doc);
+                }
+
+            }
+
+            return new Prey(info());
+        }
+
+        public static Prey GetUnconnectedDucts(this Document doc)
+        {
+            IEnumerable<ElementInformation> info()
+            {
+
+                using FilteredElementCollector ductCollector = new FilteredElementCollector(doc)
+                    .OfCategory(BuiltInCategory.OST_DuctCurves)
+                    .WhereElementIsNotElementType();
+
+                foreach (Element ductElement in ductCollector)
+                {
+                    if (ductElement is Duct duct)
                     {
-                        if (!connector.IsConnected)
+                        bool isUnconnected = false;
+
+                        ConnectorSet connectors = duct.ConnectorManager.Connectors;
+                        foreach (Connector connector in connectors)
                         {
-                            isUnconnected = true;
-                            break;
+                            if (!connector.IsConnected)
+                            {
+                                isUnconnected = true;
+                                break;
+                            }
+                        }
+
+                        if (isUnconnected)
+                        {
+                            yield return ductElement.GetElementInformation(doc);
                         }
                     }
-
-                    if (isUnconnected)
-                    {
-                        unconnectedPipes.Add($"Pipe Name: {pipe.Name}, Pipe ID: {pipe.Id}");
-                    }
                 }
             }
-
-            return unconnectedPipes.Count > 0
-                ? string.Join("\n", unconnectedPipes)
-                : "None found";
+            return new Prey(info());
         }
 
-        public static Stack<Prey> GetUnenclosedRooms(this Document doc)
+        public static Prey GetUnconnectedElectrical(this Document doc)
         {
-            using FilteredElementCollector roomCollector = new FilteredElementCollector(doc)
-                .OfCategory(BuiltInCategory.OST_Rooms)
-                .WhereElementIsNotElementType();
-
-            List<string> unenclosedRooms = [];
-
-            foreach (Element roomElement in roomCollector)
+            IEnumerable<ElementInformation> info()
             {
-                if (roomElement is Room room)
-                {
-                    IList<IList<BoundarySegment>> boundarySegments = room.GetBoundarySegments(new SpatialElementBoundaryOptions());
+                using FilteredElementCollector electricalCollector = new FilteredElementCollector(doc)
+             .OfCategory(BuiltInCategory.OST_ElectricalFixtures)
+             .WhereElementIsNotElementType();
 
-                    if (boundarySegments == null || boundarySegments.Count == 0)
+                List<string> unconnectedConnections = [];
+
+                foreach (Element electricalElement in electricalCollector)
+                {
+                    using MEPModel mepModel = ((FamilyInstance)electricalElement).MEPModel;
+                    if (mepModel != null)
                     {
-                        unenclosedRooms.Add($"Room Name: {room.Name}, Room ID: {room.Id}");
+                        using ConnectorSet connectors = mepModel.ConnectorManager.Connectors;
+                        foreach (Connector connector in connectors)
+                        {
+                            if (!connector.IsConnected)
+                            {
+                                yield return electricalElement.GetElementInformation(doc);
+                            }
+                        }
                     }
                 }
             }
-
-            return unenclosedRooms.Count != 0
-                ? string.Join("\n", unenclosedRooms)
-                : "No unenclosed rooms found.";
-
+            return new Prey(info());
         }
 
-        public static Stack<Prey> GetUnusedFamilies(this Document doc)
+        public static Prey GetUnconnectedPipes(this Document doc)
         {
-            using FilteredElementCollector familyCollector = new FilteredElementCollector(doc)
-                .OfClass(typeof(Family));
-
-            List<string> unusedFamilies = [];
-
-            foreach (Family family in familyCollector.Cast<Family>())
+            IEnumerable<ElementInformation> info()
             {
-                try
-                {
-                    using FilteredElementCollector instanceCollector = new FilteredElementCollector(doc)
-                        .OfCategory(family.Category.BuiltInCategory)
-                        .WhereElementIsNotElementType();
+                using FilteredElementCollector pipeCollector = new FilteredElementCollector(doc)
+                    .OfCategory(BuiltInCategory.OST_PipeCurves)
+                    .WhereElementIsNotElementType();
 
-                    if (!instanceCollector.Any())
+                List<string> unconnectedPipes = [];
+
+                foreach (Element pipeElement in pipeCollector)
+                {
+                    if (pipeElement is Pipe pipe)
                     {
-                        unusedFamilies.Add(family.Name);
+                        bool isUnconnected = false;
+
+                        ConnectorSet connectors = pipe.ConnectorManager.Connectors;
+                        foreach (Connector connector in connectors)
+                        {
+                            if (!connector.IsConnected)
+                            {
+                                isUnconnected = true;
+                                break;
+                            }
+                        }
+                        if (isUnconnected)
+                        {
+                            yield return pipeElement.GetElementInformation(doc);
+                        }
                     }
                 }
-                catch
-                {
-                    continue;
-                }
             }
-
-            return unusedFamilies.Count != 0
-                ? string.Join("\n", unusedFamilies)
-                : "No unused families found.";
+            return new Prey(info());
         }
 
-        public static Stack<Prey> GetViews(this Document doc)
+        public static Prey GetUnenclosedRooms(this Document doc)
         {
+            IEnumerable<ElementInformation> info()
+            {
+                using FilteredElementCollector roomCollector = new FilteredElementCollector(doc)
+                             .OfCategory(BuiltInCategory.OST_Rooms)
+                             .WhereElementIsNotElementType();
+
+                List<string> unenclosedRooms = [];
+
+                foreach (Element roomElement in roomCollector)
+                {
+                    if (roomElement is Room room)
+                    {
+                        IList<IList<BoundarySegment>> boundarySegments = room.GetBoundarySegments(new SpatialElementBoundaryOptions());
+
+                        if (boundarySegments == null || boundarySegments.Count == 0)
+                        {
+                            yield return roomElement.GetElementInformation(doc);
+                        }
+                    }
+                }
+            }
+            return new Prey(info());
+        }
+
+        public static Prey GetUnusedFamilies(this Document doc)
+        {
+            IEnumerable<ElementInformation> info()
+            {
+
+                using FilteredElementCollector familyCollector = new FilteredElementCollector(doc)
+                    .OfClass(typeof(Family));
+
+                List<ElementInformation> unusedFamilies = [];
+
+                foreach (Family family in familyCollector.Cast<Family>())
+                {
+                    try
+                    {
+                        using FilteredElementCollector instanceCollector = new FilteredElementCollector(doc)
+                            .OfCategory(family.Category.BuiltInCategory)
+                            .WhereElementIsNotElementType();
+
+                        if (!instanceCollector.Any())
+                        {
+                            unusedFamilies.Add(family.GetElementInformation(doc));
+                        }
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+                }
+                foreach (var family in unusedFamilies) { yield return family; }
+            }
+            return new Prey(info());
+        }
+
+        public static Prey GetViews(this Document doc)
+        {
+            IEnumerable<ElementInformation> info()
+            {
+
+            }
+            return new Prey(info());
+
+
+
             using FilteredElementCollector viewCollector = new FilteredElementCollector(doc)
                 .OfClass(typeof(View))
                 .WhereElementIsNotElementType();
@@ -545,119 +533,122 @@ namespace Direwolf.Revit.ElementFilters
                     views.Add(view.Name);
                 }
             }
-
-            return views.Count != 0
-                ? string.Join("\n", views)
-                : "None found";
         }
 
-        public static Stack<Prey> GetViewsNotInSheets(this Document doc)
+        public static Prey GetViewsNotInSheets(this Document doc)
         {
-            using FilteredElementCollector viewCollector = new FilteredElementCollector(doc)
-                .OfClass(typeof(View))
-                .WhereElementIsNotElementType();
-
-            FilteredElementCollector viewportCollector = new FilteredElementCollector(doc)
-                .OfClass(typeof(Viewport));
-
-            HashSet<ElementId> viewsOnSheets = [.. viewportCollector.Select(vp => (vp as Viewport).ViewId)];
-
-            List<string> viewsNotOnSheets = [];
-
-            foreach (Element viewElement in viewCollector)
+            IEnumerable<ElementInformation> info()
             {
-                if (viewElement is View view && !view.IsTemplate && !viewsOnSheets.Contains(view.Id))
+                using FilteredElementCollector viewCollector = new FilteredElementCollector(doc)
+                           .OfClass(typeof(View))
+                           .WhereElementIsNotElementType();
+
+                FilteredElementCollector viewportCollector = new FilteredElementCollector(doc)
+                    .OfClass(typeof(Viewport));
+
+                HashSet<ElementId> viewsOnSheets = [.. viewportCollector.Select(vp => (vp as Viewport).ViewId)];
+
+                List<string> viewsNotOnSheets = [];
+
+                foreach (Element viewElement in viewCollector)
                 {
-                    viewsNotOnSheets.Add($"View Name: {view.Name}, View ID: {view.Id}");
+                    if (viewElement is View view && !view.IsTemplate && !viewsOnSheets.Contains(view.Id))
+                    {
+                        viewsNotOnSheets.Add($"View Name: {view.Name}, View ID: {view.Id}");
+                    }
                 }
             }
 
-            return viewsNotOnSheets.Count != 0
-                ? string.Join("\n", viewsNotOnSheets)
-                : "All views are placed on sheets.";
-
+            return new Prey(info());
         }
 
-        public static Stack<Prey> LargestFamilies(this Document doc)
+        public static Prey LargestFamilies(this Document doc)
         {
-            using FilteredElementCollector familyCollector = new FilteredElementCollector(doc)
-                .OfClass(typeof(Family));
-
-            Dictionary<string, int> familySizes = [];
-
-            foreach (Family family in familyCollector)
+            IEnumerable<ElementInformation> info()
             {
-                ICollection<ElementId> familyTypeIds = family.GetFamilySymbolIds();
-                int totalInstances = 0;
 
-                foreach (ElementId typeId in familyTypeIds)
-                {
-                    totalInstances += new FilteredElementCollector(doc)
-                        .WhereElementIsNotElementType()
-                        .Where(e => e.GetTypeId() == typeId)
-                        .Count();
-                }
-
-                familySizes[family.Name] = totalInstances;
-            }
-
-            var largestFamilies = familySizes
-                .OrderByDescending(pair => pair.Value)
-                .Take(10);
-
-            List<string> results = largestFamilies
-                .Select(pair => $"Family Name: {pair.Key}, Instances: {pair.Value}")
-                .ToList();
-
-            return results.Count != 0
-                ? string.Join("\n", results)
-                : "No families found.";
-        }
-
-        public static Stack<Prey> TotalSizeOfFamiliesByMB(this Document doc)
-        {
-            var desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            Directory.CreateDirectory(Path.Combine(desktop, "rvt"));
-
-            string folderPath = Path.GetFullPath(Path.Combine(desktop, "rvt"));
-            double totalSizeInMB = 0;
-
-            SortedDictionary<long, string> sorted = [];
-
-            if (Directory.Exists(folderPath))
-            {
                 using FilteredElementCollector familyCollector = new FilteredElementCollector(doc)
                     .OfClass(typeof(Family));
 
-                foreach (Family family in familyCollector.Cast<Family>())
+                Dictionary<string, int> familySizes = [];
+
+                foreach (Family family in familyCollector)
                 {
-                    string familyPath = Path.Combine(folderPath, $"{family.Name}.rfa");
-                    if (family.IsEditable)
+                    ICollection<ElementId> familyTypeIds = family.GetFamilySymbolIds();
+                    int totalInstances = 0;
+
+                    foreach (ElementId typeId in familyTypeIds)
                     {
-                        if (!File.Exists(familyPath))
-                        {
-                            doc.EditFamily(family).SaveAs(familyPath);
-                            long length = new FileInfo(familyPath).Length / 1024;
-                            if (!sorted.TryGetValue(length, out string familyName))
-                                sorted.Add(length, familyName);
-                        }
-                        else
-                        {
-                            totalSizeInMB = new DirectoryInfo(folderPath).EnumerateFiles()
-                                .OrderByDescending(x => x.Length)
-                                .FirstOrDefault()
-                                .Length / 1024;
-                        }
+                        totalInstances += new FilteredElementCollector(doc)
+                            .WhereElementIsNotElementType()
+                            .Where(e => e.GetTypeId() == typeId)
+                            .Count();
                     }
+
+                    familySizes[family.Name] = totalInstances;
                 }
 
-                if (sorted.Count != 0) totalSizeInMB = sorted.FirstOrDefault().Key;
-                return $"Total Size of All Families: {totalSizeInMB} KB";
+                var largestFamilies = familySizes
+                    .OrderByDescending(pair => pair.Value)
+                    .Take(10);
+
+                List<string> results = largestFamilies
+                    .Select(pair => $"Family Name: {pair.Key}, Instances: {pair.Value}")
+                    .ToList();
+
             }
-            else
-            {
-                return "The specified folder does not exist.";
-            }
+            return new Prey(info());
         }
+
+        public static Prey TotalSizeOfFamiliesByMB(this Document doc)
+        {
+            IEnumerable<ElementInformation> info()
+            {
+                var desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                Directory.CreateDirectory(Path.Combine(desktop, "rvt"));
+
+                string folderPath = Path.GetFullPath(Path.Combine(desktop, "rvt"));
+                double totalSizeInMB = 0;
+
+                SortedDictionary<long, string> sorted = [];
+
+                if (Directory.Exists(folderPath))
+                {
+                    using FilteredElementCollector familyCollector = new FilteredElementCollector(doc)
+                        .OfClass(typeof(Family));
+
+                    foreach (Family family in familyCollector.Cast<Family>())
+                    {
+                        string familyPath = Path.Combine(folderPath, $"{family.Name}.rfa");
+                        if (family.IsEditable)
+                        {
+                            if (!File.Exists(familyPath))
+                            {
+                                doc.EditFamily(family).SaveAs(familyPath);
+                                long length = new FileInfo(familyPath).Length / 1024;
+                                if (!sorted.TryGetValue(length, out string familyName))
+                                    sorted.Add(length, familyName);
+                            }
+                            else
+                            {
+                                totalSizeInMB = new DirectoryInfo(folderPath).EnumerateFiles()
+                                    .OrderByDescending(x => x.Length)
+                                    .FirstOrDefault()
+                                    .Length / 1024;
+                            }
+                        }
+                    }
+
+                    if (sorted.Count != 0) totalSizeInMB = sorted.FirstOrDefault().Key;
+                    return $"Total Size of All Families: {totalSizeInMB} KB";
+                }
+                else
+                {
+                    return "The specified folder does not exist.";
+                }
+            }
+            return new Prey(info());
+        }
+
     }
 }

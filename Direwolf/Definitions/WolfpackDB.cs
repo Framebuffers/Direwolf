@@ -16,7 +16,6 @@ namespace Direwolf.Definitions
         {
             _str = db;
             DatabaseConnectedEventHandler += WolfpackDB_DatabaseConnectedEventHandler;
-
         }
 
         private void WolfpackDB_DatabaseConnectedEventHandler(object? sender, EventArgs e)

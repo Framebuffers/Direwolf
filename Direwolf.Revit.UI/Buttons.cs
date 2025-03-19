@@ -6,7 +6,7 @@ namespace Direwolf.Revit.UI
     {
         public static PushButton? AddGetModelHealthButton(RibbonPanel? rp)
         {
-            PushButtonData b = new("modelHealth", "Get Model Health", References.AssemblyLocation, "Direwolf.Revit.UI.Commands.GetModelHealth");
+            PushButtonData b = new("modelHealth", "Get Model Health", Libraries.References.AssemblyLocation, "Direwolf.Revit.UI.Commands.GetModelHealth");
             return rp?.AddItem(b) as PushButton;
         }
 
