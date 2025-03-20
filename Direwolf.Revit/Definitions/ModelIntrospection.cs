@@ -8,23 +8,23 @@
         public long fileSize { get; init; }
         public List<string> warnings { get; init; }
         public Dictionary<string, double> elementCount { get; init; }
-        public Dictionary<ElementInformation, List<ParameterInformation?>>? viewsInsideDocument { get; init; }
-        public Dictionary<ElementInformation, List<ParameterInformation?>>? notInSheets { get; init; }
-        public Dictionary<ElementInformation, List<ParameterInformation?>>? annotativeElements { get; init; }
+        public int viewsInsideDocument { get; init; }
+        public int notInSheets { get; init; }
+        public int annotativeElements { get; init; }
         public Dictionary<string, string>? externalRefs { get; init; }
-        public Dictionary<ElementInformation, List<ParameterInformation?>>? modelGroups { get; init; }
-        public Dictionary<ElementInformation, List<ParameterInformation?>>? detailGroups { get; init; }
-        public Dictionary<ElementInformation, List<ParameterInformation?>>? designOptions { get; init; }
-        public Dictionary<ElementInformation, List<ParameterInformation?>>? levels { get; init; }
-        public Dictionary<ElementInformation, List<ParameterInformation?>>? grids { get; init; }
-        public Dictionary<ElementInformation, List<ParameterInformation?>>? warns { get; init; }
-        public Dictionary<ElementInformation, List<ParameterInformation?>>? unenclosedRoom { get; init; }
-        public Dictionary<ElementInformation, List<ParameterInformation?>>? viewports { get; init; }
-        public Dictionary<ElementInformation, List<ParameterInformation?>>? unconnectedDucts { get; init; }
-        public Dictionary<ElementInformation, List<ParameterInformation?>>? unconnectedPipes { get; init; }
-        public Dictionary<ElementInformation, List<ParameterInformation?>>? unconnectedElectrical { get; init; }
-        public Dictionary<ElementInformation, List<ParameterInformation?>>? nonNativeStyles { get; init; }
-        public Dictionary<ElementInformation, List<ParameterInformation?>>? isFlipped { get; init; }
+        public int modelGroups { get; init; }
+        public int detailGroups { get; init; }
+        public int designOptions { get; init; }
+        public int levels { get; init; }
+        public int grids { get; init; }
+        public int warns { get; init; }
+        public int unenclosedRoom { get; init; }
+        public int viewports { get; init; }
+        public int unconnectedDucts { get; init; }
+        public int unconnectedPipes { get; init; }
+        public int unconnectedElectrical { get; init; }
+        public int nonNativeStyles { get; init; }
+        public int isFlipped { get; init; }
         public Dictionary<string, int> worksetElementCount { get; init; }
     }
 }
