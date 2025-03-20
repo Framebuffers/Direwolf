@@ -5,10 +5,21 @@ using Autodesk.Revit.DB.Plumbing;
 using Direwolf.Definitions;
 using Direwolf.Revit.Definitions;
 using Direwolf.Revit.Extensions;
-using System.Runtime.CompilerServices;
 
 namespace Direwolf.Revit.Howls
 {
+    /// <summary>
+    /// This is an unbundled version of all tests inside Direwolf Revit.
+    /// It runs a very exhaustive analysis of the whole model; iterating, categorizing, extracting data and saving records of each element inside the model.
+    /// This is the most intense test in all of Direwolf Revit.
+    /// It outputs a record called <see cref="ModelIntrospection"/>, which contains not only the counts, but also a <see cref="ElementInformation"/> and <see cref="ParameterInformation"/> for each element.
+    /// Output of this file is meant to go into three tables inside the Direwolf database:
+    ///     - <see cref="Wolfpack"/>
+    ///         |_<see cref="ModelIntrospection"/> <-- Goes into [results] as JSON
+    ///         |_<see cref="ElementInformation"/> <-- Dedicated table with FK to Wolfpack's row
+    ///             |_<see cref="ParameterInformation"/>  <-- Dedicated table with FK to their corresponding <see cref="ElementInformation"/>.
+    /// Check <see cref="WolfpackDB"/> for details on the SQL implementation. Schema is inside the prisma.schema file on direwolf-db.
+    /// </summary>
     public record class GetModelSnapshot : RevitHowl
     {
         // These are all categories for which information has to be extracted.
@@ -448,7 +459,7 @@ namespace Direwolf.Revit.Howls
                 refs.Add(rt.ToString(), fr.PathType.ToString());
             }
 
-            ModelIntrospectionInformation m = new()
+            ModelIntrospection m = new()
             {
                 elementCountTotal = collector.Count,
                 familiyElementCount = elementsByFamilyString,

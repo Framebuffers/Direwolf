@@ -1,6 +1,6 @@
 ﻿namespace Direwolf.Revit.Definitions
 {
-    public readonly record struct ModelIntrospectionInformation
+    public readonly record struct ModelIntrospection
     {
         public double elementCountTotal { get; init; }
         public Dictionary<string, List<string>> familiyElementCount { get; init; }
