@@ -2,6 +2,8 @@
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
+using Direwolf.Revit.Utilities;
+using System.Linq;
 
 namespace Direwolf.Revit.ElementFilters
 {
@@ -20,22 +22,35 @@ namespace Direwolf.Revit.ElementFilters
 
         public static IEnumerable<Element?> GetAnnotativeElements(this Document doc)
         {
-            return [.. doc.GetAllValidElements()
-                          .Where(x => x is not null && x.Category.CategoryType is CategoryType.Annotation)];
+            foreach (var e in from e in doc.GetAllValidElements()
+                              where e.Category is not null
+                              where e.Category.CategoryType is CategoryType.Annotation
+                              select e)
+            {
+                yield return e;
+            }
         }
 
         public static IEnumerable<Element?> GetDesignOptions(this Document doc)
         {
-            return [.. doc.GetAllValidElements()
-                          .Where(x => x is DesignOption)
-                          .Cast<DesignOption>()];
+            foreach (var e in from e in doc.GetAllValidElements()
+                              where e is DesignOption
+                              select e)
+            {
+                yield return e;
+            }
         }
 
         public static IEnumerable<Element?> GetDetailGroups(this Document doc)
         {
-            return [.. doc.GetAllValidElements()
-                .Where(x => x is Group)
-                .Where(e =>e is not null && e.Category.Name == "Detail Groups")];
+            foreach (var e in from e in doc.GetAllValidElements()
+                              where e is Group
+                              where e.Category is not null
+                              where e.Name == "Detail Groups"
+                              select e)
+            {
+                yield return e;
+            }
         }
 
         public static Dictionary<string, int> GetElementsByWorkset(this Document doc)
@@ -168,12 +183,16 @@ namespace Direwolf.Revit.ElementFilters
 
         public static IEnumerable<FailureMessage> GetErrorsAndWarnings(this Document doc) => doc.GetWarnings();
 
-        public static HashSet<Family> GetFamilies(this Document doc)
+        public static IEnumerable<Family> GetFamilies(this Document doc)
         {
-            return [.. doc.GetAllValidElements()
-                          .Where(x => x is not null && ! x.ViewSpecific)
-                          .OfType<FamilyInstance>()
-                          .Select(x => x.Symbol.Family)];
+            foreach (var e in from x in doc.GetAllValidElements()
+                              where x is FamilyInstance
+                              let fi = (FamilyInstance)x
+                              where !x.ViewSpecific
+                              select fi.Symbol.Family)
+            {
+                yield return e;
+            }
         }
 
         public static int GetGridLineCount(this Document doc)
@@ -185,16 +204,27 @@ namespace Direwolf.Revit.ElementFilters
 
         public static IEnumerable<Element?> GetExternalFileReferences(this Document doc)
         {
-            return [.. doc.GetAllValidElements().Where(x => x is not null && x.IsExternalFileReference())];
+            foreach (var e in from x in doc.GetAllValidElements()
+                              where x is not null
+                              where x.IsExternalFileReference()
+                              select x)
+            {
+                yield return e;
+            }
         }
 
         public static IEnumerable<Element?> GetInPlaceFamilies(this Document doc)
         {
-            return [.. doc.GetFamilies().Where(x => x.IsInPlace)];
+            foreach (var e in from x in doc.GetFamilies()
+                              where x.IsInPlace
+                              select x)
+            {
+                yield return e;
+            }
         }
 
         public static IEnumerable<Family> GetFamliesWithMostTypes(this Document doc)
-        {
+        { 
             return doc.GetFamilies().OrderByDescending(x => x.GetFamilySymbolIds().Count);
         }
 
@@ -205,77 +235,127 @@ namespace Direwolf.Revit.ElementFilters
 
         public static IEnumerable<Element?> GetMirroredObjects(this Document doc)
         {
-            return [.. doc.GetAllValidElements().OfType<FamilyInstance>().Where(x => x.Mirrored)];
+            foreach (var e in from x in doc.GetAllValidElements()
+                              where x is FamilyInstance
+                              let m = x as FamilyInstance
+                              where m.Mirrored
+                              select m)
+            {
+                yield return e;
+            }
         }
 
         public static IEnumerable<Element?> GetModelGroups(this Document doc)
         {
-            return [.. doc.GetAllValidElements()
-                .OfType<Group>()];
+            foreach (var e in from x in doc.GetAllValidElements()
+                              where x is Group
+                              select x)
+            {
+                yield return e;
+            }
         }
 
         public static IEnumerable<Element?> GetNonNativeObjectStyles(this Document doc)
         {
-            return [.. doc.GetAllValidElements()
-                .Where(x => x is not null && x.Category is not null && x.Category.IsCuttable)
-                .Where(x =>x is not null && x.Category.CategoryType is CategoryType.Annotation)];
+            foreach (var x in from e in doc.GetAllValidElements()
+                              where e.Category is not null
+                              where e.Category.IsCuttable
+                              where e.Category.CategoryType is CategoryType.Annotation
+                              select e)
+            {
+                yield return x;
+            }
         }
 
         public static IEnumerable<Element?> GetUnconnectedDucts(this Document doc)
         {
-            IEnumerable<Duct> ducts = doc.GetAllValidElements().Where(x => x is not null && x.Category.BuiltInCategory is BuiltInCategory.OST_DuctCurves).Cast<Duct>().AsEnumerable();
-
-            return [.. from Duct d in ducts
-                   from ConnectorSet set in d.ConnectorManager.Connectors
-                   from Connector c in set
-                   where !c.IsConnected
-                   select d];
+            foreach (var e in from e in doc.GetAllValidElements()
+                              where e is not null
+                              where e.Category is not null
+                              where e.Category.BuiltInCategory is BuiltInCategory.OST_DuctCurves
+                              let d = e as Duct
+                              where d is not null
+                              let connector = d.ConnectorManager.Connectors
+                              from Connector c in connector
+                              where !c.IsConnected
+                              select e)
+            {
+                yield return e;
+            }
         }
 
         public static IEnumerable<Element?> GetUnconnectedElectrical(this Document doc)
         {
-            IEnumerable<Element?> electricalCollector = doc.GetAllValidElements().Where(x => x is not null && x.Category.BuiltInCategory is BuiltInCategory.OST_ElectricalFixtures).AsEnumerable();
 
-            return from Element electricalElement in electricalCollector
-                   let mepModel = ((FamilyInstance)electricalElement).MEPModel
-                   where mepModel != null
-                   let connectors = mepModel.ConnectorManager.Connectors
-                   from Connector connector in connectors
-                   where !connector.IsConnected
-                   select electricalElement;
+            foreach (var e in from e in doc.GetAllValidElements()
+                              where e is not null
+                              where e.Category is not null
+                              where e.Category.BuiltInCategory is BuiltInCategory.OST_ElectricalFixtures
+                              let mep = ((FamilyInstance)e).MEPModel
+                              where mep is not null
+                              let connectors = mep.ConnectorManager.Connectors
+                              from Connector c in connectors
+                              where !c.IsConnected
+                              select e)
+            {
+                yield return e;
+            }
         }
+
 
         public static IEnumerable<Element?> GetUnconnectedPipes(this Document doc)
         {
-            IEnumerable<Pipe> pipeCollector = doc.GetAllValidElements().Where(x => x is not null && x.Category.BuiltInCategory is BuiltInCategory.OST_PipeCurves).Cast<Pipe>().AsEnumerable();
-
-            return [.. from Pipe pipeElement in pipeCollector
-                       let connectors = pipeElement.ConnectorManager.Connectors
-                       from Connector connector in connectors
-                       where !connector.IsConnected
-                       select pipeElement];
-
+            foreach (var e in from e in doc.GetAllValidElements()
+                              where e is not null
+                              where e.Category is not null
+                              where e.Category.BuiltInCategory is BuiltInCategory.OST_PipeCurves
+                              let p = e as Pipe
+                              where p is not null
+                              let c = p.ConnectorManager.Connectors
+                              from Connector cn in c
+                              where !cn.IsConnected
+                              select e)
+            {
+                yield return e;
+            }
         }
 
         public static IEnumerable<Element?> GetUnenclosedRooms(this Document doc)
         {
-            return doc.GetAllValidElements()
-                .Where(x => x is not null && x.Category.BuiltInCategory is BuiltInCategory.OST_Rooms)
-                .Cast<Room>()
-                .Where(x => x.GetBoundarySegments(new SpatialElementBoundaryOptions()) is null && x.GetBoundarySegments(new SpatialElementBoundaryOptions()).Count == 0)
-                .AsEnumerable();
+            foreach (var x in from e in doc.GetAllValidElements()
+                              where e.Category is not null
+                              where e.Category.BuiltInCategory is BuiltInCategory.OST_Rooms
+                              let room = e as Room
+                              let boundaries = room.GetBoundarySegments(new SpatialElementBoundaryOptions())
+                              where boundaries is null
+                              where boundaries.Count == 0
+                              select e)
+            {
+                yield return x;
+            }
         }
 
         public static IEnumerable<Element?> GetUnusedFamilies(this Document doc)
         {
-            return [.. doc.GetFamilies().Where(x => x.GetFamilySymbolIds().Count == 0)];
+            foreach (var x in from e in doc.GetFamilies()
+                              where e.GetFamilySymbolIds().Count == 0
+                              select e)
+            {
+                yield return x;
+            }
         }
 
         public static IEnumerable<Element?> GetViews(this Document doc)
         {
-            return [.. doc.GetAllValidElements()
-                 .OfType<View>()
-                 .Where(x => x.IsTemplate)];
+
+            foreach (var x in from e in doc.GetAllValidElements()
+                              where e is View
+                              let v = e as View
+                              where v.IsTemplate
+                              select v)
+            {
+                yield return x;
+            }
         }
 
         public static IEnumerable<Element?> GetViewsNotInSheets(this Document doc)
@@ -300,7 +380,7 @@ namespace Direwolf.Revit.ElementFilters
 
                 Directory.CreateDirectory(fullPath);
                 SortedDictionary<long, string> sorted = [];
-            
+
                 foreach (Family f in doc.GetFamilies())
                 {
                     var rfa = Path.Combine(fullPath, $"{f.Name}.rfa");
