@@ -2,9 +2,6 @@
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
-using Direwolf.Revit.Utilities;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace Direwolf.Revit.ElementFilters
 {
@@ -89,24 +86,6 @@ namespace Direwolf.Revit.ElementFilters
             {
                 if (p.IsShared) return p.GetParameterValue();
                 else continue;
-            }
-            return null;
-        }
-
-        public static IDictionary<string, object>? GetParametersFromElement(this Element e)
-        {
-            foreach (Parameter p in e.GetOrderedParameters())
-            {
-                return new Dictionary<string, object>()
-                {
-
-                    ["guid"] = p.GUID,
-                    ["hasValue"] = p.HasValue,
-                    ["id"] = p.Id.Value,
-                    ["isReadOnly"] = p.IsReadOnly,
-                    ["isShared"] = p.IsShared,
-                    ["isUserModifiable"] = p.UserModifiable,
-                };
             }
             return null;
         }
@@ -237,7 +216,7 @@ namespace Direwolf.Revit.ElementFilters
         }
 
         public static IEnumerable<Family> GetFamliesWithMostTypes(this Document doc)
-        { 
+        {
             return doc.GetFamilies().OrderByDescending(x => x.GetFamilySymbolIds().Count);
         }
 
@@ -389,7 +368,7 @@ namespace Direwolf.Revit.ElementFilters
                 yield return e;
             }
         }
-        
+
         public static SortedDictionary<long, string> GetFamilyFileNamesSortedByFileSize(this Document doc)
         {
             try

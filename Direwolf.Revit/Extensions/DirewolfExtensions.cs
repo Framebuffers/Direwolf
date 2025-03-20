@@ -1,12 +1,29 @@
 ﻿using Autodesk.Revit.UI;
 using Autodesk.Revit.DB;
 using Direwolf.Revit.Definitions;
+using System.Net;
+using Direwolf.Revit.ElementFilters;
 
 namespace Direwolf.Revit.Extensions;
 public static class DirewolfExtensions
 {
-    
-    
+    public static ParameterInformation? GetParameterFromElement(this Parameter p, Document doc)
+    {
+        if (doc is not null)
+            return new ParameterInformation()
+            {
+                parameterGuid = p.GUID.ToString(),
+                documentOwner = doc.CreationGUID.ToString(),
+                hasValue = p.HasValue,
+                storageType = p.StorageType,
+                parameterIdValue = p.Id.Value,
+                isReadOnly = p.IsReadOnly,
+                isShared = p.IsShared,
+                isUserModifiable = p.UserModifiable
+            };
+        return null;
+    }
+
     public static ElementInformation GetElementInformation(this Element e, Document d)
     {
         if (e is not null && e.IsValidObject && e.Category is not null && e.Category.CategoryType is not CategoryType.Invalid || e?.Category?.CategoryType is not CategoryType.Internal)
@@ -95,6 +112,23 @@ public static class DirewolfExtensions
             // level where it is located
             if (e?.LevelId is not null) levelId = e.LevelId.ToString();
 
+            // get every parameter from element
+            List<ParameterInformation?>? parameters = [];
+            parameters.AddRange(from p in e.GetOrderedParameters()
+                                select p.GetParameterFromElement(d));
+
+            Dictionary<string, string> processed = [];
+            foreach (var p in parameters)
+            {
+                processed.Add("parameterGuid", p.Value.parameterGuid);
+                processed.Add("documentOwner", p.Value.documentOwner);
+                processed.Add("storageType", p.Value.storageType.ToString());
+                processed.Add("hasValue", p.Value.hasValue.ToString());
+                processed.Add("parameterIdValue", p.Value.parameterIdValue.ToString());
+                processed.Add("isReadOnly", p.Value.isReadOnly.ToString());
+                processed.Add("isShared", p.Value.isShared.ToString());
+                processed.Add("isUserModifiable", p.Value.ToString());
+            }
 
             return new ElementInformation
             {
@@ -123,7 +157,7 @@ public static class DirewolfExtensions
                 isModel = isModel,
                 isPinned = isPinned,
                 isWorkshared = isWorkshared,
-                Parameters = null
+                Parameters = processed
             };
         }
         else
