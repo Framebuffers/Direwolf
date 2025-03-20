@@ -25,12 +25,13 @@ namespace Direwolf.Revit.UI.Commands
             try
             {
                 RevitTask.Initialize(commandData.Application);
-                RevitHowler rh = new();
-                rh.CreateWolf(new Wolf(), new GetExtensionTest(doc));
                 Direwolf dw = new(commandData.Application);
+                RevitHowler rh = new();
+
+                rh.CreateWolf(new Wolf(), new GetModelSnapshot(doc));
                 dw.QueueHowler(rh);
-                dw.HuntAsync("Extension Test");
-                dw.SendAllToDB();
+                dw.HuntAsync("ModelSnapshot");
+                dw.WriteQueriesToJson();
             }
             catch
             {

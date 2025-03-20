@@ -22,6 +22,8 @@ namespace Direwolf.Revit.Howls
     /// </summary>
     public record class GetModelSnapshot : RevitHowl
     {
+        public GetModelSnapshot(Document doc) => SetRevitDocument(doc);
+
         // These are all categories for which information has to be extracted.
         private List<View> viewsInsideDocument = [];
         private List<View> notInSheets = [];
