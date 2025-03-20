@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Direwolf.Revit.ElementFilters;
 using Direwolf.Revit.Utilities;
 using System.Diagnostics;
 using System.Transactions;
