@@ -170,7 +170,7 @@ namespace Direwolf
 
         private void Direwolf_AsyncHuntCompletedEventHandler1(object? sender, EventArgs e)
         {
-            SendAllToDB();
+            //SendAllToDB();
         }
 
         public async void HuntAsync(IHowler howler, string queryName = "query")

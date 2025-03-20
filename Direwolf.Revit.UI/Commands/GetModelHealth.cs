@@ -28,7 +28,7 @@ namespace Direwolf.Revit.UI.Commands
                 Direwolf dw = new(commandData.Application);
                 RevitHowler rh = new();
 
-                rh.CreateWolf(new Wolf(), new GetModelSnapshot(doc));
+                rh.CreateWolf(new Wolf(), new _getModelSnapshot(doc));
                 dw.QueueHowler(rh);
                 dw.HuntAsync("ModelSnapshot");
                 dw.WriteQueriesToJson();

@@ -4,26 +4,11 @@ using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
 using Direwolf.Definitions;
 using Direwolf.Revit.Definitions;
-using Direwolf.Revit.Extensions;
 
 namespace Direwolf.Revit.Howls
 {
-    /// <summary>
-    /// This is an unbundled version of all tests inside Direwolf Revit.
-    /// It runs a very exhaustive analysis of the whole model; iterating, categorizing, extracting data and saving records of each element inside the model.
-    /// This is the most intense test in all of Direwolf Revit.
-    /// It outputs a record called <see cref="ModelIntrospection"/>, which contains not only the counts, but also a <see cref="ElementInformation"/> and <see cref="ParameterInformation"/> for each element.
-    /// Output of this file is meant to go into three tables inside the Direwolf database:
-    ///     - <see cref="Wolfpack"/>
-    ///         |_<see cref="ModelIntrospection"/> <-- Goes into [results] as JSON
-    ///         |_<see cref="ElementInformation"/> <-- Dedicated table with FK to Wolfpack's row
-    ///             |_<see cref="ParameterInformation"/>  <-- Dedicated table with FK to their corresponding <see cref="ElementInformation"/>.
-    /// Check <see cref="WolfpackDB"/> for details on the SQL implementation. Schema is inside the prisma.schema file on direwolf-db.
-    /// </summary>
     public record class GetModelSnapshot : RevitHowl
     {
-        public GetModelSnapshot(Document doc) => SetRevitDocument(doc);
-
         // These are all categories for which information has to be extracted.
         private List<View> viewsInsideDocument = [];
         private List<View> notInSheets = [];
@@ -44,15 +29,12 @@ namespace Direwolf.Revit.Howls
         private List<Element> isFlipped = [];
         private Dictionary<string, int> worksetElementCount = [];
         private Stack<ElementInformation> individualElementInfo = [];
-        private Dictionary<Family, List<Element?>> getElementsByFamily = [];
-        private Dictionary<string, List<string>> elementsByFamilyString = [];
 
         private Prey ProcessInfo()
         {
             var doc = GetRevitDocument();
             warns.AddRange(GetRevitDocument().GetWarnings());
             ICollection<Element> collector = [.. new FilteredElementCollector(GetRevitDocument()).WhereElementIsNotElementType()];
-            double elementCountTotal = collector.Count;
 
             foreach (Element e in collector)
             {
@@ -84,22 +66,6 @@ namespace Direwolf.Revit.Howls
                     bool? isWorkshared = false;
 
                     FamilyInstance? fm = e as FamilyInstance;
-                    if (fm is not null)
-                    {
-                        if (!getElementsByFamily.TryGetValue(fm.Symbol.Family, out List<Element?>? value))
-                        {
-                            value = [];
-                            getElementsByFamily[fm.Symbol.Family] = value;
-                        }
-                        value.Add(fm.Symbol.Family);
-
-                        if (!elementsByFamilyString.TryGetValue(fm.Symbol.FamilyName, out List<string>? stringValue))
-                        {
-                            stringValue = [];
-                            elementsByFamilyString[fm.Symbol.FamilyName] = stringValue;
-                        }
-                        stringValue.Add(fm.Symbol.FamilyName);
-                    }
 
                     // isGrouped
                     if (e?.GroupId is not null)
@@ -165,55 +131,6 @@ namespace Direwolf.Revit.Howls
 
                     if (e.LevelId is not null) levelId = e.LevelId.ToString();
 
-                    // create element info
-                    List<ParameterInformation?>? parameters = [];
-                    parameters.AddRange(from p in e.GetOrderedParameters()
-                                        select p.GetParameterFromElement(doc));
-
-                    Dictionary<string, string> processed = [];
-                    foreach (var p in parameters)
-                    {
-                        processed.Add("parameterGuid", p.Value.parameterGuid);
-                        processed.Add("documentOwner", p.Value.documentOwner);
-                        processed.Add("storageType", p.Value.storageType.ToString());
-                        processed.Add("hasValue", p.Value.hasValue.ToString());
-                        processed.Add("parameterIdValue", p.Value.parameterIdValue.ToString());
-                        processed.Add("isReadOnly", p.Value.isReadOnly.ToString());
-                        processed.Add("isShared", p.Value.isShared.ToString());
-                        processed.Add("isUserModifiable", p.Value.ToString());
-                    }
-
-                    individualElementInfo.Push(new ElementInformation
-                    {
-                        idValue = e.Id.Value,
-                        uniqueElementId = e.UniqueId,
-                        elementVersionId = e.VersionGuid.ToString(),
-                        familyName = familyName,
-                        category = builtInCategory,
-                        builtInCategory = builtInCategory,
-                        workset = workset,
-                        views = views,
-                        designOption = designOption,
-                        documentOwner = docOwner,
-                        ownerViewId = ownerViewId,
-                        worksetId = worksetId,
-                        levelId = levelId,
-                        createdPhaseId = createdPhaseId,
-                        demolishedPhaseId = demolishedPhaseId,
-                        groupId = groupId,
-                        workshareId = workshareId,
-                        isGrouped = isGrouped,
-                        isModifiable = isModifiable,
-                        isViewSpecific = isViewSpecific,
-                        isBuiltInCategory = isBuiltInCategory,
-                        isAnnotative = isAnnotative,
-                        isModel = isModel,
-                        isPinned = isPinned,
-                        isWorkshared = isWorkshared,
-                        Parameters = processed
-                    });
-
-                    // filter element for indicators
                     switch (e)
                     {
                         case View:
@@ -386,6 +303,35 @@ namespace Direwolf.Revit.Howls
                             break;
                     }
 
+                    individualElementInfo.Push(new ElementInformation
+                    {
+                        idValue = e.Id.Value,
+                        uniqueElementId = e.UniqueId,
+                        elementVersionId = e.VersionGuid.ToString(),
+                        familyName = familyName,
+                        category = builtInCategory,
+                        builtInCategory = builtInCategory,
+                        workset = workset,
+                        views= views,
+                        designOption= designOption,
+                        documentOwner = docOwner,
+                        ownerViewId = ownerViewId,
+                        worksetId = worksetId,
+                        levelId = levelId,
+                        createdPhaseId = createdPhaseId,
+                        demolishedPhaseId= demolishedPhaseId,
+                        groupId= groupId,
+                        workshareId= workshareId,
+                        isGrouped= isGrouped,
+                        isModifiable= isModifiable,
+                        isViewSpecific= isViewSpecific,
+                        isBuiltInCategory= isBuiltInCategory,
+                        isAnnotative= isAnnotative,
+                        isModel= isModel,
+                        isPinned= isPinned,
+                        isWorkshared= isWorkshared,
+                        Parameters = null
+                    });
                 }
             }
             // view not in sheet. needs to be done after all are done.
@@ -425,70 +371,7 @@ namespace Direwolf.Revit.Howls
                 { "isFlipped", isFlipped.Count },
                 { "worksetElementCount", worksetElementCount.Count }
             };
-
-            Dictionary<string, double> elementCount = [];
-            foreach (KeyValuePair<Family, List<Element?>> e in getElementsByFamily)
-            {
-                elementCount.Add(e.Key.Name, e.Value.Count);
-            }
-
-
-            Dictionary<ElementInformation, List<ParameterInformation?>>? introspectionInfo(IEnumerable<Element> list)
-            {
-                Dictionary<ElementInformation, List<ParameterInformation?>>? results = [];
-                List<ParameterInformation?> parameters = [];
-
-                foreach (var e in viewsInsideDocument)
-                {
-                    ElementInformation el = e.GetElementInformation(doc);
-
-                    foreach (var pl in e.GetOrderedParameters())
-                    {
-                        ParameterInformation? pi = pl.GetParameterFromElement(doc);
-                        parameters.Add(pi);
-                    }
-                    results.Add(el, parameters);
-                }
-                return results;
-            }
-
-            Dictionary<string, string>? refs = [];
-            foreach (var r in externalRefs)
-            {
-                ExternalFileReferenceType rt = r.Item1;
-                ExternalFileReference fr = r.Item2;
-
-                refs.Add(rt.ToString(), fr.PathType.ToString());
-            }
-
-            ModelIntrospection m = new()
-            {
-                elementCountTotal = collector.Count,
-                familiyElementCount = elementsByFamilyString,
-                documentVersion = doc.ProjectInformation.VersionGuid.ToString(),
-                fileSize = new FileInfo(doc.PathName).Length,
-                warnings = [.. doc.GetWarnings().Select(x => x.GetDescriptionText())],
-                elementCount = elementCount,
-                viewsInsideDocument = introspectionInfo(viewsInsideDocument),
-                notInSheets = introspectionInfo(notInSheets),
-                annotativeElements = introspectionInfo(annotativeElements),
-                externalRefs = refs,
-                modelGroups = introspectionInfo(modelGroups),
-                detailGroups = introspectionInfo(detailGroups),
-                designOptions = introspectionInfo(designOptions),
-                levels = introspectionInfo(levels),
-                grids = introspectionInfo(grids),
-                unenclosedRoom = introspectionInfo(unenclosedRoom),
-                viewports = introspectionInfo(viewports),
-                unconnectedDucts = introspectionInfo(unconnectedDucts),
-                unconnectedPipes = introspectionInfo(unconnectedPipes),
-                unconnectedElectrical = introspectionInfo((IEnumerable<Element>)unconnectedElectrical),
-                nonNativeStyles = introspectionInfo(nonNativeStyles),
-                isFlipped = introspectionInfo(isFlipped),
-                worksetElementCount = worksetElementCount
-            };
-
-            return new Prey(m);
+            return new Prey(results);
         }
 
         public override bool Execute()

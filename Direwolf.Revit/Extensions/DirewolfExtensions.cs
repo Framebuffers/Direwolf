@@ -9,18 +9,25 @@ public static class DirewolfExtensions
 {
     public static ParameterInformation? GetParameterFromElement(this Parameter p, Document doc)
     {
-        if (doc is not null)
-            return new ParameterInformation()
+        if (doc is not null && p is not null)
+        {
+            try
             {
-                parameterGuid = p.GUID.ToString(),
-                documentOwner = doc.CreationGUID.ToString(),
-                hasValue = p.HasValue,
-                storageType = p.StorageType,
-                parameterIdValue = p.Id.Value,
-                isReadOnly = p.IsReadOnly,
-                isShared = p.IsShared,
-                isUserModifiable = p.UserModifiable
-            };
+                var pi = new ParameterInformation() // parameter has every value filled, or Revit has initialized them to null/zero.
+                {
+                    parameterGuid = p.GUID.ToString(),
+                    documentOwner = doc.CreationGUID.ToString(),
+                    hasValue = p.HasValue,
+                    storageType = p.StorageType,
+                    parameterIdValue = p.Id.Value,
+                    value = p.GetParameterValue()
+                };
+            }
+            catch (Exception)
+            {
+                return null; 
+            }
+        }
         return null;
     }
 
@@ -120,14 +127,20 @@ public static class DirewolfExtensions
             Dictionary<string, string> processed = [];
             foreach (var p in parameters)
             {
-                processed.Add("parameterGuid", p.Value.parameterGuid);
-                processed.Add("documentOwner", p.Value.documentOwner);
-                processed.Add("storageType", p.Value.storageType.ToString());
-                processed.Add("hasValue", p.Value.hasValue.ToString());
-                processed.Add("parameterIdValue", p.Value.parameterIdValue.ToString());
-                processed.Add("isReadOnly", p.Value.isReadOnly.ToString());
-                processed.Add("isShared", p.Value.isShared.ToString());
-                processed.Add("isUserModifiable", p.Value.ToString());
+                try
+                {
+                    processed.Add("parameterGuid", p.Value.parameterGuid);
+                    processed.Add("documentOwner", p.Value.documentOwner);
+                    processed.Add("storageType", p.Value.storageType.ToString());
+                    processed.Add("hasValue", p.Value.hasValue.ToString());
+                    processed.Add("value", p.Value.value.ToString() ?? string.Empty);
+                    processed.Add("parameterIdValue", p.Value.parameterIdValue.ToString());
+                    processed.Add("isUserModifiable", p.Value.ToString());
+                }
+                catch
+                {
+                    continue;
+                }
             }
 
             return new ElementInformation
