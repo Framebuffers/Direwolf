@@ -7,7 +7,7 @@ using Direwolf.Revit.Howls;
 using Direwolf.Revit.Utilities;
 using Revit.Async;
 using System.Diagnostics;
-using static Direwolf.Revit.Utilities.DirewolfExtensions;
+using static Direwolf.Revit.Extensions.DirewolfExtensions;
 
 namespace Direwolf.Revit.Commands.DirewolfCommands
 {
