@@ -1,6 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Direwolf.Definitions;
-using Direwolf.Revit.ElementFilters;
+using Direwolf.Revit.Extensions;
 using Direwolf.Revit.Utilities;
 using System;
 using System.Collections.Generic;
@@ -26,7 +26,7 @@ namespace Direwolf.Revit.Howls
 
             try
             {
-                IEnumerable<Element?> annotativeElements = doc.GetAnnotativeElements();
+                IEnumerable<Element?> annotativeElements = doc._GetAnnotativeElements();
                 lastName = "getAnnotativeElements";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, annotativeElements.Count().ToString())));
                 Debug.Print(lastName+" "+annotativeElements.Count().ToString());
@@ -38,7 +38,7 @@ namespace Direwolf.Revit.Howls
                 //}
                 //try
                 //{
-                IEnumerable<Element?> designOptions = doc.GetDesignOptions();
+                IEnumerable<Element?> designOptions = doc._GetDesignOptions();
                 lastName = "getDesignOptions";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, designOptions.Count().ToString())));
                 Debug.Print(lastName + " " +designOptions.Count().ToString());
@@ -50,7 +50,7 @@ namespace Direwolf.Revit.Howls
                 //}
                 //try
                 //{
-                IEnumerable<Element?> detailGroups = doc.GetDetailGroups();
+                IEnumerable<Element?> detailGroups = doc._GetDetailGroups();
                 lastName = "getDetailGroups";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, detailGroups.Count().ToString())));
                 Debug.Print(lastName+" "+detailGroups.Count().ToString());
@@ -62,7 +62,7 @@ namespace Direwolf.Revit.Howls
                 //}
                 //try
                 //{
-                Dictionary<string, int> elementsByWorkset = doc.GetElementsByWorkset();
+                Dictionary<string, int> elementsByWorkset = doc._GetElementsByWorkset();
                 lastName = "getElementsByWorkset";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, elementsByWorkset.Count.ToString())));
                 Debug.Print(lastName);
@@ -74,7 +74,7 @@ namespace Direwolf.Revit.Howls
                 //}
                 //try
                 //{
-                IEnumerable<FailureMessage> errorsAndWarnings = doc.GetErrorsAndWarnings();
+                IEnumerable<FailureMessage> errorsAndWarnings = doc._GetErrorsAndWarnings();
                 lastName = "getErrorsAndWarnings";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, errorsAndWarnings.Count().ToString())));
                 Debug.Print(lastName);
@@ -86,7 +86,7 @@ namespace Direwolf.Revit.Howls
                 //}
                 //try
                 //{
-                int familyCount = doc.GetFamilies().Count();
+                int familyCount = doc._GetFamilies().Count();
                 lastName = "getHowManyFamilies";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, familyCount.ToString())));
                 Debug.Print(lastName);
@@ -110,7 +110,7 @@ namespace Direwolf.Revit.Howls
                 //}
                 //try
                 //{
-                IEnumerable<Element?> inPlaceFamilies = doc.GetInPlaceFamilies();
+                IEnumerable<Element?> inPlaceFamilies = doc._GetInPlaceFamilies();
                 lastName = "getInPlaceFamilies";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, inPlaceFamilies.Count().ToString())));
                 Debug.Print(lastName);
@@ -122,7 +122,7 @@ namespace Direwolf.Revit.Howls
                 //}
                 //try
                 //{
-                IEnumerable<Family> familiesWithMostTypes = doc.GetFamliesWithMostTypes();
+                IEnumerable<Family> familiesWithMostTypes = doc._GetFamliesWithMostTypes();
                 lastName = "getFamliesWithMostTypes";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, familiesWithMostTypes.Count().ToString())));
                 Debug.Print(lastName);
@@ -134,7 +134,7 @@ namespace Direwolf.Revit.Howls
                 //}
                 //try
                 //{
-                int levelCount = doc.GetLevelCount();
+                int levelCount = doc._GetLevelCount();
                 lastName = "getLevelCount";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, levelCount.ToString())));
                 Debug.Print(lastName);
@@ -146,7 +146,7 @@ namespace Direwolf.Revit.Howls
                 //}
                 //try
                 //{
-                IEnumerable<Element?> mirroredObjects = doc.GetMirroredObjects();
+                IEnumerable<Element?> mirroredObjects = doc._GetMirroredObjects();
                 lastName = "getMirroredObjects";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, mirroredObjects.Count().ToString())));
                 Debug.Print(lastName);
@@ -158,7 +158,7 @@ namespace Direwolf.Revit.Howls
                 //}
                 //try
                 //{
-                IEnumerable<Element?> modelGroups = doc.GetModelGroups();
+                IEnumerable<Element?> modelGroups = doc._GetModelGroups();
                 lastName = "getModelGroups";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, modelGroups.Count().ToString())));
                 Debug.Print(lastName);
@@ -170,7 +170,7 @@ namespace Direwolf.Revit.Howls
                 //}
                 //try
                 //{
-                IEnumerable<Element?> nonNativeObjectStyles = doc.GetNonNativeObjectStyles();
+                IEnumerable<Element?> nonNativeObjectStyles = doc._GetNonNativeObjectStyles();
                 lastName = "getNonNativeObjectStyles";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, nonNativeObjectStyles.Count().ToString())));
                 Debug.Print(lastName);
@@ -182,7 +182,7 @@ namespace Direwolf.Revit.Howls
                 //}
                 //try
                 //{
-                IEnumerable<Element?> externalFiles = doc.GetExternalFileReferences();
+                IEnumerable<Element?> externalFiles = doc._GetExternalFileReferences();
                 lastName = "getImportedInstances";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, externalFiles.Count().ToString())));
                 Debug.Print(lastName);
@@ -194,7 +194,7 @@ namespace Direwolf.Revit.Howls
                 //}
                 //try
                 //{
-                IEnumerable<Element?> unconnectedDucts = doc.GetUnconnectedDucts();
+                IEnumerable<Element?> unconnectedDucts = doc._GetUnconnectedDucts();
                 lastName = "getUnconnectedDucts";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, unconnectedDucts.Count().ToString())));
                 Debug.Print(lastName);
@@ -206,7 +206,7 @@ namespace Direwolf.Revit.Howls
                 //}
                 //try
                 //{
-                IEnumerable<Element?> unconnectedElectrical = doc.GetUnconnectedElectrical();
+                IEnumerable<Element?> unconnectedElectrical = doc._GetUnconnectedElectrical();
                 lastName = "getUnconnectedElectrical";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, unconnectedElectrical.Count().ToString())));
                 Debug.Print(lastName);
@@ -218,7 +218,7 @@ namespace Direwolf.Revit.Howls
                 //}
                 //try
                 //{
-                IEnumerable<Element?> unconnectedPipes = doc.GetUnconnectedPipes();
+                IEnumerable<Element?> unconnectedPipes = doc._GetUnconnectedPipes();
                 lastName = "getUnconnectedPipes";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, unconnectedPipes.Count().ToString())));
                 Debug.Print(lastName);
@@ -230,7 +230,7 @@ namespace Direwolf.Revit.Howls
                 //}
                 //try
                 //{
-                IEnumerable<Element?> unenclosedRooms = doc.GetUnenclosedRooms();
+                IEnumerable<Element?> unenclosedRooms = doc._GetUnenclosedRooms();
                 lastName = "getUnenclosedRooms";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, unenclosedRooms.Count().ToString())));
                 Debug.Print(lastName);
@@ -242,7 +242,7 @@ namespace Direwolf.Revit.Howls
                 //}
                 //try
                 //{
-                IEnumerable<Element?> unusedFamilies = doc.GetUnusedFamilies();
+                IEnumerable<Element?> unusedFamilies = doc._GetUnusedFamilies();
                 lastName = "getUnusedFamilies";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, unusedFamilies.Count().ToString())));
                 Debug.Print(lastName);
@@ -255,7 +255,7 @@ namespace Direwolf.Revit.Howls
                 //try
                 //{
 
-                IEnumerable<Element?> views = doc.GetViews();
+                IEnumerable<Element?> views = doc._GetViews();
                 lastName = "getViews";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, views.Count().ToString())));
                 Debug.Print(lastName);
@@ -267,7 +267,7 @@ namespace Direwolf.Revit.Howls
                 //}
                 //try
                 //{
-                Dictionary<Family, int> instancesPerFamily = doc.GetInstancesPerFamily();
+                Dictionary<Family, int> instancesPerFamily = doc._GetInstancesPerFamily();
                 lastName = "getInstancesPerFamily";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, instancesPerFamily.Count.ToString())));
                 Debug.Print(lastName);
@@ -279,7 +279,7 @@ namespace Direwolf.Revit.Howls
                 //}
                 //try
                 //{
-                Dictionary<Category, List<Family>> familiesByCategory = doc.GetFamiliesByCategory();
+                Dictionary<Category, List<Family>> familiesByCategory = doc._GetFamiliesByCategory();
                 lastName = "getFamiliesByCategory";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, familiesByCategory.Count.ToString())));
                 Debug.Print(lastName);
@@ -291,7 +291,7 @@ namespace Direwolf.Revit.Howls
                 //}
                 //try
                 //{
-                IEnumerable<Element?>? viewsNotInSheets = doc.GetViewsNotInSheets();
+                IEnumerable<Element?>? viewsNotInSheets = doc._GetViewsNotInSheets();
                 lastName = "getViewsNotInSheets";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, viewsNotInSheets.Count().ToString())));
                 Debug.Print(lastName);

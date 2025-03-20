@@ -33,5 +33,9 @@
 		<ProjectReference Include="..\Direwolf\Direwolf.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="ElementFilters\" />
+	</ItemGroup>
+
 
 </Project>
