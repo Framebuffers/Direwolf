@@ -10,7 +10,6 @@ namespace Direwolf.Definitions
     {
         public event EventHandler DatabaseConnectedEventHandler;
         private readonly DbConnectionString _str;
-        private const string TABLE_NAME = "Wolfpack";
 
         public WolfpackDB(DbConnectionString db)
         {

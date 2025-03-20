@@ -48,7 +48,7 @@
 
 //            foreach (Element e in collector)
 //            {
-//                if (e is not null && e.IsValidObject && e.Category is not null && e.Category.CategoryType is not CategoryType.Invalid || e?.Category?.CategoryType is not CategoryType.Internal)
+//                if (e is not null && e.IsValidObject && e.category is not null && e.category.CategoryType is not CategoryType.Invalid || e?.category?.CategoryType is not CategoryType.Internal)
 //                {
 //                    Autodesk.Revit.DB.Parameter? worksetParam = e?.get_Parameter(BuiltInParameter.ELEM_PARTITION_PARAM);
 
@@ -78,14 +78,14 @@
 //                    FamilyInstance? fm = e as FamilyInstance;
 
 //                    // isGrouped
-//                    if (e?.GroupId is not null)
+//                    if (e?.groupId is not null)
 //                    {
 //                        isGrouped = true;
-//                        groupId = e.GroupId.ToString();
+//                        groupId = e.groupId.ToString();
 //                    }
 
 //                    // isModifiable
-//                    if (e.IsModifiable) isModifiable = true;
+//                    if (e.isModifiable) isModifiable = true;
 
 //                    // isViewSpecific
 //                    if (!e.ViewSpecific)
@@ -95,31 +95,31 @@
 //                    else
 //                    {
 //                        isViewSpecific = true;
-//                        ownerViewId = e.OwnerViewId.ToString();
+//                        ownerViewId = e.ownerViewId.ToString();
 //                    }
 
 //                    // isBuiltInCategory + builtInCategory
-//                    if (e.Category is not null && e.Category.BuiltInCategory is not BuiltInCategory.INVALID)
+//                    if (e.category is not null && e.category.builtInCategory is not builtInCategory.INVALID)
 //                    {
 //                        isBuiltInCategory = true;
-//                        category = e.Category.Name;
+//                        category = e.category.Name;
 //                    }
 
-//                    if (e.WorksetId is not null) worksetId = e.WorksetId.ToString();
+//                    if (e.worksetId is not null) worksetId = e.worksetId.ToString();
 
 //                    if (e.HasPhases())
 //                    {
-//                        if (e.CreatedPhaseId is not null) createdPhaseId = e.CreatedPhaseId.ToString();
-//                        if (e.DemolishedPhaseId is not null) demolishedPhaseId = e.DemolishedPhaseId.ToString();
+//                        if (e.createdPhaseId is not null) createdPhaseId = e.createdPhaseId.ToString();
+//                        if (e.demolishedPhaseId is not null) demolishedPhaseId = e.demolishedPhaseId.ToString();
 //                    }
 
-//                    if (e.DesignOption is not null) designOption = e.DesignOption.Name;
+//                    if (e.designOption is not null) designOption = e.designOption.Name;
 
 //                    if (e.Document is not null) docOwner = doc.CreationGUID.ToString();
 
 //                    isPinned = e.Pinned;
 
-//                    if (doc.IsWorkshared)
+//                    if (doc.isWorkshared)
 //                    {
 //                        isWorkshared = true;
 //                        workshareId = doc.WorksharingCentralGUID.ToString();
@@ -139,7 +139,7 @@
 //                        }
 //                    }
 
-//                    if (e.LevelId is not null) levelId = e.LevelId.ToString();
+//                    if (e.levelId is not null) levelId = e.levelId.ToString();
 
 //                    switch (e)
 //                    {
@@ -150,18 +150,18 @@
 //                            {
 //                                viewsInsideDocument.Add(v);
 //                            }
-//                            builtInCategory = e?.Category?.BuiltInCategory.ToString();
+//                            builtInCategory = e?.category?.builtInCategory.ToString();
 //                            break;
 //                        case Viewport:
 //                            Viewport? vp = e as Viewport;
 //                            if (vp is not null) viewports.Add(vp);
-//                            builtInCategory = e?.Category?.BuiltInCategory.ToString();
+//                            builtInCategory = e?.category?.builtInCategory.ToString();
 //                            break;
 //                        case Group:
 //                            Group? g = e as Group;
 //                            if (g is not null)
 //                            {
-//                                if (g.Category.Name == "Detail Groups")
+//                                if (g.category.Name == "Detail Groups")
 //                                {
 //                                    detailGroups.Add(g);
 //                                }
@@ -170,29 +170,29 @@
 //                                    modelGroups.Add(g);
 //                                }
 //                            }
-//                            builtInCategory = e?.Category?.BuiltInCategory.ToString();
+//                            builtInCategory = e?.category?.builtInCategory.ToString();
 //                            break;
-//                        case DesignOption:
-//                            DesignOption? option = e as DesignOption;
+//                        case designOption:
+//                            designOption? option = e as designOption;
 //                            if (option is not null) designOptions.Add(option);
-//                            builtInCategory = e?.Category?.BuiltInCategory.ToString();
+//                            builtInCategory = e?.category?.builtInCategory.ToString();
 //                            break;
 //                        case Level:
 //                            Level? l = e as Level;
 //                            if (l is not null) levels.Add(l);
-//                            builtInCategory = e?.Category?.BuiltInCategory.ToString();
+//                            builtInCategory = e?.category?.builtInCategory.ToString();
 //                            break;
 //                        case Grid:
 //                            Grid? gr = e as Grid;
 //                            if (gr is not null) grids.Add(gr);
-//                            builtInCategory = e?.Category?.BuiltInCategory.ToString();
+//                            builtInCategory = e?.category?.builtInCategory.ToString();
 //                            break;
 //                        case GraphicsStyle:
 //                            GraphicsStyle? graphicsStyle = e as GraphicsStyle;
 //                            if (graphicsStyle is not null)
 //                            {
-//                                Category c = graphicsStyle.GraphicsStyleCategory;
-//                                builtInCategory = e?.Category?.BuiltInCategory.ToString();
+//                                category c = graphicsStyle.GraphicsStyleCategory;
+//                                builtInCategory = e?.category?.builtInCategory.ToString();
 
 //                                if (c is not null && c.IsCuttable is not false && c.CategoryType == CategoryType.Annotation)
 //                                {
@@ -204,13 +204,13 @@
 //                            if (fm is not null)
 //                            {
 //                                if (fm.Mirrored) isFlipped.Add(e);
-//                                builtInCategory = e?.Category?.BuiltInCategory.ToString();
+//                                builtInCategory = e?.category?.builtInCategory.ToString();
 //                            }
 //                            break;
 //                        default:
-//                            switch (e?.Category?.BuiltInCategory)
+//                            switch (e?.category?.builtInCategory)
 //                            {
-//                                case BuiltInCategory.OST_Rooms:
+//                                case builtInCategory.OST_Rooms:
 //                                    Room? room = e as Room;
 //                                    if (room is not null)
 //                                    {
@@ -221,10 +221,10 @@
 //                                            unenclosedRoom.Add(room);
 //                                        }
 //                                    }
-//                                    builtInCategory = e?.Category?.BuiltInCategory.ToString();
+//                                    builtInCategory = e?.category?.builtInCategory.ToString();
 
 //                                    break;
-//                                case BuiltInCategory.OST_DuctCurves:
+//                                case builtInCategory.OST_DuctCurves:
 //                                    if (e is Duct duct)
 //                                    {
 //                                        bool isUnconnected = false;
@@ -244,9 +244,9 @@
 //                                            unconnectedDucts.Add(duct);
 //                                        }
 //                                    }
-//                                    builtInCategory = e?.Category?.BuiltInCategory.ToString();
+//                                    builtInCategory = e?.category?.builtInCategory.ToString();
 //                                    break;
-//                                case BuiltInCategory.OST_PipeCurves:
+//                                case builtInCategory.OST_PipeCurves:
 //                                    if (e is Pipe pipe)
 //                                    {
 //                                        bool isUnconnected = false;
@@ -266,9 +266,9 @@
 //                                            unconnectedPipes.Add(pipe);
 //                                        }
 //                                    }
-//                                    builtInCategory = e?.Category?.BuiltInCategory.ToString();
+//                                    builtInCategory = e?.category?.builtInCategory.ToString();
 //                                    break;
-//                                case BuiltInCategory.OST_ElectricalFixtures:
+//                                case builtInCategory.OST_ElectricalFixtures:
 //                                    MEPModel mepModel = ((FamilyInstance)e).MEPModel;
 //                                    if (mepModel != null)
 //                                    {
@@ -281,10 +281,10 @@
 //                                            }
 //                                        }
 //                                    }
-//                                    builtInCategory = e?.Category?.BuiltInCategory.ToString();
+//                                    builtInCategory = e?.category?.builtInCategory.ToString();
 //                                    break;
 //                                default:
-//                                    builtInCategory = e?.Category?.BuiltInCategory.ToString();
+//                                    builtInCategory = e?.category?.builtInCategory.ToString();
 //                                    break;
 //                            }
 
@@ -293,7 +293,7 @@
 //                            break;
 //                    }
 
-//                    switch (e?.Category?.CategoryType)
+//                    switch (e?.category?.CategoryType)
 //                    {
 //                        case CategoryType.Model:
 //                            isAnnotative = false;
@@ -315,31 +315,31 @@
 
 //                    individualElementInfo.Push(new ElementInformation
 //                    {
-//                        ElementIdValue = e.Id.Value,
-//                        ElementUniqueId = e.UniqueId,
-//                        ElementVersionId = e.VersionGuid.ToString(),
-//                        FamilyName = familyName,
-//                        Category = builtInCategory,
-//                        BuiltInCategory = builtInCategory,
-//                        Workset = workset,
-//                        Views = views,
-//                        DesignOption = designOption,
-//                        DocumentOwner = docOwner,
-//                        OwnerViewId = ownerViewId,
-//                        WorksetId = worksetId,
-//                        LevelId = levelId,
-//                        CreatedPhaseId = createdPhaseId,
-//                        DemolishedPhaseId = demolishedPhaseId,
-//                        GroupId = groupId,
-//                        WorkshareId = workshareId,
-//                        IsGrouped = isGrouped,
-//                        IsModifiable = isModifiable,
-//                        IsViewSpecific = isViewSpecific,
-//                        IsBuiltInCategory = isBuiltInCategory,
-//                        IsAnnotative = isAnnotative,
-//                        IsModel = isModel,
-//                        IsPinned = isPinned,
-//                        IsWorkshared = isWorkshared,
+//                        idValue = e.Id.Value,
+//                        uniqueElementId = e.UniqueId,
+//                        elementVersionId = e.VersionGuid.ToString(),
+//                        familyName = familyName,
+//                        category = builtInCategory,
+//                        builtInCategory = builtInCategory,
+//                        workset = workset,
+//                        views = views,
+//                        designOption = designOption,
+//                        documentOwner = docOwner,
+//                        ownerViewId = ownerViewId,
+//                        worksetId = worksetId,
+//                        levelId = levelId,
+//                        createdPhaseId = createdPhaseId,
+//                        demolishedPhaseId = demolishedPhaseId,
+//                        groupId = groupId,
+//                        workshareId = workshareId,
+//                        isGrouped = isGrouped,
+//                        isModifiable = isModifiable,
+//                        isViewSpecific = isViewSpecific,
+//                        isBuiltInCategory = isBuiltInCategory,
+//                        isAnnotative = isAnnotative,
+//                        isModel = isModel,
+//                        isPinned = isPinned,
+//                        isWorkshared = isWorkshared,
 //                        Parameters = null
 //                    });
 //                }

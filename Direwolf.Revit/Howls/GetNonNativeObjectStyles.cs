@@ -22,7 +22,7 @@ namespace Direwolf.Revit.Howls
                     using Category category = graphicsStyle.GraphicsStyleCategory;
                     if (category != null && category.IsCuttable == false && category.CategoryType == CategoryType.Annotation)
                     {
-                        nonNativeObjectStyles.Add($"Style Name: {graphicsStyle.Name}, Category: {category.Name}");
+                        nonNativeObjectStyles.Add($"Style Name: {graphicsStyle.Name}, category: {category.Name}");
                     }
                 }
             }

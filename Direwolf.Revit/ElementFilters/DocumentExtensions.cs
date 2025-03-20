@@ -20,7 +20,6 @@ namespace Direwolf.Revit.ElementFilters
             }
         }
 
-
         public static IEnumerable<Element?> GetAnnotativeElements(this Document doc)
         {
             foreach (var e in from e in doc.GetAllValidElements()
@@ -36,6 +35,7 @@ namespace Direwolf.Revit.ElementFilters
         {
             foreach (var e in from e in doc.GetAllValidElements()
                               where e is DesignOption
+                              where e.Category.BuiltInCategory is BuiltInCategory.OST_DesignOptions
                               select e)
             {
                 yield return e;
@@ -47,8 +47,19 @@ namespace Direwolf.Revit.ElementFilters
             foreach (var e in from e in doc.GetAllValidElements()
                               where e is Group
                               where e.Category is not null
-                              where e.Name == "Detail Groups"
+                              where e.Category.Name == "Detail Groups"
                               select e)
+            {
+                yield return e;
+            }
+        }
+        public static IEnumerable<Element?> GetModelGroups(this Document doc)
+        {
+            foreach (var e in from x in doc.GetAllValidElements()
+                              where x is Group
+                              where x.Category is not null
+                              where x.Category.Name != "Detail Groups"
+                              select x)
             {
                 yield return e;
             }
@@ -102,6 +113,7 @@ namespace Direwolf.Revit.ElementFilters
 
         public static Dictionary<string, object>? GetParameterValue(this Parameter p)
         {
+
             Dictionary<string, object> parameters = [];
             if (p.Definition is not null)
             {
@@ -199,6 +211,7 @@ namespace Direwolf.Revit.ElementFilters
         {
             return doc.GetAllValidElements()
                 .OfType<Grid>()
+                .Where(x => x.Category is not null && x.Category.BuiltInCategory is BuiltInCategory.OST_Grids)
                 .Count();
         }
 
@@ -245,15 +258,6 @@ namespace Direwolf.Revit.ElementFilters
             }
         }
 
-        public static IEnumerable<Element?> GetModelGroups(this Document doc)
-        {
-            foreach (var e in from x in doc.GetAllValidElements()
-                              where x is Group
-                              select x)
-            {
-                yield return e;
-            }
-        }
 
         public static IEnumerable<Element?> GetNonNativeObjectStyles(this Document doc)
         {
@@ -385,7 +389,7 @@ namespace Direwolf.Revit.ElementFilters
                 yield return e;
             }
         }
-
+        
         public static SortedDictionary<long, string> GetFamilyFileNamesSortedByFileSize(this Document doc)
         {
             try

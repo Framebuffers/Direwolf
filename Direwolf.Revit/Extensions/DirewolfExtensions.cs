@@ -51,7 +51,7 @@ public static class DirewolfExtensions
         {
             ["UniqueId"] = element.UniqueId ?? 0.ToString(),
             ["VersionGuid"] = element.VersionGuid.ToString(),
-            ["IsPinned"] = element.Pinned.ToString(),
+            ["isPinned"] = element.Pinned.ToString(),
             ["Data"] = ExtractParameterMap(element)
         }
     });
@@ -114,7 +114,7 @@ public static class DirewolfExtensions
                 category = e.Category.Name;
             }
 
-            // is on Workset
+            // is on workset
             if (e.WorksetId is not null) worksetId = e.WorksetId.ToString();
 
             // phase info
@@ -147,31 +147,31 @@ public static class DirewolfExtensions
 
             return new ElementInformation
             {
-                ElementIdValue = e.Id.Value,
-                ElementUniqueId = e.UniqueId,
-                ElementVersionId = e.VersionGuid.ToString(),
-                FamilyName = familyName,
-                Category = builtInCategory,
-                BuiltInCategory = builtInCategory,
-                Workset = workset,
-                Views = views,
-                DesignOption = designOption,
-                DocumentOwner = docOwner,
-                OwnerViewId = ownerViewId,
-                WorksetId = worksetId,
-                LevelId = levelId,
-                CreatedPhaseId = createdPhaseId,
-                DemolishedPhaseId = demolishedPhaseId,
-                GroupId = groupId,
-                WorkshareId = workshareId,
-                IsGrouped = isGrouped,
-                IsModifiable = isModifiable,
-                IsViewSpecific = isViewSpecific,
-                IsBuiltInCategory = isBuiltInCategory,
-                IsAnnotative = isAnnotative,
-                IsModel = isModel,
-                IsPinned = isPinned,
-                IsWorkshared = isWorkshared,
+                idValue = e.Id.Value,
+                uniqueElementId = e.UniqueId,
+                elementVersionId = e.VersionGuid.ToString(),
+                familyName = familyName,
+                category = builtInCategory,
+                builtInCategory = builtInCategory,
+                workset = workset,
+                views = views,
+                designOption = designOption,
+                documentOwner = docOwner,
+                ownerViewId = ownerViewId,
+                worksetId = worksetId,
+                levelId = levelId,
+                createdPhaseId = createdPhaseId,
+                demolishedPhaseId = demolishedPhaseId,
+                groupId = groupId,
+                workshareId = workshareId,
+                isGrouped = isGrouped,
+                isModifiable = isModifiable,
+                isViewSpecific = isViewSpecific,
+                isBuiltInCategory = isBuiltInCategory,
+                isAnnotative = isAnnotative,
+                isModel = isModel,
+                isPinned = isPinned,
+                isWorkshared = isWorkshared,
                 Parameters = null
             };
         }
