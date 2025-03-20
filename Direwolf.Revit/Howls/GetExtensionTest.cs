@@ -25,7 +25,7 @@ namespace Direwolf.Revit.Howls
 
             try
             {
-                IEnumerable<Element> annotativeElements = doc.GetAnnotativeElements();
+                IEnumerable<Element?> annotativeElements = doc.GetAnnotativeElements();
                 lastName = "getAnnotativeElements";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, annotativeElements.Count().ToString())));
             }
@@ -38,7 +38,7 @@ namespace Direwolf.Revit.Howls
             try
             {
 
-                IEnumerable<Element> designOptions = doc.GetDesignOptions();
+                IEnumerable<Element?> designOptions = doc.GetDesignOptions();
                 lastName = "getDesignOptions";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, designOptions.Count().ToString())));
             }
@@ -51,7 +51,7 @@ namespace Direwolf.Revit.Howls
             {
 
 
-                IEnumerable<Element> detailGroups = doc.GetDetailGroups();
+                IEnumerable<Element?> detailGroups = doc.GetDetailGroups();
                 lastName = "getDetailGroups";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, detailGroups.Count().ToString())));
             }
@@ -75,8 +75,6 @@ namespace Direwolf.Revit.Howls
             }
             try
             {
-
-
                 IEnumerable<FailureMessage> errorsAndWarnings = doc.GetErrorsAndWarnings();
                 lastName = "getErrorsAndWarnings";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, errorsAndWarnings.Count().ToString())));
@@ -89,8 +87,7 @@ namespace Direwolf.Revit.Howls
 
             try
             {
-
-                int familyCount = doc.GetFamilies();
+                int familyCount = doc.GetFamilies().Count;
                 lastName = "getHowManyFamilies";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, familyCount.ToString())));
             }
@@ -99,20 +96,7 @@ namespace Direwolf.Revit.Howls
                 SendCatchToCallback(new Prey($"Extension throwed exception at {lastName}: {e.Message}"));
                 return false;
             }
-            try
-            {
-
-
-                Dictionary<Family, int> familiesWithMostInstances = doc.GetFamiliesWithMostInstances();
-                lastName = "getFamiliesWithMostInstances";
-                SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, familiesWithMostInstances.Count.ToString())));
-            }
-            catch (Exception e)
-            {
-                SendCatchToCallback(new Prey($"Extension throwed exception at {lastName}: {e.Message}"));
-                return false;
-            }
-
+       
             try
             {
 
@@ -126,23 +110,11 @@ namespace Direwolf.Revit.Howls
                 return false;
             }
 
+        
             try
             {
 
-                IList<Element> importedImages = doc.GetImportedImages();
-                lastName = "getImportedImages";
-                SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, importedImages.Count.ToString())));
-            }
-            catch (Exception e)
-            {
-                SendCatchToCallback(new Prey($"Extension throwed exception at {lastName}: {e.Message}"));
-                return false;
-            }
-
-            try
-            {
-
-                IEnumerable<Element> inPlaceFamilies = doc.GetInPlaceFamilies();
+                IEnumerable<Element?> inPlaceFamilies = doc.GetInPlaceFamilies();
                 lastName = "getInPlaceFamilies";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, inPlaceFamilies.Count().ToString())));
             }
@@ -181,7 +153,7 @@ namespace Direwolf.Revit.Howls
             {
 
 
-                IEnumerable<Element> mirroredObjects = doc.GetMirroredObjects();
+                IEnumerable<Element?> mirroredObjects = doc.GetMirroredObjects();
                 lastName = "getMirroredObjects";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, mirroredObjects.Count().ToString())));
             }
@@ -194,7 +166,7 @@ namespace Direwolf.Revit.Howls
             try
             {
 
-                IEnumerable<Element> modelGroups = doc.GetModelGroups();
+                IEnumerable<Element?> modelGroups = doc.GetModelGroups();
                 lastName = "getModelGroups";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, modelGroups.Count().ToString())));
             }
@@ -207,7 +179,7 @@ namespace Direwolf.Revit.Howls
             {
 
 
-                IEnumerable<Element> nonNativeObjectStyles = doc.GetNonNativeObjectStyles();
+                IEnumerable<Element?> nonNativeObjectStyles = doc.GetNonNativeObjectStyles();
                 lastName = "getNonNativeObjectStyles";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, nonNativeObjectStyles.Count().ToString())));
             }
@@ -220,9 +192,9 @@ namespace Direwolf.Revit.Howls
             try
             {
 
-                IEnumerable<Element> importedInstances = doc.GetImportedInstances();
+                IEnumerable<Element?> externalFiles = doc.GetExternalFileReferences();
                 lastName = "getImportedInstances";
-                SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, importedInstances.Count().ToString())));
+                SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, externalFiles.Count().ToString())));
             }
             catch (Exception e)
             {
@@ -233,7 +205,7 @@ namespace Direwolf.Revit.Howls
             {
 
 
-                IEnumerable<Element> unconnectedDucts = doc.GetUnconnectedDucts();
+                IEnumerable<Element?> unconnectedDucts = doc.GetUnconnectedDucts();
                 lastName = "getUnconnectedDucts";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, unconnectedDucts.Count().ToString())));
             }
@@ -246,7 +218,7 @@ namespace Direwolf.Revit.Howls
             {
 
 
-                IEnumerable<Element> unconnectedElectrical = doc.GetUnconnectedElectrical();
+                IEnumerable<Element?> unconnectedElectrical = doc.GetUnconnectedElectrical();
                 lastName = "getUnconnectedElectrical";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, unconnectedElectrical.Count().ToString())));
             }
@@ -259,7 +231,7 @@ namespace Direwolf.Revit.Howls
             try
             {
 
-                IEnumerable<Element> unconnectedPipes = doc.GetUnconnectedPipes();
+                IEnumerable<Element?> unconnectedPipes = doc.GetUnconnectedPipes();
                 lastName = "getUnconnectedPipes";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, unconnectedPipes.Count().ToString())));
             }
@@ -272,7 +244,7 @@ namespace Direwolf.Revit.Howls
             {
 
 
-                IEnumerable<Element> unenclosedRooms = doc.GetUnenclosedRooms();
+                IEnumerable<Element?> unenclosedRooms = doc.GetUnenclosedRooms();
                 lastName = "getUnenclosedRooms";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, unenclosedRooms.Count().ToString())));
             }
@@ -285,7 +257,7 @@ namespace Direwolf.Revit.Howls
             try
             {
 
-                IEnumerable<Element> unusedFamilies = doc.GetUnusedFamilies();
+                IEnumerable<Element?> unusedFamilies = doc.GetUnusedFamilies();
                 lastName = "getUnusedFamilies";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, unusedFamilies.Count().ToString())));
             }
@@ -298,7 +270,7 @@ namespace Direwolf.Revit.Howls
             try
             {
 
-                IEnumerable<Element> views = doc.GetViews();
+                IEnumerable<Element?> views = doc.GetViews();
                 lastName = "getViews";
                 SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, views.Count().ToString())));
             }
@@ -307,6 +279,45 @@ namespace Direwolf.Revit.Howls
                 SendCatchToCallback(new Prey($"Extension throwed exception at {lastName}: {e.Message}"));
                 return false;
             }
+            try
+            {
+
+                SortedDictionary<int, Family> views = doc.GetInstancesPerFamily();
+                lastName = "getInstancesPerFamily";
+                SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, views.Count.ToString())));
+            }
+            catch (Exception e)
+            {
+                SendCatchToCallback(new Prey($"Extension throwed exception at {lastName}: {e.Message}"));
+                return false;
+            }
+            try
+            {
+
+                SortedDictionary<Category, List<Family>> views = doc.GetFamiliesByCategory();
+                lastName = "getFamiliesByCategory";
+                SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, views.Count.ToString())));
+            }
+            catch (Exception e)
+            {
+                SendCatchToCallback(new Prey($"Extension throwed exception at {lastName}: {e.Message}"));
+                return false;
+            }
+            try
+            {
+
+                IEnumerable<Element?>? views = doc.GetViewsNotInSheets();
+                lastName = "getViewsNotInSheets";
+                SendCatchToCallback(new Prey(new KeyValuePair<string, string>(lastName, views.Count().ToString())));
+            }
+            catch (Exception e)
+            {
+                SendCatchToCallback(new Prey($"Extension throwed exception at {lastName}: {e.Message}"));
+                return false;
+            }
+
+
+
 
             return true;
         }

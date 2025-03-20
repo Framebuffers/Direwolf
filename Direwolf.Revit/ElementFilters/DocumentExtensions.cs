@@ -2,15 +2,12 @@
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
-using Direwolf.Definitions;
-using Direwolf.Revit.Utilities;
-using System.Diagnostics;
 
 namespace Direwolf.Revit.ElementFilters
 {
     public static class DocumentExtensions
     {
-        public static IEnumerable<Element> GetAllValidElements(this Document doc)
+        public static IEnumerable<Element?> GetAllValidElements(this Document doc)
         {
             using FilteredElementCollector collector = new FilteredElementCollector(doc).WhereElementIsNotElementType();
             foreach (var e in collector)
@@ -21,24 +18,24 @@ namespace Direwolf.Revit.ElementFilters
         }
 
 
-        public static IEnumerable<Element> GetAnnotativeElements(this Document doc)
+        public static IEnumerable<Element?> GetAnnotativeElements(this Document doc)
         {
             return [.. doc.GetAllValidElements()
-                          .Where(x => x.Category.CategoryType is CategoryType.Annotation)];
+                          .Where(x => x is not null && x.Category.CategoryType is CategoryType.Annotation)];
         }
 
-        public static IEnumerable<Element> GetDesignOptions(this Document doc)
+        public static IEnumerable<Element?> GetDesignOptions(this Document doc)
         {
             return [.. doc.GetAllValidElements()
                           .Where(x => x is DesignOption)
                           .Cast<DesignOption>()];
         }
 
-        public static IEnumerable<Element> GetDetailGroups(this Document doc)
+        public static IEnumerable<Element?> GetDetailGroups(this Document doc)
         {
             return [.. doc.GetAllValidElements()
                 .Where(x => x is Group)
-                .Where(e => e.Category.Name == "Detail Groups")];
+                .Where(e =>e is not null && e.Category.Name == "Detail Groups")];
         }
 
         public static Dictionary<string, int> GetElementsByWorkset(this Document doc)
@@ -133,11 +130,11 @@ namespace Direwolf.Revit.ElementFilters
         {
             var elementsSortedByFamily = new SortedDictionary<Category, List<Family>>();
             foreach ((Element? f, Category? familyCategory) in from Element e in doc.GetAllValidElements()
-                                                       let f = e as FamilyInstance
-                                                       where f is not null
-                                                       let familyCategory = f.Symbol.Family.Category
-                                                       where familyCategory is not null
-                                                       select (e, familyCategory))
+                                                               let f = e as FamilyInstance
+                                                               where f is not null
+                                                               let familyCategory = f.Symbol.Family.Category
+                                                               where familyCategory is not null
+                                                               select (e, familyCategory))
             {
                 if (!elementsSortedByFamily.TryGetValue(familyCategory, out List<Family>? value))
                 {
@@ -150,16 +147,16 @@ namespace Direwolf.Revit.ElementFilters
 
         }
 
-        public static Dictionary<Family, List<Element>> GetElementsByFamily(this Document doc)
+        public static Dictionary<Family, List<Element?>> GetElementsByFamily(this Document doc)
         {
-            var elementsSortedByFamily = new Dictionary<Family, List<Element>>();
+            var elementsSortedByFamily = new Dictionary<Family, List<Element?>>();
             foreach ((Element e, Family familyName) in from Element e in doc.GetAllValidElements()
                                                        let f = e as FamilyInstance
                                                        where f is not null
                                                        let familyName = f.Symbol.Family
                                                        select (e, familyName))
             {
-                if (!elementsSortedByFamily.TryGetValue(familyName, out List<Element>? value))
+                if (!elementsSortedByFamily.TryGetValue(familyName, out List<Element?>? value))
                 {
                     value = [];
                     elementsSortedByFamily[familyName] = value;
@@ -174,7 +171,7 @@ namespace Direwolf.Revit.ElementFilters
         public static HashSet<Family> GetFamilies(this Document doc)
         {
             return [.. doc.GetAllValidElements()
-                          .Where(x => !x.ViewSpecific)
+                          .Where(x => x is not null && ! x.ViewSpecific)
                           .OfType<FamilyInstance>()
                           .Select(x => x.Symbol.Family)];
         }
@@ -186,70 +183,47 @@ namespace Direwolf.Revit.ElementFilters
                 .Count();
         }
 
-        public static Element[] GetExternalFileReferences(this Document doc)
+        public static IEnumerable<Element?> GetExternalFileReferences(this Document doc)
         {
-            return [.. doc.GetAllValidElements().Where(x => x.IsExternalFileReference())];
+            return [.. doc.GetAllValidElements().Where(x => x is not null && x.IsExternalFileReference())];
         }
 
-        public static IEnumerable<Element> GetInPlaceFamilies(this Document doc)
+        public static IEnumerable<Element?> GetInPlaceFamilies(this Document doc)
         {
             return [.. doc.GetFamilies().Where(x => x.IsInPlace)];
         }
 
         public static IEnumerable<Family> GetFamliesWithMostTypes(this Document doc)
         {
-            var count = [.. doc.GetFamilies().Select(x => x.GetFamilySymbolIds())];
+            return doc.GetFamilies().OrderByDescending(x => x.GetFamilySymbolIds().Count);
         }
 
         public static int GetLevelCount(this Document doc)
         {
-            return new FilteredElementCollector(doc)
-                .WhereElementIsViewIndependent()
-                .WhereElementIsNotElementType()
-                .OfClass(typeof(Level))
-                .GetElementCount();
+            return doc.GetAllValidElements().OfType<Grid>().Count();
         }
 
-        public static IEnumerable<Element> GetMirroredObjects(this Document doc)
+        public static IEnumerable<Element?> GetMirroredObjects(this Document doc)
         {
-            return [.. doc.GetAllValidElements()
-                      .OfType<FamilyInstance>()
-                      .Where(x => x.GetTransform().HasReflection)];
+            return [.. doc.GetAllValidElements().OfType<FamilyInstance>().Where(x => x.Mirrored)];
         }
 
-        public static IEnumerable<Element> GetModelGroups(this Document doc)
+        public static IEnumerable<Element?> GetModelGroups(this Document doc)
         {
             return [.. doc.GetAllValidElements()
                 .OfType<Group>()];
         }
 
-        public static IEnumerable<Element> GetNonNativeObjectStyles(this Document doc)
+        public static IEnumerable<Element?> GetNonNativeObjectStyles(this Document doc)
         {
-            return [.. new FilteredElementCollector(doc)
-                .OfClass(typeof(GraphicsStyle))
-                .WhereElementIsNotElementType()
-                .WhereElementIsViewIndependent()
-                .Where(x => x is not null)
-                .Where(x => x.Category is not null && x.Category.IsCuttable)
-                .Where(x => x.Category.CategoryType is CategoryType.Annotation)];
+            return [.. doc.GetAllValidElements()
+                .Where(x => x is not null && x.Category is not null && x.Category.IsCuttable)
+                .Where(x =>x is not null && x.Category.CategoryType is CategoryType.Annotation)];
         }
 
-        public static IEnumerable<Element> GetImportedInstances(this Document doc)
+        public static IEnumerable<Element?> GetUnconnectedDucts(this Document doc)
         {
-            return new FilteredElementCollector(doc)
-                .OfClass(typeof(ImportInstance))
-                .WhereElementIsNotElementType()
-                .WhereElementIsViewIndependent()
-                .ToElements();
-        }
-
-        public static IEnumerable<Element> GetUnconnectedDucts(this Document doc)
-        {
-            var ducts = new FilteredElementCollector(doc)
-                .OfCategory(BuiltInCategory.OST_DuctCurves)
-                .WhereElementIsNotElementType()
-                .WhereElementIsViewIndependent()
-                .Cast<Duct>();
+            IEnumerable<Duct> ducts = doc.GetAllValidElements().Where(x => x is not null && x.Category.BuiltInCategory is BuiltInCategory.OST_DuctCurves).Cast<Duct>().AsEnumerable();
 
             return [.. from Duct d in ducts
                    from ConnectorSet set in d.ConnectorManager.Connectors
@@ -258,13 +232,9 @@ namespace Direwolf.Revit.ElementFilters
                    select d];
         }
 
-        public static IEnumerable<Element> GetUnconnectedElectrical(this Document doc)
+        public static IEnumerable<Element?> GetUnconnectedElectrical(this Document doc)
         {
-            var electricalCollector =
-                new FilteredElementCollector(doc)
-                    .WhereElementIsViewIndependent()
-                    .WhereElementIsNotElementType()
-                    .OfCategory(BuiltInCategory.OST_ElectricalFixtures);
+            IEnumerable<Element?> electricalCollector = doc.GetAllValidElements().Where(x => x is not null && x.Category.BuiltInCategory is BuiltInCategory.OST_ElectricalFixtures).AsEnumerable();
 
             return from Element electricalElement in electricalCollector
                    let mepModel = ((FamilyInstance)electricalElement).MEPModel
@@ -275,13 +245,9 @@ namespace Direwolf.Revit.ElementFilters
                    select electricalElement;
         }
 
-        public static IEnumerable<Element> GetUnconnectedPipes(this Document doc)
+        public static IEnumerable<Element?> GetUnconnectedPipes(this Document doc)
         {
-            IEnumerable<Pipe> pipeCollector = new FilteredElementCollector(doc)
-                .OfCategory(BuiltInCategory.OST_PipeCurves)
-                .WhereElementIsViewIndependent()
-                .WhereElementIsNotElementType()
-                .Cast<Pipe>();
+            IEnumerable<Pipe> pipeCollector = doc.GetAllValidElements().Where(x => x is not null && x.Category.BuiltInCategory is BuiltInCategory.OST_PipeCurves).Cast<Pipe>().AsEnumerable();
 
             return [.. from Pipe pipeElement in pipeCollector
                        let connectors = pipeElement.ConnectorManager.Connectors
@@ -291,61 +257,31 @@ namespace Direwolf.Revit.ElementFilters
 
         }
 
-        public static IEnumerable<Element> GetUnenclosedRooms(this Document doc)
+        public static IEnumerable<Element?> GetUnenclosedRooms(this Document doc)
         {
-            return [.. from room in new FilteredElementCollector(doc)
-                         .OfCategory(BuiltInCategory.OST_Rooms)
-                         .WhereElementIsViewIndependent()
-                         .WhereElementIsNotElementType()
-                         .Cast<Room>()
-                           let r = room
-                           let boundary = r.GetBoundarySegments(new SpatialElementBoundaryOptions())
-                       where boundary is null && boundary.Count == 0
-                       select room ];
+            return doc.GetAllValidElements()
+                .Where(x => x is not null && x.Category.BuiltInCategory is BuiltInCategory.OST_Rooms)
+                .Cast<Room>()
+                .Where(x => x.GetBoundarySegments(new SpatialElementBoundaryOptions()) is null && x.GetBoundarySegments(new SpatialElementBoundaryOptions()).Count == 0)
+                .AsEnumerable();
         }
 
-        public static IEnumerable<Element> GetUnusedFamilies(this Document doc)
+        public static IEnumerable<Element?> GetUnusedFamilies(this Document doc)
         {
-            return new FilteredElementCollector(doc)
-                           .WhereElementIsNotElementType()
-                           .WhereElementIsViewIndependent()
-                           .OfClass(typeof(Family))
-                           .Cast<Family>()
-                           .Where(x => x is not null)
-                           .Where(x => !x.GetFamilySymbolIds().Any())
-                           .AsEnumerable();
+            return [.. doc.GetFamilies().Where(x => x.GetFamilySymbolIds().Count == 0)];
         }
 
-        public static IEnumerable<Element> GetViews(this Document doc)
+        public static IEnumerable<Element?> GetViews(this Document doc)
         {
-            return [.. from view in new FilteredElementCollector(doc)
-                       .WhereElementIsNotElementType()
-                       .WhereElementIsViewIndependent()
-                       .OfClass(typeof(View))
-                       where view is not null
-                       let viewCheck = view as View
-                       where viewCheck.IsTemplate is false
-                       select view];
+            return [.. doc.GetAllValidElements()
+                 .OfType<View>()
+                 .Where(x => x.IsTemplate)];
         }
 
-        public static IEnumerable<Element> GetViewsNotInSheets(this Document doc)
+        public static IEnumerable<Element?> GetViewsNotInSheets(this Document doc)
         {
-            var viewCollector =
-                new FilteredElementCollector(doc)
-                       .OfClass(typeof(View))
-                       .WhereElementIsViewIndependent()
-                       .WhereElementIsNotElementType()
-                       .Where(x => x is not null)
-                       .Cast<View>();
-
-            HashSet<ElementId> viewportIds =
-                [.. new FilteredElementCollector(doc)
-                    .OfClass(typeof(Viewport))
-                    .WhereElementIsViewIndependent()
-                    .WhereElementIsNotElementType()
-                    .Where(x => x is not null)
-                    .Cast<Viewport>()
-                    .Select(x => x.ViewId)];
+            IEnumerable<View> viewCollector = [.. doc.GetAllValidElements().OfType<View>()];
+            IEnumerable<ElementId> viewportIds = [.. doc.GetAllValidElements().OfType<Viewport>().Select(x => x.ViewId)];
 
             return from Element viewElement in viewCollector
                    where viewElement is View view
@@ -364,17 +300,8 @@ namespace Direwolf.Revit.ElementFilters
 
                 Directory.CreateDirectory(fullPath);
                 SortedDictionary<long, string> sorted = [];
-
-                HashSet<Family> families = [.. new FilteredElementCollector(doc)
-                                   .WhereElementIsNotElementType()
-                                   .WhereElementIsViewIndependent()
-                                   .OfClass(typeof(Family))
-                                   .Where(x => x is not null)
-                                   .Cast<Family>()
-                                   .Where(x => x.IsEditable && x.IsValidObject)
-                                   .AsEnumerable()];
-
-                foreach (Family f in families)
+            
+                foreach (Family f in doc.GetFamilies())
                 {
                     var rfa = Path.Combine(fullPath, $"{f.Name}.rfa");
                     try
@@ -389,7 +316,7 @@ namespace Direwolf.Revit.ElementFilters
                 }
                 return sorted;
             }
-            catch (Exception e) { Debug.Print(e.Message); }
+            catch { throw new Exception("Error while creating folder"); } // because, else, it could file in the middle
 
             throw new Exception($"The routine could not be initialized. Reason: Could not get into the try/catch clause.");
         }
