@@ -32,7 +32,7 @@ public class GetElementIdByFamily : IExternalCommand
 
     public static Dictionary<string, object> RunBenchmark(Document RevitDocument)
     {
-        ICollection<Element>? allValidElements = RevitDocument?.GetAllValidElements()?.Where(x => x is not null).ToList();
+        ICollection<Element>? allValidElements = RevitDocument?._GetAllValidElements()?.Where(x => x is not null).ToList();
         
         var elementsSortedByFamilyNative = new Dictionary<string, List<long>>();
         foreach ((Element? e, string? familyName) in from Element? e in allValidElements

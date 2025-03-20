@@ -21,25 +21,25 @@
 //    {
 //        public GetModelSnapshotWithInfo(Document doc) => SetRevitDocument(doc);
 //        // These are all categories for which information has to be extracted.
-//        private List<ElementInformation> viewsInsideDocument = [];
-//        private List<ElementInformation> notInSheets = [];
-//        private List<ElementInformation> annotativeElements = [];
+//        private List<_ElementInformation> viewsInsideDocument = [];
+//        private List<_ElementInformation> notInSheets = [];
+//        private List<_ElementInformation> annotativeElements = [];
 //        private List<(ExternalFileReferenceType, ExternalFileReference)> externalRefs = [];
-//        private List<ElementInformation> modelGroups = [];
-//        private List<ElementInformation> detailGroups = [];
-//        private List<ElementInformation> designOptions = [];
-//        private List<ElementInformation> levels = [];
-//        private List<ElementInformation> grids = [];
-//        private List<ElementInformation> warns = [];
-//        private List<ElementInformation> unenclosedRoom = [];
-//        private List<ElementInformation> viewports = [];
-//        private List<ElementInformation> unconnectedDucts = [];
-//        private List<ElementInformation> unconnectedPipes = [];
-//        private List<ElementInformation> unconnectedElectrical = [];
-//        private List<ElementInformation> nonNativeStyles = [];
-//        private List<ElementInformation> isFlipped = [];
-//        private List<ElementInformation> worksetElementCount = [];
-//        private Stack<ElementInformation> individualElementInfo = [];
+//        private List<_ElementInformation> modelGroups = [];
+//        private List<_ElementInformation> detailGroups = [];
+//        private List<_ElementInformation> designOptions = [];
+//        private List<_ElementInformation> levels = [];
+//        private List<_ElementInformation> grids = [];
+//        private List<_ElementInformation> warns = [];
+//        private List<_ElementInformation> unenclosedRoom = [];
+//        private List<_ElementInformation> viewports = [];
+//        private List<_ElementInformation> unconnectedDucts = [];
+//        private List<_ElementInformation> unconnectedPipes = [];
+//        private List<_ElementInformation> unconnectedElectrical = [];
+//        private List<_ElementInformation> nonNativeStyles = [];
+//        private List<_ElementInformation> isFlipped = [];
+//        private List<_ElementInformation> worksetElementCount = [];
+//        private Stack<_ElementInformation> individualElementInfo = [];
 
 //        private Prey ProcessInfo()
 //        {
@@ -313,7 +313,7 @@
 //                            break;
 //                    }
 
-//                    individualElementInfo.Push(new ElementInformation
+//                    individualElementInfo.Push(new _ElementInformation
 //                    {
 //                        idValue = e.Id.Value,
 //                        uniqueElementId = e.UniqueId,
@@ -360,18 +360,18 @@
 //                externalRefs.Add((ext.GetExternalFileReference().ExternalFileReferenceType, ext.GetExternalFileReference()));
 //            }
 
-//            List<ElementInformation> views = [];
+//            List<_ElementInformation> views = [];
 //            views.AddRange(from v in viewsInsideDocument
 //                           let e = v as Element
-//                           select DirewolfExtensions.GetElementInformation(e, doc));
+//                           select DirewolfExtensions._GetElementInformation(e, doc));
 
-//            List<ElementInformation> sheets = [];
+//            List<_ElementInformation> sheets = [];
 
 
 
 //            Dictionary<string, object> results = new()
 //            {
-//                { "viewsInsideDocument", viewsInsideDocument.SelectMany(x => DirewolfExtensions.GetElementInformation(x, GetRevitDocument()))},
+//                { "viewsInsideDocument", viewsInsideDocument.SelectMany(x => DirewolfExtensions._GetElementInformation(x, GetRevitDocument()))},
 //                { "notInSheets", notInSheets.Count },
 //                { "annotativeElements", annotativeElements.Count },
 //                { "externalRefs", externalRefs.Count },

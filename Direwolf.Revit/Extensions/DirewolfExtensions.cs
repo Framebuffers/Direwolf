@@ -5,7 +5,7 @@ using Direwolf.Revit.Definitions;
 namespace Direwolf.Revit.Utilities;
 public static class DirewolfExtensions
 {
-    public static ICollection<Element>? GetAllValidElements(this Document doc)
+    public static ICollection<Element>? _GetAllValidElements(this Document doc)
     {
         return new FilteredElementCollector(doc)
                 .WhereElementIsNotElementType()
@@ -13,7 +13,7 @@ public static class DirewolfExtensions
                 .ToElements();
     }
 
-    public static Dictionary<string, object> ExtractParameterMap(this Element e)
+    public static Dictionary<string, object> _ExtractParameterMap(this Element e)
     {
         Dictionary<string, object> results = [];
         ParameterSet ps = e.Parameters;
@@ -45,18 +45,18 @@ public static class DirewolfExtensions
         return results;
     }
 
-    public static Dictionary<string, object> ExtractElementData(this Element element) => new(new Dictionary<string, object>
+    public static Dictionary<string, object> _ExtractElementData(this Element element) => new(new Dictionary<string, object>
     {
         [element.Id.ToString()] = new Dictionary<string, object>()
         {
             ["UniqueId"] = element.UniqueId ?? 0.ToString(),
             ["VersionGuid"] = element.VersionGuid.ToString(),
             ["isPinned"] = element.Pinned.ToString(),
-            ["Data"] = ExtractParameterMap(element)
+            ["Data"] = _ExtractParameterMap(element)
         }
     });
 
-    public static ElementInformation GetElementInformation(this Element e, Document d)
+    public static _ElementInformation _GetElementInformation(this Element e, Document d)
     {
         if (e is not null && e.IsValidObject && e.Category is not null && e.Category.CategoryType is not CategoryType.Invalid || e?.Category?.CategoryType is not CategoryType.Internal)
         {
@@ -145,7 +145,7 @@ public static class DirewolfExtensions
             if (e?.LevelId is not null) levelId = e.LevelId.ToString();
 
 
-            return new ElementInformation
+            return new _ElementInformation
             {
                 idValue = e.Id.Value,
                 uniqueElementId = e.UniqueId,

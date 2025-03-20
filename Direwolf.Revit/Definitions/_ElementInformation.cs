@@ -1,9 +1,7 @@
-﻿using Autodesk.Revit.DB;
-
-namespace Direwolf.Revit.Definitions
+﻿namespace Direwolf.Revit.Definitions
 {
 
-    public readonly record struct ElementInformation()
+    public readonly record struct _ElementInformation()
     {
         public required double idValue { get; init; }
         public required string uniqueElementId { get; init; }
@@ -31,26 +29,5 @@ namespace Direwolf.Revit.Definitions
         public bool? isPinned { get; init; }
         public bool? isWorkshared { get; init; }
         public Dictionary<string, string>? Parameters { get; init; }
-    }
-    
-    public readonly record struct ParameterInformation()
-    {
-        public required string parameterGuid { get; init; }
-        public required string documentOwner { get; init; }
-        public StorageType storageType { get;init; }
-        public bool hasValue { get; init; }
-        public double parameterIdValue { get; init; }
-        public bool isReadOnly { get; init; }
-        public bool isShared { get; init; }
-        public bool isUserModifiable { get; init; }
-    }
-
-    public readonly record struct ModelIntrospectionInformation
-    {
-        public double elementCountTotal { get; init; }
-        public Dictionary<string, List<string>> familiyElementCount { get; init; }
-        public string documentVersion { get; init; }
-        public long fileSize { get;init; }
-
     }
 }

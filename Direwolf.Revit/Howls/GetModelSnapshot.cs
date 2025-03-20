@@ -28,7 +28,7 @@ namespace Direwolf.Revit.Howls
         private List<GraphicsStyle> nonNativeStyles = [];
         private List<Element> isFlipped = [];
         private Dictionary<string, int> worksetElementCount = [];
-        private Stack<ElementInformation> individualElementInfo = [];
+        private Stack<_ElementInformation> individualElementInfo = [];
 
         private Prey ProcessInfo()
         {
@@ -303,7 +303,7 @@ namespace Direwolf.Revit.Howls
                             break;
                     }
 
-                    individualElementInfo.Push(new ElementInformation
+                    individualElementInfo.Push(new _ElementInformation
                     {
                         idValue = e.Id.Value,
                         uniqueElementId = e.UniqueId,
