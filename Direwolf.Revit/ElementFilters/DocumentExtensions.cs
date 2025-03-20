@@ -3,6 +3,7 @@ using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
 using Direwolf.Revit.Utilities;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 namespace Direwolf.Revit.ElementFilters
@@ -130,20 +131,19 @@ namespace Direwolf.Revit.ElementFilters
             return parameters;
         }
 
-        public static SortedDictionary<int, Family> GetInstancesPerFamily(this Document doc)
+        public static Dictionary<Family, int> GetInstancesPerFamily(this Document doc)
         {
-            var elements = doc.GetElementsByFamily();
-            SortedDictionary<int, Family> results = [];
-            foreach (var v in elements)
+            Dictionary<Family, int> results = [];
+            foreach (Family family in doc.GetFamilies())
             {
-                results.Add(v.Value.Count, v.Key);
+                results.Add(family, family.GetFamilySymbolIds().Count);
             }
             return results;
         }
 
-        public static SortedDictionary<Category, List<Family>> GetFamiliesByCategory(this Document doc)
+        public static Dictionary<Category, List<Family>> GetFamiliesByCategory(this Document doc)
         {
-            var elementsSortedByFamily = new SortedDictionary<Category, List<Family>>();
+            var elementsSortedByFamily = new Dictionary<Category, List<Family>>();
             foreach ((Element? f, Category? familyCategory) in from Element e in doc.GetAllValidElements()
                                                                let f = e as FamilyInstance
                                                                where f is not null
@@ -349,9 +349,12 @@ namespace Direwolf.Revit.ElementFilters
         {
 
             foreach (var x in from e in doc.GetAllValidElements()
+                              where e.Category is not null
+                              where e.Category.BuiltInCategory is BuiltInCategory.OST_Views
                               where e is View
                               let v = e as View
-                              where v.IsTemplate
+                              where v is not null
+                              where !v.IsTemplate
                               select v)
             {
                 yield return x;
@@ -360,14 +363,27 @@ namespace Direwolf.Revit.ElementFilters
 
         public static IEnumerable<Element?> GetViewsNotInSheets(this Document doc)
         {
-            IEnumerable<View> viewCollector = [.. doc.GetAllValidElements().OfType<View>()];
-            IEnumerable<ElementId> viewportIds = [.. doc.GetAllValidElements().OfType<Viewport>().Select(x => x.ViewId)];
+            List<View> views = [];
+            List<ElementId> viewports = [];
 
-            return from Element viewElement in viewCollector
-                   where viewElement is View view
-                   && !view.IsTemplate
-                   && !viewportIds.Contains(view.Id)
-                   select viewElement;
+            views.AddRange(from e in doc.GetAllValidElements()
+                           where e is View && e is not null
+                           let v = e as View
+                           where !v.IsTemplate
+                           select v);
+
+            viewports.AddRange(from e in doc.GetAllValidElements()
+                               where e is Viewport && e is not null
+                               let v = e as Viewport
+                               let id = v.ViewId
+                               select id);
+
+            foreach (var e in from e in views
+                              where !viewports.Contains(e.Id)
+                              select e)
+            {
+                yield return e;
+            }
         }
 
         public static SortedDictionary<long, string> GetFamilyFileNamesSortedByFileSize(this Document doc)
@@ -380,10 +396,10 @@ namespace Direwolf.Revit.ElementFilters
 
                 Directory.CreateDirectory(fullPath);
                 SortedDictionary<long, string> sorted = [];
-
-                foreach (Family f in doc.GetFamilies())
+                foreach (var (f, rfa) in from Family f in doc.GetFamilies()
+                                         let rfa = Path.Combine(fullPath, $"{f.Name}.rfa")
+                                         select (f, rfa))
                 {
-                    var rfa = Path.Combine(fullPath, $"{f.Name}.rfa");
                     try
                     {
                         doc.EditFamily(f).SaveAs(rfa);
@@ -397,7 +413,6 @@ namespace Direwolf.Revit.ElementFilters
                 return sorted;
             }
             catch { throw new Exception("Error while creating folder"); } // because, else, it could file in the middle
-
             throw new Exception($"The routine could not be initialized. Reason: Could not get into the try/catch clause.");
         }
     }
