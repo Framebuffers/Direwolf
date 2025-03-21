@@ -62,7 +62,7 @@ namespace Direwolf.Revit.Commands
             {
                 ["UniqueId"] = element.UniqueId ?? 0.ToString(),
                 ["VersionGuid"] = element.VersionGuid.ToString(),
-                ["IsPinned"] = element.Pinned.ToString(),
+                ["isPinned"] = element.Pinned.ToString(),
                 ["Data"] = ProcessParameterMap(element)
             }
         });

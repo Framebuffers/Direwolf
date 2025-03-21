@@ -28,7 +28,7 @@ namespace Direwolf.Revit.Howls
         private List<GraphicsStyle> nonNativeStyles = [];
         private List<Element> isFlipped = [];
         private Dictionary<string, int> worksetElementCount = [];
-        private Stack<ElementInformation> individualElementInfo = [];
+        private Stack<_ElementInformation> individualElementInfo = [];
 
         private Prey ProcessInfo()
         {
@@ -303,33 +303,33 @@ namespace Direwolf.Revit.Howls
                             break;
                     }
 
-                    individualElementInfo.Push(new ElementInformation
+                    individualElementInfo.Push(new _ElementInformation
                     {
-                        ElementIdValue = e.Id.Value,
-                        ElementUniqueId = e.UniqueId,
-                        ElementVersionId = e.VersionGuid.ToString(),
-                        FamilyName = familyName,
-                        Category = builtInCategory,
-                        BuiltInCategory = builtInCategory,
-                        Workset = workset,
-                        Views = views,
-                        DesignOption = designOption,
-                        DocumentOwner = docOwner,
-                        OwnerViewId = ownerViewId,
-                        WorksetId = worksetId,
-                        LevelId = levelId,
-                        CreatedPhaseId = createdPhaseId,
-                        DemolishedPhaseId = demolishedPhaseId,
-                        GroupId = groupId,
-                        WorkshareId = workshareId,
-                        IsGrouped = isGrouped,
-                        IsModifiable = isModifiable,
-                        IsViewSpecific = isViewSpecific,
-                        IsBuiltInCategory = isBuiltInCategory,
-                        IsAnnotative = isAnnotative,
-                        IsModel = isModel,
-                        IsPinned = isPinned,
-                        IsWorkshared = isWorkshared,
+                        idValue = e.Id.Value,
+                        uniqueElementId = e.UniqueId,
+                        elementVersionId = e.VersionGuid.ToString(),
+                        familyName = familyName,
+                        category = builtInCategory,
+                        builtInCategory = builtInCategory,
+                        workset = workset,
+                        views = views,
+                        designOption = designOption,
+                        documentOwner = docOwner,
+                        ownerViewId = ownerViewId,
+                        worksetId = worksetId,
+                        levelId = levelId,
+                        createdPhaseId = createdPhaseId,
+                        demolishedPhaseId = demolishedPhaseId,
+                        groupId = groupId,
+                        workshareId = workshareId,
+                        isGrouped = isGrouped,
+                        isModifiable = isModifiable,
+                        isViewSpecific = isViewSpecific,
+                        isBuiltInCategory = isBuiltInCategory,
+                        isAnnotative = isAnnotative,
+                        isModel = isModel,
+                        isPinned = isPinned,
+                        isWorkshared = isWorkshared,
                         Parameters = null
                     });
                 }

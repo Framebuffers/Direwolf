@@ -1,16 +1,15 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
-using System.Text.Json;
 using System.Diagnostics;
-using Direwolf.Definitions;
 using Direwolf.Revit.Howlers;
 using Revit.Async;
-using Direwolf.Revit.Benchmarking;
+using Direwolf.Definitions;
 using Direwolf.Revit.Howls;
 
 namespace Direwolf.Revit.UI.Commands
 {
+
     /// <summary>
     /// Benchmark code.
     /// </summary>
@@ -27,9 +26,11 @@ namespace Direwolf.Revit.UI.Commands
             {
                 RevitTask.Initialize(commandData.Application);
                 RevitHowler rh = new();
+                rh.CreateWolf(new Wolf(), new GetExtensionTest(doc));
                 Direwolf dw = new(commandData.Application);
                 dw.QueueHowler(rh);
-                dw.HuntAsync("Model Health");
+                dw.HuntAsync("Extension Test");
+                dw.SendAllToDB();
             }
             catch
             {

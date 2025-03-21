@@ -11,18 +11,17 @@
 	  <Compile Remove="Howlers\Dynamics\**" />
 	  <Compile Remove="Howls\Dynamics\**" />
 	  <Compile Remove="Testing\**" />
+	  <Compile Remove="Wolves\**" />
 	  <EmbeddedResource Remove="Contracts\Dynamics\**" />
 	  <EmbeddedResource Remove="Howlers\Dynamics\**" />
 	  <EmbeddedResource Remove="Howls\Dynamics\**" />
 	  <EmbeddedResource Remove="Testing\**" />
+	  <EmbeddedResource Remove="Wolves\**" />
 	  <None Remove="Contracts\Dynamics\**" />
 	  <None Remove="Howlers\Dynamics\**" />
 	  <None Remove="Howls\Dynamics\**" />
 	  <None Remove="Testing\**" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Folder Include="Wolves\" />
+	  <None Remove="Wolves\**" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -32,6 +31,10 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Direwolf\Direwolf.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="ElementFilters\" />
 	</ItemGroup>
 
 

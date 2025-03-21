@@ -3,24 +3,60 @@ using Autodesk.Revit.DB;
 using Direwolf.Revit.Definitions;
 
 namespace Direwolf.Revit.Utilities;
-public static class Helpers
+public static class DirewolfExtensions
 {
-    public static void GenerateNewWindow(string title, string content)
+    public static ICollection<Element>? _GetAllValidElements(this Document doc)
     {
-        using TaskDialog t = new(title)
+        return new FilteredElementCollector(doc)
+                .WhereElementIsNotElementType()
+                .WhereElementIsViewIndependent()
+                .ToElements();
+    }
+
+    public static Dictionary<string, object> _ExtractParameterMap(this Element e)
+    {
+        Dictionary<string, object> results = [];
+        ParameterSet ps = e.Parameters;
+        foreach (Autodesk.Revit.DB.Parameter p in ps)
         {
-            MainContent = content
-        };
-        t.Show();
+            string GetValue()
+            {
+                return p.StorageType switch
+                {
+                    StorageType.None => "None",
+                    StorageType.Integer => p.AsInteger().ToString(),
+                    StorageType.Double => p.AsDouble().ToString(),
+                    StorageType.String => p.AsString(),
+                    StorageType.ElementId => p.AsElementId().ToString(),
+                    _ => "None",
+                };
+            }
+
+            Dictionary<string, string> data = new()
+            {
+                ["GUID"] = p.GUID.ToString(),
+                ["Type"] = p.GetTypeId().TypeId,
+                ["HasValue"] = p.HasValue.ToString(),
+                ["Value"] = GetValue()
+
+            };
+            results.Add(p.Definition.Name, results);
+        }
+        return results;
     }
 
-    public readonly record struct RevitAppDoc(ExternalCommandData ExternalCommandData)
+    public static Dictionary<string, object> _ExtractElementData(this Element element) => new(new Dictionary<string, object>
     {
-        public static UIApplication GetApplication(ExternalCommandData cmd) => cmd.Application;
-        public static Document GetDocument(ExternalCommandData cmd) => cmd.Application.ActiveUIDocument.Document;
-    }
+        [element.Id.ToString()] = new Dictionary<string, object>()
+        {
+            ["UniqueId"] = element.UniqueId ?? 0.ToString(),
+            ["VersionGuid"] = element.VersionGuid.ToString(),
+            ["isPinned"] = element.Pinned.ToString(),
+            ["Data"] = _ExtractParameterMap(element)
+        }
+    });
 
-    public static ElementInformation ExtractElementInfo(Element e, Document d)
+    public static _ElementInformation _GetElementInformation(this Element e, Document d)
     {
         if (e is not null && e.IsValidObject && e.Category is not null && e.Category.CategoryType is not CategoryType.Invalid || e?.Category?.CategoryType is not CategoryType.Internal)
         {
@@ -78,7 +114,7 @@ public static class Helpers
                 category = e.Category.Name;
             }
 
-            // is on Workset
+            // is on workset
             if (e.WorksetId is not null) worksetId = e.WorksetId.ToString();
 
             // phase info
@@ -109,39 +145,39 @@ public static class Helpers
             if (e?.LevelId is not null) levelId = e.LevelId.ToString();
 
 
-            return new ElementInformation
+            return new _ElementInformation
             {
-                ElementIdValue = e.Id.Value,
-                ElementUniqueId = e.UniqueId,
-                ElementVersionId = e.VersionGuid.ToString(),
-                FamilyName = familyName,
-                Category = builtInCategory,
-                BuiltInCategory = builtInCategory,
-                Workset = workset,
-                Views = views,
-                DesignOption = designOption,
-                DocumentOwner = docOwner,
-                OwnerViewId = ownerViewId,
-                WorksetId = worksetId,
-                LevelId = levelId,
-                CreatedPhaseId = createdPhaseId,
-                DemolishedPhaseId = demolishedPhaseId,
-                GroupId = groupId,
-                WorkshareId = workshareId,
-                IsGrouped = isGrouped,
-                IsModifiable = isModifiable,
-                IsViewSpecific = isViewSpecific,
-                IsBuiltInCategory = isBuiltInCategory,
-                IsAnnotative = isAnnotative,
-                IsModel = isModel,
-                IsPinned = isPinned,
-                IsWorkshared = isWorkshared,
+                idValue = e.Id.Value,
+                uniqueElementId = e.UniqueId,
+                elementVersionId = e.VersionGuid.ToString(),
+                familyName = familyName,
+                category = builtInCategory,
+                builtInCategory = builtInCategory,
+                workset = workset,
+                views = views,
+                designOption = designOption,
+                documentOwner = docOwner,
+                ownerViewId = ownerViewId,
+                worksetId = worksetId,
+                levelId = levelId,
+                createdPhaseId = createdPhaseId,
+                demolishedPhaseId = demolishedPhaseId,
+                groupId = groupId,
+                workshareId = workshareId,
+                isGrouped = isGrouped,
+                isModifiable = isModifiable,
+                isViewSpecific = isViewSpecific,
+                isBuiltInCategory = isBuiltInCategory,
+                isAnnotative = isAnnotative,
+                isModel = isModel,
+                isPinned = isPinned,
+                isWorkshared = isWorkshared,
                 Parameters = null
             };
         }
         else
         {
-            throw new ArgumentNullException();
+            throw new ArgumentNullException($"Could not extract information. Document {d.Title} is invalid, or does not have information about element {e.Name}::{e.Id.Value}");
         }
     }
 }

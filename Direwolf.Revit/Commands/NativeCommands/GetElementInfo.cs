@@ -1,8 +1,9 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Direwolf.Revit.Utilities;
 using System.Diagnostics;
-using static Direwolf.Revit.Utilities.Helpers;
+using static Direwolf.Revit.Utilities.DirewolfExtensions;
 
 namespace Direwolf.Revit.Commands.NativeCommands;
 
@@ -18,7 +19,7 @@ public class GetElementInfo : IExternalCommand
         benchmarkTimer.Start();
         try
         {
-            var doc = RevitAppDoc.GetDocument(commandData);
+            var doc = commandData.GetDocument();
             Common.WriteToFile($"{GetType().Name}_Native.json", RunBenchmark(doc));
             benchmarkTimer.Stop();
             TimeTaken += benchmarkTimer.Elapsed.TotalSeconds;

@@ -1,9 +1,9 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Direwolf.Revit.Utilities;
 using System.Diagnostics;
 using System.Transactions;
-using static Direwolf.Revit.Utilities.Helpers;
 
 namespace Direwolf.Revit.Commands.NativeCommands;
 
@@ -17,7 +17,7 @@ public class GetElementIdByFamily : IExternalCommand
         benchmarkTimer.Start();
         try
         {
-            var doc = RevitAppDoc.GetDocument(commandData);
+            var doc = commandData.GetDocument();
             Common.WriteToFile($"{GetType().Name}_Native.json", RunBenchmark(doc));
             benchmarkTimer.Stop();
             TimeTaken += benchmarkTimer.Elapsed.TotalSeconds;
@@ -32,14 +32,15 @@ public class GetElementIdByFamily : IExternalCommand
 
     public static Dictionary<string, object> RunBenchmark(Document RevitDocument)
     {
-        ICollection<Element> allValidElements = Common.GetAllValidElements(RevitDocument);
+        ICollection<Element>? allValidElements = RevitDocument?._GetAllValidElements()?.Where(x => x is not null).ToList();
         
         var elementsSortedByFamilyNative = new Dictionary<string, List<long>>();
-        foreach ((Element e, string familyName) in from Element e in allValidElements
-                                                   let f = e as FamilyInstance 
-                                                   where f is not null
-                                                   let familyName = f.Symbol.Family.Name           
-                                                   select (e, familyName)) 
+        foreach ((Element? e, string? familyName) in from Element? e in allValidElements
+                                                    where e is not null
+                                                    let f = e as FamilyInstance 
+                                                    where f is not null
+                                                    let familyName = f.Symbol.Family.Name           
+                                                    select (e, familyName)) 
         {
             if (!elementsSortedByFamilyNative.TryGetValue(familyName, out List<long>? value))
             {

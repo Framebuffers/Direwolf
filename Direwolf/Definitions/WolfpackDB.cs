@@ -1,8 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Update;
-using Npgsql;
+﻿using Npgsql;
 using NpgsqlTypes;
 using System.Diagnostics;
-using System.Security.Cryptography;
 
 namespace Direwolf.Definitions
 {
@@ -12,13 +10,11 @@ namespace Direwolf.Definitions
     {
         public event EventHandler DatabaseConnectedEventHandler;
         private readonly DbConnectionString _str;
-        private const string TABLE_NAME = "Wolfpack";
 
         public WolfpackDB(DbConnectionString db)
         {
             _str = db;
             DatabaseConnectedEventHandler += WolfpackDB_DatabaseConnectedEventHandler;
-
         }
 
         private void WolfpackDB_DatabaseConnectedEventHandler(object? sender, EventArgs e)
@@ -30,7 +26,7 @@ namespace Direwolf.Definitions
         {
             DatabaseConnectedEventHandler?.Invoke(this, new EventArgs());
             string sqlQuery =
-                """INSERT INTO "Wolfpack" ("documentName", "fileOrigin", "documentVersion", "wasCompleted", "timeTaken", "createdAt", "guid", "resultCount", "testName", "results", "testId") VALUES (@docName, @origin, @version, @completed, @time, @creation, @id, @resCount, @name, @result, @testNumber)""";
+                """INSERT INTO "Wolfpack" ("documentName", "fileOrigin", "documentVersion", "wasCompleted", "timeTaken", "createdAt", "guid", "resultCount", "testName", "results") VALUES (@docName, @origin, @version, @completed, @time, @creation, @id, @resCount, @name, @result)""";
 
             try
             {
@@ -62,7 +58,6 @@ namespace Direwolf.Definitions
                         cmd.Parameters.AddWithValue("resCount", wolfpack.ResultCount);
                         cmd.Parameters.AddWithValue("name", wolfpack.TestName);
                         cmd.Parameters.Add(resultJson);
-                        cmd.Parameters.AddWithValue("testNumber", 0);
 
                         int rowsAffected = await cmd.ExecuteNonQueryAsync();
                         Debug.Print($"Executed query. Added {rowsAffected} rows");
