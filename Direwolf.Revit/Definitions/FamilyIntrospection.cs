@@ -1,27 +1,12 @@
 ﻿using Autodesk.Revit.DB;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Direwolf.Revit.Definitions
 {
-    public readonly record struct ParameterIntrospection(Parameter parameter)
+    public readonly record struct FamilyIntrospection(Family family)
     {
-        public double id
+        public static FamilyIntrospection CreateFromSymbol(FamilyInstance fi)
         {
-            get
-            {
-                try
-                {
-                    return parameter.Id.Value;
-                }
-                catch
-                {
-                    return -1;
-                }
-            }
+            return new FamilyIntrospection(fi.Symbol.Family);
         }
         public string name
         {
@@ -29,7 +14,7 @@ namespace Direwolf.Revit.Definitions
             {
                 try
                 {
-                    return parameter.Definition.Name;
+                    return family.Category.Name;
                 }
                 catch
                 {
@@ -37,63 +22,27 @@ namespace Direwolf.Revit.Definitions
                 }
             }
         }
-        public string value
+        public double id
         {
             get
             {
                 try
                 {
-                    return parameter.StorageType switch
-                    {
-                        StorageType.None => "None",
-                        StorageType.Integer => parameter.AsInteger().ToString(),
-                        StorageType.Double => parameter.AsDouble().ToString(),
-                        StorageType.String => parameter.AsString(),
-                        StorageType.ElementId => parameter.AsElementId().ToString(),
-                        _ => "None",
-                    };
+                    return family.Id.Value;
                 }
                 catch
                 {
-                    return string.Empty;
+                    return -1;
                 }
             }
         }
-        public string storageType
+        public string uniqueId
         {
             get
             {
                 try
                 {
-                    return parameter.StorageType.ToString();
-                }
-                catch
-                {
-                    return StorageType.None.ToString();
-                }
-            }
-        }
-        public string unitTypeId
-        {
-            get
-            {
-                try
-                {
-                    return parameter.GetUnitTypeId().TypeId.ToString();
-                }
-                catch
-                {
-                    return string.Empty;
-                }
-            }
-        }
-        public string parentElement
-        {
-            get
-            {
-                try
-                {
-                    return parameter.Element.UniqueId;
+                    return family.UniqueId;
                 }
                 catch
                 {
@@ -101,70 +50,27 @@ namespace Direwolf.Revit.Definitions
                 }
             }
         }
-
-        public bool hasValue
+        public string builtInCategory
         {
             get
             {
                 try
                 {
-                    return hasValue;
+                    return family.Category.BuiltInCategory.ToString();
                 }
                 catch
                 {
-                    return false;
+                    return BuiltInCategory.INVALID.ToString();
                 }
             }
         }
-        public bool userModifiable
+        public string familyCategory
         {
             get
             {
                 try
                 {
-                    return userModifiable;
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-        }
-        public bool isShared
-        {
-            get
-            {
-                try
-                {
-                    return parameter.IsShared;
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-        }
-        public string sharedParameterGuid
-        {
-            get
-            {
-                try
-                {
-                    return parameter.GUID.ToString();
-                }
-                catch
-                {
-                    return Guid.Empty.ToString();
-                }
-            }
-        }
-        public string dataType
-        {
-            get
-            {
-                try
-                {
-                    return parameter.Definition.GetDataType().TypeId;
+                    return family.FamilyCategory.Name;
                 }
                 catch
                 {
@@ -172,19 +78,132 @@ namespace Direwolf.Revit.Definitions
                 }
             }
         }
-        public string groupTypeId
+        public double familyCategoryId
         {
             get
             {
                 try
                 {
-                    return parameter.Definition.GetGroupTypeId().TypeId;
+                    return family.FamilyCategoryId.Value;
                 }
                 catch
                 {
-                    return string.Empty;
+                    return -1;
+                }
+            }
+        }
+        public string familyPlacementType
+        {
+            get
+            {
+                try
+                {
+                    return family.FamilyPlacementType.ToString();
+                }
+                catch
+                {
+                    return FamilyPlacementType.Invalid.ToString();
+                }
+            }
+        }
+        public bool isConceptualMassFamily
+        {
+            get
+            {
+                try
+                {
+                    return family.IsConceptualMassFamily;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
+        public bool isCurtainWallPanelFamily
+        {
+            get
+            {
+                try
+                {
+                    return family.IsCurtainPanelFamily;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
+        public bool isEditable
+        {
+            get
+            {
+                try
+                {
+                    return family.IsEditable;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
+        public bool isInPlace
+        {
+            get
+            {
+                try
+                {
+                    return family.IsInPlace;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
+        public bool isOwnerFamily
+        {
+            get
+            {
+                try
+                {
+                    return family.IsOwnerFamily;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
+        public bool isParametric
+        {
+            get
+            {
+                try
+                {
+                    return family.IsParametric;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
+        public bool isUserCreated
+        {
+            get
+            {
+                try
+                {
+                    return family.IsUserCreated;
+                }
+                catch
+                {
+                    return false;
                 }
             }
         }
     }
 }
+

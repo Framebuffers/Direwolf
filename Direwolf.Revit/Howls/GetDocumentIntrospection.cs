@@ -1,14 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Autodesk.Revit.DB;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Autodesk.Revit.DB;
+using Direwolf.Revit.Definitions;
+using Direwolf.Definitions;
 
 namespace Direwolf.Revit.Howls
 {
     public record class GetDocumentIntrospection : RevitHowl
     {
-        public GetDocumentIntrospection(Document doc) => SetRevitDocument(doc);
+        public GetDocumentIntrospection(Document doc)
+        {
+            ArgumentNullException.ThrowIfNull(doc);
+            SetRevitDocument(doc);
+        }
+
+        public override bool Execute()
+        {
+            try
+            {
+                DocumentIntrospection di = new(GetRevitDocument());
+                SendCatchToCallback(new Prey(di));
+                return true;
+            }
+            catch (Exception e)
+            {
+                SendCatchToCallback(new Prey($"Exception caught: {e.Message}"));
+                return false;
+            }
+        }
     }
 }

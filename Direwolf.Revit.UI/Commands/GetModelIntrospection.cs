@@ -1,6 +1,8 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Direwolf.Definitions;
+using Direwolf.Revit.Howlers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +18,8 @@ namespace Direwolf.Revit.UI.Commands
         {
             try
             {
-
+                RevitHowler rh = new();
+                rh.CreateWolf(new Wolf())
                 return Result.Succeeded;
             }
             catch

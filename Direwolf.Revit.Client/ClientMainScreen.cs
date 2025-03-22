@@ -11,5 +11,10 @@ namespace Direwolf.Revit.Client
         {
 
         }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
     }
 }

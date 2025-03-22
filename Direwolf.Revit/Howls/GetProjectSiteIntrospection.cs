@@ -1,6 +1,5 @@
 ﻿using Autodesk.Revit.DB;
 using Direwolf.Definitions;
-using Direwolf.Revit.Definitions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,22 +8,19 @@ using System.Threading.Tasks;
 
 namespace Direwolf.Revit.Howls
 {
-    public record class GetFamilyIntrospection : RevitHowl
+    public record class GetProjectSiteIntrospection : RevitHowl
     {
-        public GetFamilyIntrospection(Document doc, Family? f)
+        public GetProjectSiteIntrospection(Document doc)
         {
             ArgumentNullException.ThrowIfNull(doc);
-            ArgumentNullException.ThrowIfNull(f);
             SetRevitDocument(doc);
-            _f = f;
         }
-        private Family? _f;
+
         public override bool Execute()
         {
             try
             {
-                if (_f is not null)
-                    SendCatchToCallback(new Prey(new FamilyIntrospection(_f)));
+                SendCatchToCallback(new Prey(new GetProjectSiteIntrospection(GetRevitDocument())));
                 return true;
             }
             catch (Exception e)

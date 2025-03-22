@@ -2,15 +2,112 @@
 
 namespace Direwolf.Revit.Definitions
 {
-    public readonly record struct ProjectSiteIntrospection(Document Document)
+    public readonly record struct ProjectSiteIntrospection(Document document)
     {
-        public string placeName => Document.SiteLocation.PlaceName;
-        public double elevation => Document.SiteLocation.Elevation;
-        public double latitude => Document.SiteLocation.Latitude;
-        public double longitude => Document.SiteLocation.Longitude;
-        public double timeZone => Document.SiteLocation.TimeZone;
-        public string geoCoordinateSystemId => Document.SiteLocation.GeoCoordinateSystemId;
-        public string geoCoordinateSystemDefinition => Document.SiteLocation.GeoCoordinateSystemDefinition;
+        public string placeName
+        {
+            get
+            {
+                try
+                {
+                    return document.SiteLocation.PlaceName;
+                }
+                catch
+                {
+                    return string.Empty;
+                }
+            }
+        }
+        public double elevation
+        {
+            get
+            {
+                try
+                {
+
+                    return document.SiteLocation.Elevation;
+                }
+                catch
+                {
+                    return -1;
+                }
+            }
+        }
+        public double latitude
+        {
+            get
+            {
+                try
+                {
+
+                    return document.SiteLocation.Latitude;
+                }
+                catch
+                {
+                    return -1;
+                }
+            }
+        }
+        public double longitude
+        {
+            get
+            {
+                try
+                {
+
+                    return document.SiteLocation.Longitude;
+                }
+                catch
+                {
+                    return -1;
+                }
+            }
+        }
+        public double timeZone
+        {
+            get
+            {
+                try
+                {
+
+                return document.SiteLocation.TimeZone;
+                }
+                catch
+                {
+                    return -1;
+                }
+            }
+        }
+        public string geoCoordinateSystemId
+        {
+            get
+            {
+                try
+                {
+
+                    return document.SiteLocation.GeoCoordinateSystemId;
+                }
+                catch
+                {
+                    return string.Empty;
+                }
+            }
+        }
+        public string geoCoordinateSystemDefinition
+        {
+            get
+            {
+                try
+                {
+
+                    return document.SiteLocation.GeoCoordinateSystemDefinition;
+                }
+                catch
+                {
+                    return string.Empty;
+                }
+            }
+        }
     }
 
 }

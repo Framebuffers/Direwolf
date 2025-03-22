@@ -9,22 +9,22 @@ using System.Threading.Tasks;
 
 namespace Direwolf.Revit.Howls
 {
-    public record class GetFamilyIntrospection : RevitHowl
+    public record class GetParameterIntrospection : RevitHowl
     {
-        public GetFamilyIntrospection(Document doc, Family? f)
+        public GetParameterIntrospection(Document doc, Parameter? p)
         {
             ArgumentNullException.ThrowIfNull(doc);
-            ArgumentNullException.ThrowIfNull(f);
+            ArgumentNullException.ThrowIfNull(p);
             SetRevitDocument(doc);
-            _f = f;
+            _p = p;
         }
-        private Family? _f;
+        private Parameter? _p;
         public override bool Execute()
         {
             try
             {
-                if (_f is not null)
-                    SendCatchToCallback(new Prey(new FamilyIntrospection(_f)));
+                if (_p is not null)
+                    SendCatchToCallback(new Prey(new ParameterIntrospection(_p)));
                 return true;
             }
             catch (Exception e)

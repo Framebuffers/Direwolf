@@ -1,6 +1,6 @@
 ﻿using Autodesk.Revit.UI;
 using Autodesk.Revit.DB;
-using Direwolf.Revit.Definitions;
+using Direwolf.Revit.Definitions.Legacy;
 
 namespace Direwolf.Revit.Utilities;
 public static class DirewolfExtensions
