@@ -1,9 +1,19 @@
 ﻿using Npgsql;
 using NpgsqlTypes;
 using System.Diagnostics;
+using System.Text.Json;
 
 namespace Direwolf.Definitions
 {
+    public static class WolfdenExtensions
+    {
+        public static string SqlQuerySend(this Wolfden w)
+        {
+            _ = w;
+            return
+"""INSERT INTO "Wolfpack" ("documentName", "fileOrigin", "documentVersion", "wasCompleted", "timeTaken", "createdAt", "guid", "resultCount", "testName", "results") VALUES (@docName, @origin, @version, @completed, @time, @creation, @id, @resCount, @name, @result)""";
+        }
+    }
 
     public class Wolfden : Stack<Wolfpack>
     {
@@ -24,9 +34,6 @@ namespace Direwolf.Definitions
         public async Task Send()
         {
             DatabaseConnectedEventHandler?.Invoke(this, new EventArgs());
-            string sqlQuery =
-                """INSERT INTO "Wolfpack" ("documentName", "fileOrigin", "documentVersion", "wasCompleted", "timeTaken", "createdAt", "guid", "resultCount", "testName", "results") VALUES (@docName, @origin, @version, @completed, @time, @creation, @id, @resCount, @name, @result)""";
-
             try
             {
                 using NpgsqlConnection c = new($"Host={_str.Host};Port={_str.Port};Username={_str.Username};Password={_str.Password};Database={_str.Database}");
@@ -36,11 +43,10 @@ namespace Direwolf.Definitions
                 c.Notice += C_Notice;
                 while (Count > 0)
                 {
-
                     Wolfpack wolfpack = Pop();
                     Console.WriteLine(c.ConnectionString);
                     c.Open();
-                    await using var cmd = new NpgsqlCommand(sqlQuery, c);
+                    await using var cmd = new NpgsqlCommand(this.SqlQuerySend(), c);
                     {
                         var resultJson = cmd.CreateParameter();
                         resultJson.ParameterName = "result";
@@ -74,10 +80,19 @@ namespace Direwolf.Definitions
         {
             Debug.Print($"Postgres Notice: {e.Notice.Severity}; {e.Notice.MessageText}");
         }
-
         private void C_StateChange(object sender, System.Data.StateChangeEventArgs e)
         {
             Debug.Print($"Connection status: {e.CurrentState}");
+        }
+        public override string ToString()
+        {
+            using StringWriter s = new();
+            while (Count > 0)
+            {
+                Wolfpack wolfpack = Pop();
+                s.Write(wolfpack);
+            }
+            return s.ToString();
         }
     }
 }

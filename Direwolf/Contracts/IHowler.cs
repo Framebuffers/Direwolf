@@ -7,10 +7,9 @@ namespace Direwolf.Contracts
     {
         public Stack<Prey> Den { get; set; }
         public Queue<IWolf> Wolfpack { get; set; }
-        public void CreateWolf(IWolf runner, IHowl instruction);
-        public Wolfpack Howl(string testName, DbConnectionString db, WolfpackTarget where);
-        public Wolfpack Howl(string testName, WolfpackTarget where);
+        public void CreateWolf(IWolf runner, IHowl instruction, WolfpackTarget where);
+        public WolfpackTarget FinalTarget { get; set; }
+        public Wolfpack Howl(string testName);
         public event EventHandler<HuntCompletedEventArgs> HuntCompleted;
-
     }
 }

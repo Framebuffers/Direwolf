@@ -1,6 +1,8 @@
 ﻿using Direwolf.Definitions;
+using Direwolf.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -15,5 +17,26 @@ namespace Direwolf
         /// </summary>
         private static readonly DbConnectionString _default = new("localhost", 5432, "wolf", "awoo", "direwolf");
         [JsonExtensionData] private Wolfden Queries { get; set; } = new(_default);
+        public async void SendAllToDB()
+        {
+            try
+            {
+                await Queries.Send();
+            }
+            catch (Exception e)
+            {
+                $"{e.Message}".ToConsole();
+            }
+        }
+        public virtual void SendAllToScreen()
+        {
+            using StringWriter s = new();
+            foreach (var q in Queries)
+            {
+                s.Write(q.ToString());
+            }
+            s.ToString().ToConsole();
+            s.Dispose();
+        }
     }
 }

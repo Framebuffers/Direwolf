@@ -1,4 +1,5 @@
 ﻿using Direwolf.Contracts;
+using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -20,23 +21,22 @@ namespace Direwolf.Definitions
                 try
                 {
                     Instruction.Callback = this; // attach to load contents back the chain.
-                    //if (Callback is null) Console.WriteLine($"Callback is null");
+                    Debug.Assert(Instruction.Callback is not null, "Could not attach Wolf to Howler callback: callback chain is broken. This is now a lone wolf.");
                     Instruction.Execute();
                     foreach (var c in Catches)
                     {
                         Callback?.Den.Push(c);
                     }
-                    return true; // it did the thing!
+                    return true;
                 }
                 catch (Exception e) // something went wrong.
                 {
-                    Console.WriteLine(e.Message);
+                    Debug.Print(e.Message);
                     return false;
                 }
             }
             return true; // nothing ran, so no error.
         }
-
         public override string ToString()
         {
             return JsonSerializer.Serialize(Catches);

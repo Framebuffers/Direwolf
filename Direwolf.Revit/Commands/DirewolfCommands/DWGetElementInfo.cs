@@ -26,7 +26,7 @@ namespace Direwolf.Revit.Commands.DirewolfCommands
                 var doc = commandData.GetDocument();
                 Direwolf dw = new(commandData.Application);
                 RevitHowler rh = new();
-                rh.CreateWolf(new Wolf(), new GetElementInformation(doc));
+                rh.CreateWolf(new Wolf(), new GetDocumentIntrospection(doc), WolfpackTarget.DB);
                 dw.HuntAsync(rh, doc.Title);
                 benchmarkTimer.Stop();
                 TimeTaken += benchmarkTimer.Elapsed.TotalSeconds;

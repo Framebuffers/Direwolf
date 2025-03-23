@@ -34,16 +34,16 @@ namespace Direwolf.Revit.Howls
             }
         }
 
-        private Prey Hunt()
-        {
-            var elements = new FilteredElementCollector(GetRevitDocument()).WhereElementIsNotElementType();
+        //private Prey Hunt()
+        //{
+        //    var elements = new FilteredElementCollector(GetRevitDocument()).WhereElementIsNotElementType();
 
-            foreach (Element e in elements)
-            {
+        //    foreach (Element e in elements)
+        //    {
                            
-            }
+        //    }
 
-        }
+       //}
 
         private (DocumentIntrospection, ProjectInformationIntrospection, ProjectSiteIntrospection, UnitIntrospection) HuntDocument()
         {

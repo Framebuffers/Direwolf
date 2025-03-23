@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using Direwolf.Contracts;
 using Direwolf.Definitions;
+using Direwolf.Extensions;
 using Direwolf.Revit.Contracts;
 using System.Text.Json.Serialization;
 
@@ -12,6 +13,7 @@ namespace Direwolf.Revit.Howls
 
         public void SendCatchToCallback(Prey c)
         {
+            $"Sending {c.Result}".ToConsole();
             Callback?.Catches.Push(c);
         }
 
@@ -40,6 +42,7 @@ namespace Direwolf.Revit.Howls
 
         public override string ToString() // the default implementation will recursively serialize everything up the tree. that is: not good.
         {
+            $"Serializing Howl to string".ToConsole();
             var d = new Dictionary<string, object>()
             {
                 { "Callback", Callback?.GetType().Name ?? "unknown" },

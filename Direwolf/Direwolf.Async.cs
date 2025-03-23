@@ -1,5 +1,6 @@
 ﻿using Direwolf.Contracts;
 using Direwolf.Definitions;
+using Direwolf.EventHandlers;
 using Revit.Async;
 using System;
 using System.Collections.Generic;
@@ -14,25 +15,18 @@ namespace Direwolf
     {
         public async void HuntAsync(string queryName = "query")
         {
-            AsyncHuntCompletedEventHandler += Direwolf_AsyncHuntCompletedEventHandler1;
+            HuntCompletedEventHandler += OnHuntCompleted;
             Revit.Async.RevitTask.Initialize(_app);
             foreach (var howler in Howlers)
             {
                 await HuntTask(howler, queryName);
             }
         }
-
-        private void Direwolf_AsyncHuntCompletedEventHandler1(object? sender, EventArgs e)
-        {
-            SendAllToDB();
-        }
-
         public async void HuntAsync(IHowler howler, string queryName = "query")
         {
             Revit.Async.RevitTask.Initialize(_app);
             await HuntTask(howler, queryName);
         }
-
         private async Task HuntTask(IHowler howler, string queryName = "query")
         {
             try
@@ -49,11 +43,9 @@ namespace Direwolf
                     };
                     PreviousHowls.Add(h);
                 });
-                AsyncHuntCompletedEventHandler?.Invoke(this, new EventArgs());
+                HuntCompletedEventHandler?.Invoke(this, new HuntCompletedEventArgs() { IsSuccessful = true, Where = howler.FinalTarget });
             }
             catch (Exception e) { Debug.WriteLine(e.Message); }
-
         }
-
     }
 }

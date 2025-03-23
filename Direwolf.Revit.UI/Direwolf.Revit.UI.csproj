@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0-windows7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -10,10 +10,10 @@
     <PackageReference Include="Autodesk.Revit.SDK" Version="2025.0.2.419" />
     <PackageReference Include="MiniExcel" Version="1.39.0" />
     <PackageReference Include="Npgsql" Version="9.0.3" />
+
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Direwolf.Revit.Client\Direwolf.Revit.Client.csproj" />
     <ProjectReference Include="..\Direwolf.Revit\Direwolf.Revit.csproj" />
   </ItemGroup>
 

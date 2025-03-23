@@ -14,17 +14,22 @@ namespace Direwolf.Revit.Howlers
     /// </summary>
     public record class RevitHowler : Howler
     {
-        public new event EventHandler<HuntCompletedEventArgs>? HuntCompleted;
         private Document? _doc;
+        public new event EventHandler<HuntCompletedEventArgs>? HuntCompleted;
         private readonly Stopwatch _timeTaken = new();
-        public override void CreateWolf(IWolf runner, IHowl instruction) // wolf factory
+
+        public override WolfpackTarget FinalTarget { get; set; } = WolfpackTarget.INVALID;
+
+        public override void CreateWolf(IWolf runner, IHowl instruction, WolfpackTarget where) // wolf factory
         {
             if (instruction is IRevitHowl)
             {
                 runner.Instruction = instruction;
                 IRevitHowl? i = instruction as IRevitHowl;
-                _doc = i.GetRevitDocument();
+                if (i is not null)
+                    _doc = i.GetRevitDocument();
                 runner.Callback = this;
+                FinalTarget = where;
                 Wolfpack.Enqueue(runner);
             }
             else
@@ -35,6 +40,7 @@ namespace Direwolf.Revit.Howlers
         
         public override Wolfpack Howl(string testName)
         {
+            ArgumentNullException.ThrowIfNull(_doc);
             _timeTaken.Start();
             try
             {
@@ -52,12 +58,12 @@ namespace Direwolf.Revit.Howlers
                 {
                     TestName = testName
                 };
-                HuntCompleted?.Invoke(this, new HuntCompletedEventArgs() { IsSuccessful = true});
+                HuntCompleted?.Invoke(this, new HuntCompletedEventArgs() { IsSuccessful = true, Where = FinalTarget});
                 return w;
             }
             catch
             {
-                HuntCompleted?.Invoke(this, new HuntCompletedEventArgs() { IsSuccessful = false});
+                HuntCompleted?.Invoke(this, new HuntCompletedEventArgs() { IsSuccessful = false, Where = FinalTarget});
                 throw new ApplicationException();
             }
         }

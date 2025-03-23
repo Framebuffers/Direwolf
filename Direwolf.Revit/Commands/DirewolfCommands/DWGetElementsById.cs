@@ -22,13 +22,12 @@ namespace Direwolf.Revit.Commands.DirewolfCommands
             RevitTask.Initialize(commandData.Application);
             try
             {
-                var doc = commandData.GetDocument();
-                Direwolf dw = new(commandData.Application);
-                RevitHowler rh = new();
-                rh.CreateWolf(new Wolf(), new Howls.GetElementIdByFamily(doc));
-                dw.HuntAsync(rh, $"{GetType().Name}");
-                benchmarkTimer.Stop();
-                TimeTaken += benchmarkTimer.Elapsed.TotalSeconds;
+                //var doc = commandData.GetDocument();
+                //Direwolf dw = new(commandData.Application);
+                //RevitHowler rh = new();
+                //dw.HuntAsync(rh, $"{GetType().Name}");
+                //benchmarkTimer.Stop();
+                //TimeTaken += benchmarkTimer.Elapsed.TotalSeconds;
             }
             catch
             {

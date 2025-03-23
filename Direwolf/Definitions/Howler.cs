@@ -10,81 +10,23 @@ namespace Direwolf.Definitions
     /// Howler creates wolves, taking a prototype Wolf, attaching a Howls (an instruction) and itself as a callback.
     /// Then, to dispatch wolves, it executes a function inside each Wolf.
     /// </summary>
-    //[JsonSerializable(typeof(Howler))] 
     public abstract record class Howler : IHowler
     {
         public event EventHandler<HuntCompletedEventArgs>? HuntCompleted;
 
         [JsonPropertyName("response")] public Stack<Prey> Den { get; set; } = [];
         [JsonIgnore] public Queue<IWolf> Wolfpack { get; set; } = [];
+        public abstract WolfpackTarget FinalTarget { get; set; }
 
-        public virtual void CreateWolf(IWolf runner, IHowl instruction) // wolf factory
+        public abstract Wolfpack Howl(string testName);
+
+        public virtual void CreateWolf(IWolf runner, IHowl instruction, WolfpackTarget where) // wolf factory
         {
             runner.Instruction = instruction;
             runner.Callback = this;
             Wolfpack.Enqueue(runner);
+            FinalTarget = where;
         }
-
-        public virtual Wolfpack Howl(string testName, WolfpackTarget where)
-        {
-            try
-            {
-                Stopwatch s = new();
-                s.Start();
-                foreach (var wolf in Wolfpack)
-                {
-                    wolf.Run();
-                }
-
-                HuntCompleted?.Invoke(this, new HuntCompletedEventArgs() { IsSuccessful = true });
-                s.Stop();
-
-                switch (WolfpackTarget)
-                {
-                    case WolfpackTarget.OnScreen:
-                    case WolfpackTarget.Excel:
-                    case WolfpackTarget.DB:
-                    case WolfpackTarget.INVALID:
-                    default:
-                        throw new ArgumentException("Test has been ran, but no target has been set: WolfpackTarget is invalid or null.");
-                }
-                return new Wolfpack(this, "", "", "", true, s.Elapsed.TotalSeconds)
-                {
-                    TestName = testName
-                };
-            }
-            catch
-            {
-                HuntCompleted?.Invoke(this, new HuntCompletedEventArgs() { IsSuccessful = false });
-                throw new ApplicationException();
-            }
-        }
-
-        public virtual Wolfpack Howl(string testName, DbConnectionString db, WolfpackTarget where)
-        {
-            try
-            {
-                Stopwatch s = new();
-                s.Start();
-                foreach (var wolf in Wolfpack)
-                {
-                    wolf.Run();
-                }
-
-                HuntCompleted?.Invoke(this, new HuntCompletedEventArgs() { IsSuccessful = true });
-                s.Stop();
-                return new Wolfpack(this, "", "", "", true, s.Elapsed.TotalSeconds)
-                {
-                    TestName = testName
-                };
-            }
-            catch
-            {
-                HuntCompleted?.Invoke(this, new HuntCompletedEventArgs() { IsSuccessful = false });
-                throw new ApplicationException();
-            }
-        }
-
         public override string ToString()
         {
             return JsonSerializer.Serialize(Den);
