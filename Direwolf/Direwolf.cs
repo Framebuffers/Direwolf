@@ -9,15 +9,11 @@ using System.Text.Json.Serialization;
 
 namespace Direwolf
 {
-    public class Direwolf
+    public partial class Direwolf
     {
         public event EventHandler? DatabaseConnectionEventHandler;
-        public event EventHandler? AsyncHuntCompletedEventHandler;
-        /// <summary>
-        /// This is a proof of concept, not a production-ready solution. Please **CHANGE THIS** if you plan to deploy.
-        /// </summary>
-        private static readonly DbConnectionString _default = new("localhost", 5432, "wolf", "awoo", "direwolf");
-
+        public event EventHandler<AsyncHuntCompletedEventHandler>? AsyncHuntCompletedEventHandler;
+        private Queue<IHowler> Howlers { get; set; } = [];
         private readonly UIApplication? _app;
         private List<HowlId> PreviousHowls = [];
 
@@ -49,9 +45,21 @@ namespace Direwolf
             _app = app;
         }
 
-        private void Direwolf_AsyncHuntCompletedEventHandler(object? sender, EventArgs e)
+        private void Direwolf_AsyncHuntCompletedEventHandler(object? sender, AsyncHuntCompletedEventHandler e)
         {
-            SendAllToDB();
+            switch (e.Destination)
+            {
+                case WolfpackTarget.OnScreen:
+                    break;
+                case WolfpackTarget.Excel:
+                    break;
+                case WolfpackTarget.DB:
+                    break;
+                case WolfpackTarget.INVALID:
+                default:
+                    break;
+
+            }
         }
 
         public Direwolf(IHowler howler, IHowl instructions, IWolf wolf, UIApplication app)
@@ -65,7 +73,6 @@ namespace Direwolf
 
         }
 
-
         public void QueueHowler(IHowler howler)
         {
             ArgumentNullException.ThrowIfNull(howler);
@@ -73,45 +80,7 @@ namespace Direwolf
             howler.HuntCompleted += OnHuntCompleted;
         }
 
-        private Queue<IHowler> Howlers { get; set; } = [];
 
-        public string GetQueueInfo()
-        {
-            try
-            {
-                var howlers = new Dictionary<string, object>
-                {
-                    ["count"] = Howlers.Count.ToString() ?? ""
-                };
-
-                foreach (IHowler h in Howlers)
-                {
-                    var howler = new Dictionary<string, object>();
-                    var hw = new Dictionary<string, object>
-                    {
-                        ["wolves"] = h.Wolfpack.Count,
-                        ["catchCount"] = h.Den.Count
-                    };
-
-                    howler["name"] = h.GetType().Name;
-                    howler["metadata"] = hw;
-                    howlers["howler"] = howler;
-                }
-
-                var total = new Dictionary<string, object>
-                {
-                    ["totalHowlers"] = howlers
-                };
-                return JsonSerializer.Serialize(new Prey(total));
-            }
-            catch
-            {
-                return "";
-            }
-        }
-
-        [JsonExtensionData]
-        private WolfpackDB Queries { get; set; } = new(_default);
         public async void SendAllToDB()
         {
             try { await Queries.Send(); } catch (Exception e) { Debug.Print(e.Message); }
@@ -158,48 +127,6 @@ namespace Direwolf
             }
         }
 
-        public async void HuntAsync(string queryName = "query")
-        {
-            AsyncHuntCompletedEventHandler += Direwolf_AsyncHuntCompletedEventHandler1;
-            Revit.Async.RevitTask.Initialize(_app);
-            foreach (var howler in Howlers)
-            {
-                await HuntTask(howler, queryName);
-            }
-        }
-
-        private void Direwolf_AsyncHuntCompletedEventHandler1(object? sender, EventArgs e)
-        {
-            SendAllToDB();
-        }
-
-        public async void HuntAsync(IHowler howler, string queryName = "query")
-        {
-            Revit.Async.RevitTask.Initialize(_app);
-            await HuntTask(howler, queryName);
-        }
-
-        private async Task HuntTask(IHowler howler, string queryName = "query")
-        {
-            try
-            {
-                Revit.Async.RevitTask.Initialize(_app);
-                await RevitTask.RunAsync(() =>
-                {
-                    var results = howler.Howl(queryName);
-                    Queries.Push(results);
-                    var h = new HowlId()
-                    {
-                        HowlIdentifier = new Guid(),
-                        Name = howler.GetType().Name
-                    };
-                    PreviousHowls.Add(h);
-                });
-                AsyncHuntCompletedEventHandler?.Invoke(this, new EventArgs());
-            }
-            catch (Exception e) { Debug.WriteLine(e.Message); }
-
-        }
 
         private readonly string Desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 

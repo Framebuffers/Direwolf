@@ -3,6 +3,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Direwolf.Definitions;
 using Direwolf.Revit.Howlers;
+using Direwolf.Revit.Howls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace Direwolf.Revit.UI.Commands
             try
             {
                 RevitHowler rh = new();
-                rh.CreateWolf(new Wolf())
+                rh.CreateWolf(new Wolf(), GetDocumentIntrospection(commandData.Application.ActiveUIDocument.Document));
                 return Result.Succeeded;
             }
             catch

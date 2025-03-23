@@ -4,14 +4,13 @@ using System.Diagnostics;
 
 namespace Direwolf.Definitions
 {
-    public readonly record struct DbConnectionString(string Host, int Port, string Username, string Password, string Database) { }
 
-    public class WolfpackDB : Stack<Wolfpack>
+    public class Wolfden : Stack<Wolfpack>
     {
         public event EventHandler DatabaseConnectedEventHandler;
         private readonly DbConnectionString _str;
 
-        public WolfpackDB(DbConnectionString db)
+        public Wolfden(DbConnectionString db)
         {
             _str = db;
             DatabaseConnectedEventHandler += WolfpackDB_DatabaseConnectedEventHandler;
