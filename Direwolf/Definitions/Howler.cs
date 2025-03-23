@@ -14,10 +14,9 @@ namespace Direwolf.Definitions
     {
         public event EventHandler<HuntCompletedEventArgs>? HuntCompleted;
 
-        [JsonPropertyName("response")] public Stack<Prey> Den { get; set; } = [];
+        [JsonPropertyName("response")] public Stack<Prey> Results { get; set; } = [];
         [JsonIgnore] public Queue<IWolf> Wolfpack { get; set; } = [];
         public abstract WolfpackTarget FinalTarget { get; set; }
-
         public abstract Wolfpack Howl(string testName);
 
         public virtual void CreateWolf(IWolf runner, IHowl instruction, WolfpackTarget where) // wolf factory
@@ -29,7 +28,7 @@ namespace Direwolf.Definitions
         }
         public override string ToString()
         {
-            return JsonSerializer.Serialize(Den);
+            return JsonSerializer.Serialize(Results);
         }
     }
 }

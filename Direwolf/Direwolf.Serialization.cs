@@ -17,7 +17,7 @@ namespace Direwolf
             switch (where)
             {
                 case WolfpackTarget.OnScreen:
-                    //stub
+                    SendAllToScreen();
                     return;
                 case WolfpackTarget.Excel:
                     //stub

@@ -27,10 +27,12 @@ namespace Direwolf.Revit.UI.Commands
                 RevitTask.Initialize(commandData.Application);
                 RevitHowler rh = new();
                 rh.CreateWolf(new Wolf(), new GetDocumentIntrospection(doc), WolfpackTarget.DB);
+                //rh.CreateWolf(new Wolf(), new GetProjectInformationIntrospection(doc), WolfpackTarget.DB);
+                //rh.CreateWolf(new Wolf(), new GetProjectSiteIntrospection(doc), WolfpackTarget.DB);
+                //rh.CreateWolf(new Wolf(), new GetProjectUnitsIntrospection(doc), WolfpackTarget.DB);
                 Direwolf dw = new(commandData.Application);
                 dw.QueueHowler(rh);
-                dw.HuntAsync("Extension Test");
-                dw.SendAllToDB();
+                dw.HuntAsync("IntrospectionTest");
             }
             catch
             {

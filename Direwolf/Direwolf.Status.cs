@@ -26,7 +26,7 @@ namespace Direwolf
                     var hw = new Dictionary<string, object>
                     {
                         ["wolves"] = h.Wolfpack.Count,
-                        ["catchCount"] = h.Den.Count
+                        ["catchCount"] = h.Results.Count
                     };
 
                     howler["name"] = h.GetType().Name;

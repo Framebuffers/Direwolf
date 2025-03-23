@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using Direwolf.Revit.Definitions;
 
 namespace Direwolf.Revit.Definitions
 {
@@ -40,70 +41,22 @@ namespace Direwolf.Revit.Definitions
 
     public readonly record struct DocumentIntrospection(Document Document)
     {
-        public string documentName
+        public string? documentName { get; init; }
+        public string? documentPath { get; init; }
+        public string? documentUniqueId { get; init; }
+        public string? documentVersionId { get; init; }
+        public int documentSaveCount { get; init; }
+        public IList<string>? warnings { get; init; }
+        public double? activeWorkset
         {
             get
             {
                 try
                 {
-                    return Document.Title;
-                }
-                catch
-                {
-                    return string.Empty;
-                }
-            }
-        }
-        public string documentPath
-        {
-            get
-            {
-                try
-                {
-                    return Document.PathName;
-                }
-                catch
-                {
-                    return string.Empty;
-                }
-            }
-        }
-        public string documentUniqueId
-        {
-            get
-            {
-                try
-                {
-                    return Document.CreationGUID.ToString();
-                }
-                catch
-                {
-                    return string.Empty;
-                }
-            }
-        }
-        public string documentVersionId
-        {
-            get
-            {
-                try
-                {
-
-                    return Document.GetDocumentVersion(Document).VersionGUID.ToString();
-                }
-                catch
-                {
-                    return string.Empty;
-                }
-            }
-        }
-        public int documentSaveCount
-        {
-            get
-            {
-                try
-                {
-                    return Document.GetDocumentVersion(Document).NumberOfSaves;
+                    if (Document.IsWorkshared)
+                        return Document.GetWorksetTable().GetActiveWorksetId().IntegerValue;
+                    else
+                        return -1;
                 }
                 catch
                 {
@@ -111,48 +64,125 @@ namespace Direwolf.Revit.Definitions
                 }
             }
         }
-        public string[] warnings
-        {
-            get
-            {
-                try
-                {
-                    return [.. Document.GetWarnings().Select(x => x.GetDescriptionText())];
-                }
-                catch
-                {
-                    return [];
-                }
-            }
-        }
-        public double activeWorkset
-        {
-            get
-            {
-                try
-                {
-                    return Document.GetWorksetTable().GetActiveWorksetId().IntegerValue;
-                }
-                catch
-                {
-                    return -1;
-                }
-            }
-        }
-        public ProjectInformationIntrospection projectInformation
-        {
-            get
-            {
-                try
-                {
-                    return new(Document);
-                }
-                catch
-                {
-                    return new();
-                }
-            }
-        }
+        public ProjectInformationIntrospection projectInformation { get; init; }
     }
-
 }
+//public readonly record struct DocumentIntrospection(Document Document)
+//{
+//    public string documentName
+//    {
+//        get
+//        {
+//            try
+//            {
+//                return Document.Title;
+//            }
+//            catch
+//            {
+//                return string.Empty;
+//            }
+//        }
+//    }
+//    public string documentPath
+//    {
+//        get
+//        {
+//            try
+//            {
+//                return Document.PathName;
+//            }
+//            catch
+//            {
+//                return string.Empty;
+//            }
+//        }
+//    }
+//    public string documentUniqueId
+//    {
+//        get
+//        {
+//            try
+//            {
+//                return Document.CreationGUID.ToString();
+//            }
+//            catch
+//            {
+//                return string.Empty;
+//            }
+//        }
+//    }
+//    public string documentVersionId
+//    {
+//        get
+//        {
+//            try
+//            {
+
+//                return Document.GetDocumentVersion(Document).VersionGUID.ToString();
+//            }
+//            catch
+//            {
+//                return string.Empty;
+//            }
+//        }
+//    }
+//    public int documentSaveCount
+//    {
+//        get
+//        {
+//            try
+//            {
+//                return Document.GetDocumentVersion(Document).NumberOfSaves;
+//            }
+//            catch
+//            {
+//                return -1;
+//            }
+//        }
+//    }
+//    public string[] warnings
+//    {
+//        get
+//        {
+//            try
+//            {
+//                return [.. Document.GetWarnings().Select(x => x.GetDescriptionText())];
+//            }
+//            catch
+//            {
+//                return [];
+//            }
+//        }
+//    }
+//    //public double activeWorkset
+//    //{
+//    //    get
+//    //    {
+//    //        try
+//    //        {
+//    //            if (Document.IsWorkshared)
+//    //                return Document.GetWorksetTable().GetActiveWorksetId().IntegerValue;
+//    //            else
+//    //                return -1;
+//    //        }
+//    //        catch
+//    //        {
+//    //            return -1;
+//    //        }
+//    //    }
+//    //}
+//    public ProjectInformationIntrospection projectInformation
+//    {
+//        get
+//        {
+//            try
+//            {
+//                return new(Document);
+//            }
+//            catch
+//            {
+//                return new();
+//            }
+//        }
+//    }
+//}

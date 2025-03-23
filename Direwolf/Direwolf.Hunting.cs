@@ -61,6 +61,7 @@ namespace Direwolf
                 };
                 PreviousHowls.Add(h);
                 Queries.Push(query);
+                $"Queries: {Queries.Count}".ToConsole();
             }
             catch (Exception e)
             {
@@ -70,6 +71,9 @@ namespace Direwolf
         private void OnHuntCompleted(object? sender, HuntCompletedEventArgs e)
         {
             Debug.Print($"Hunt result: {e.IsSuccessful}\nTarget:{e.Where}");
+
+            $"Queries: {Queries.Count}".ToConsole();
+            Serialize(e.Where);
         }
     }
 }

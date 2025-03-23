@@ -1,4 +1,5 @@
 ﻿using Direwolf.Contracts;
+using Direwolf.Extensions;
 using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -25,7 +26,8 @@ namespace Direwolf.Definitions
                     Instruction.Execute();
                     foreach (var c in Catches)
                     {
-                        Callback?.Den.Push(c);
+                        $"Pushing catch {c}".ToConsole();
+                        Callback?.Results.Push(c);
                     }
                     return true;
                 }

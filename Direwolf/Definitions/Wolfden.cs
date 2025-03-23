@@ -1,20 +1,11 @@
-﻿using Npgsql;
+﻿using Direwolf.Extensions;
+using Npgsql;
 using NpgsqlTypes;
 using System.Diagnostics;
 using System.Text.Json;
 
 namespace Direwolf.Definitions
 {
-    public static class WolfdenExtensions
-    {
-        public static string SqlQuerySend(this Wolfden w)
-        {
-            _ = w;
-            return
-"""INSERT INTO "Wolfpack" ("documentName", "fileOrigin", "documentVersion", "wasCompleted", "timeTaken", "createdAt", "guid", "resultCount", "testName", "results") VALUES (@docName, @origin, @version, @completed, @time, @creation, @id, @resCount, @name, @result)""";
-        }
-    }
-
     public class Wolfden : Stack<Wolfpack>
     {
         public event EventHandler DatabaseConnectedEventHandler;
@@ -36,17 +27,17 @@ namespace Direwolf.Definitions
             DatabaseConnectedEventHandler?.Invoke(this, new EventArgs());
             try
             {
+                string sqlQuerySend = """INSERT INTO "Wolfpack" ("documentName", "fileOrigin", "documentVersion", "wasCompleted", "timeTaken", "createdAt", "guid", "resultCount", "testName", "results") VALUES (@docName, @origin, @version, @completed, @time, @creation, @id, @resCount, @name, @result)""";
+
                 using NpgsqlConnection c = new($"Host={_str.Host};Port={_str.Port};Username={_str.Username};Password={_str.Password};Database={_str.Database}");
-                if (c is not null) Debug.Print("connection is not null");
                 DatabaseConnectedEventHandler?.Invoke(this, new EventArgs());
                 c.StateChange += C_StateChange;
                 c.Notice += C_Notice;
-                while (Count > 0)
+                foreach (Wolfpack wolfpack in this)
                 {
-                    Wolfpack wolfpack = Pop();
-                    Console.WriteLine(c.ConnectionString);
+                    $"c.ConnectionString".ToConsole();
                     c.Open();
-                    await using var cmd = new NpgsqlCommand(this.SqlQuerySend(), c);
+                    await using var cmd = new NpgsqlCommand(sqlQuerySend, c);
                     {
                         var resultJson = cmd.CreateParameter();
                         resultJson.ParameterName = "result";
@@ -65,7 +56,7 @@ namespace Direwolf.Definitions
                         cmd.Parameters.Add(resultJson);
 
                         int rowsAffected = await cmd.ExecuteNonQueryAsync();
-                        Debug.Print($"Executed query. Added {rowsAffected} rows");
+                        $"Executed query. Added {rowsAffected} rows".ToConsole();
                     }
                     c.Dispose();
                 }
@@ -75,7 +66,6 @@ namespace Direwolf.Definitions
                 Debug.Print(e.Message);
             }
         }
-
         private void C_Notice(object sender, NpgsqlNoticeEventArgs e)
         {
             Debug.Print($"Postgres Notice: {e.Notice.Severity}; {e.Notice.MessageText}");
@@ -86,13 +76,7 @@ namespace Direwolf.Definitions
         }
         public override string ToString()
         {
-            using StringWriter s = new();
-            while (Count > 0)
-            {
-                Wolfpack wolfpack = Pop();
-                s.Write(wolfpack);
-            }
-            return s.ToString();
+            return JsonSerializer.Serialize(this);
         }
     }
 }

@@ -9,7 +9,7 @@ namespace Direwolf.Definitions
         public string TestName { get; init; } = string.Empty;
         public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
         public Guid GUID { get; init; } = Guid.NewGuid();
-        public int ResultCount { get => Howler.Den.Count; }
+        public int ResultCount { get => Howler.Results.Count; }
         public string? Results => Howler?.ToString();
         public override string ToString()
         {
@@ -24,7 +24,7 @@ namespace Direwolf.Definitions
                 ["fileVersion"] = DocumentVersion,
                 ["fileOrigin"] = FileOrigin,
                 ["wasCompleted"] = WasCompleted,
-                ["data"] = Howler.Den
+                ["data"] = Howler.Results
             });
         }
     }

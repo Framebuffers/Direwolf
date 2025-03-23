@@ -6,7 +6,7 @@ namespace Direwolf.Revit.UI
     {
         public static PushButton? AddDocumentIntrospectionButton(RibbonPanel? rp)
         {
-            PushButtonData b = new("DocumentIntrospection", "Get Document Information", Libraries.References.AssemblyLocation, "Direwolf.Revit.UI.Commands.GetModelIntrospectioni");
+            PushButtonData b = new("DocumentIntrospection", "Get Document Information", Libraries.References.AssemblyLocation, "Direwolf.Revit.UI.Commands.GetModelIntrospection");
             return rp?.AddItem(b) as PushButton;
         }
 

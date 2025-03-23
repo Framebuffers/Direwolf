@@ -15,4 +15,5 @@ namespace Direwolf.Extensions
         public static void ToJson(this string s) => JsonSerializer.Serialize(s);
         public static void ToJsonIndented(this string s) => JsonSerializer.Serialize(s, new JsonSerializerOptions() { WriteIndented = true });
     }
+
 }

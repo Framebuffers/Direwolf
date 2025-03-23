@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using Direwolf.Revit.Definitions;
 using Direwolf.Definitions;
+using Direwolf.Revit.Howls.Legacy;
 
 namespace Direwolf.Revit.Howls
 {
@@ -16,8 +17,9 @@ namespace Direwolf.Revit.Howls
         {
             try
             {
-                DocumentIntrospection di = new(GetRevitDocument());
-                SendCatchToCallback(new Prey(di));
+            _GetElementInformation
+                var doc = GetRevitDocument();
+                              SendCatchToCallback(new Prey(di));
                 return true;
             }
             catch (Exception e)

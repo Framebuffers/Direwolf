@@ -70,7 +70,7 @@ namespace Direwolf.Revit.Howlers
 
         public override string ToString()
         {
-            return JsonSerializer.Serialize(Den);
+            return JsonSerializer.Serialize(Results);
         }
     }
 }
