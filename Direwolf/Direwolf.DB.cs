@@ -1,12 +1,6 @@
 ﻿using Direwolf.Definitions;
 using Direwolf.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace Direwolf
 {

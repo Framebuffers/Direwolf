@@ -1,11 +1,5 @@
 ﻿using Autodesk.Revit.DB;
 using Direwolf.Definitions;
-using Direwolf.Revit.Definitions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Direwolf.Revit.Howls
 {
@@ -25,7 +19,7 @@ namespace Direwolf.Revit.Howls
         {
             try
             {
-                SendCatchToCallback(new Prey(new ElementIntrospection(_e)));
+                //SendCatchToCallback(new Prey(new ElementIntrospection(_e)));
             }
             catch
             {

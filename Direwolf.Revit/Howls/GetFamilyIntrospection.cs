@@ -1,11 +1,5 @@
 ﻿using Autodesk.Revit.DB;
 using Direwolf.Definitions;
-using Direwolf.Revit.Definitions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Direwolf.Revit.Howls
 {
@@ -23,8 +17,8 @@ namespace Direwolf.Revit.Howls
         {
             try
             {
-                if (_f is not null)
-                    SendCatchToCallback(new Prey(new FamilyIntrospection(_f)));
+                //if (_f is not null)
+                //    SendCatchToCallback(new Prey(new FamilyIntrospection(_f)));
                 return true;
             }
             catch (Exception e)

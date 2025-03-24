@@ -1,6 +1,5 @@
 ﻿using Direwolf.Contracts;
 using Direwolf.EventHandlers;
-using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 

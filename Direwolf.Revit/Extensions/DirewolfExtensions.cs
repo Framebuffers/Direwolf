@@ -1,5 +1,4 @@
-﻿using Autodesk.Revit.UI;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 using Direwolf.Revit.Definitions.Legacy;
 
 namespace Direwolf.Revit.Utilities;

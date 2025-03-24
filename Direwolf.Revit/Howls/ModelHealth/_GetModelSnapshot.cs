@@ -4,15 +4,13 @@ using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
 using Direwolf.Definitions;
 using Direwolf.Revit.Definitions;
-using System;
-using Direwolf.Revit.Definitions.Legacy;
-using Direwolf.Revit.Extensions;
 
 namespace Direwolf.Revit.Howls.ModelHealth
 {
 
-    public record class GetModelSnapshot : RevitHowl
+    public record class _GetModelSnapshot : RevitHowl
     {
+        public _GetModelSnapshot(Document doc) => SetRevitDocument(doc);
         // These are all categories for which information has to be extracted.
         private List<View> viewsInsideDocument = [];
         private List<View> notInSheets = [];
@@ -504,9 +502,7 @@ namespace Direwolf.Revit.Howls.ModelHealth
                         isFlipped = isFlipped.Count,
                         worksetElementCount = worksetElementCount,
                     };
-
                 }
-
             }
 
             ProjectInformationIntrospection pji = new()
@@ -518,7 +514,6 @@ namespace Direwolf.Revit.Howls.ModelHealth
                 author = TryGetSafe(() => doc.ProjectInformation.Author, string.Empty),
                 buildingName = TryGetSafe(() => doc.ProjectInformation.BuildingName, string.Empty),
                 issueDate = TryGetSafe(() => doc.ProjectInformation.IssueDate, string.Empty),
-                location = TryGetSafe(() => doc.ProjectInformation.Location.ToString() ?? string.Empty, string.Empty),
                 projectNumber = TryGetSafe(() => doc.ProjectInformation.Number, string.Empty),
                 organizationDescription = TryGetSafe(() => doc.ProjectInformation.OrganizationDescription, string.Empty),
                 organizationName = TryGetSafe(() => doc.ProjectInformation.OrganizationName, string.Empty),

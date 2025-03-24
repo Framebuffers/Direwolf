@@ -1,10 +1,5 @@
 ﻿using Autodesk.Revit.DB;
 using Direwolf.Definitions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Direwolf.Revit.Howls
 {
@@ -20,7 +15,7 @@ namespace Direwolf.Revit.Howls
         {
             try
             {
-                SendCatchToCallback(new Prey(new GetProjectSiteIntrospection(GetRevitDocument())));
+                //SendCatchToCallback(new Prey(new GetProjectSiteIntrospection(GetRevitDocument())));
                 return true;
             }
             catch (Exception e)
