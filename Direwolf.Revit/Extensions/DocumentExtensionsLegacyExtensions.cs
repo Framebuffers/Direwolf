@@ -14,9 +14,6 @@ namespace Direwolf.Revit.Extensions
     {
         public static IEnumerable<Element?> _GetAllValidElements(this Document doc)
         {
-
-
-
             using FilteredElementCollector collector = new FilteredElementCollector(doc).WhereElementIsNotElementType();
             foreach (var e in collector)
             {

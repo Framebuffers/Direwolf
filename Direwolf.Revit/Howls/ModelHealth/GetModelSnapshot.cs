@@ -10,9 +10,9 @@ using Direwolf.Revit.Extensions;
 
 namespace Direwolf.Revit.Howls.ModelHealth
 {
+
     public record class GetModelSnapshot : RevitHowl
     {
-
         // These are all categories for which information has to be extracted.
         private List<View> viewsInsideDocument = [];
         private List<View> notInSheets = [];
@@ -33,8 +33,10 @@ namespace Direwolf.Revit.Howls.ModelHealth
         private List<Element> isFlipped = [];
         private Dictionary<string, int> worksetElementCount = [];
         private List<ElementIntrospection> individualElementInfo = [];
+        private Dictionary<FamilyIntrospection, HashSet<FamilyInstanceIntrospection>> elementsByFamily = [];
+        private Dictionary<string, Dictionary<FamilyIntrospection, HashSet<FamilyInstanceIntrospection>>> elementsByCategory = [];
 
-        private Prey ProcessInfo()
+        private ModelDatabase ProcessInfo()
         {
             var doc = GetRevitDocument();
             warns.AddRange(GetRevitDocument().GetWarnings());
@@ -159,6 +161,7 @@ namespace Direwolf.Revit.Howls.ModelHealth
                     // level
                     if (e is not null && e?.LevelId is not null) levelId = e.LevelId.Value;
 
+                    #endregion
 
                     #region filter
                     switch (e)
@@ -308,13 +311,85 @@ namespace Direwolf.Revit.Howls.ModelHealth
                                     break;
                             }
                             break;
-                            #endregion
                     }
+                    HashSet<ElementId> viewsOnSheets = [.. viewports.Select(vp => (vp as Viewport).ViewId)];
+                    foreach (Element viewElement in viewsInsideDocument)
+                    {
+                        if (viewElement is View view && !view.IsTemplate && !viewsOnSheets.Contains(view.Id))
+                        {
+                            notInSheets.Add(view);
+                        }
+                    }
+                    foreach (ElementId reference in ExternalFileUtils.GetAllExternalFileReferences(doc))
+                    {
+                        Element ext = doc.GetElement(reference);
+                        externalRefs.Add((ext.GetExternalFileReference().ExternalFileReferenceType, ext.GetExternalFileReference()));
+                    }
+                    #endregion
+                    #region family
+
+                    if (fm is not null && e?.Category is not null)
+                    {
+                        FamilyInstanceIntrospection fi = new()
+                        {
+                            id = TryGetSafe(() => fm.Id.Value, -1),
+                            uniqueId = TryGetSafe(() => fm.UniqueId, Guid.Empty.ToString()),
+                            versionId = TryGetSafe(() => fm.VersionGuid.ToString(), Guid.Empty.ToString()),
+                            canFlipFacing = TryGetSafe(() => fm.CanFlipFacing, false),
+                            canFlipHand = TryGetSafe(() => fm.CanFlipHand, false),
+                            canFlipWorkplane = TryGetSafe(() => fm.CanFlipWorkPlane, false),
+                            canRotate = TryGetSafe(() => fm.CanRotate, false),
+                            canSplit = TryGetSafe(() => fm.CanSplit, false),
+                            facingFlipped = TryGetSafe(() => fm.FacingFlipped, false),
+                            facingOrientationX = TryGetSafe(() => fm.FacingOrientation.X, 0),
+                            facingOrientationY = TryGetSafe(() => fm.FacingOrientation.Y, 0),
+                            facingOrientationZ = TryGetSafe(() => fm.FacingOrientation.Z, 0),
+                            handFlipped = TryGetSafe(() => fm.HandFlipped, false),
+                            handOrientationX = TryGetSafe(() => fm.HandOrientation.X, 0),
+                            handOrientationY = TryGetSafe(() => fm.HandOrientation.Y, 0),
+                            handOrientationZ = TryGetSafe(() => fm.HandOrientation.Z, 0),
+                            hasSpatialElementCalculationPoint = TryGetSafe(() => fm.HasSpatialElementCalculationPoint, false),
+                            hasSpatialElementFromToCalculationPoints = TryGetSafe(() => fm.HasSpatialElementFromToCalculationPoints, false),
+                            hostId = TryGetSafe(() => fm.Host.UniqueId, Guid.Empty.ToString()),
+                            invisible = TryGetSafe(() => fm.Invisible, false),
+                            isSlantedColumn = TryGetSafe(() => fm.IsSlantedColumn, false),
+                            isPinned = TryGetSafe(() => fm.Pinned, false),
+                            roomId = TryGetSafe(() => fm.Room.UniqueId, Guid.Empty.ToString()),
+                            spaceId = TryGetSafe(() => fm.Space.UniqueId, Guid.Empty.ToString()),
+                            superComponentId = TryGetSafe(() => fm.SuperComponent.UniqueId, Guid.Empty.ToString()),
+                            symbolId = TryGetSafe(() => fm.Symbol.UniqueId, Guid.Empty.ToString()),
+                        };
+
+                        HashSet<FamilyInstanceIntrospection> instanceData = [];
+                        foreach (var f in fm.Symbol.Family.GetFamilySymbolIds())
+                        {
+                            instanceData.Add(fi);
+                        }
+
+                        FamilyIntrospection fin = new()
+                        {
+                            id = TryGetSafe(() => fm.Symbol.Family.Id.Value, -1),
+                            name = TryGetSafe(() => fm.Symbol.FamilyName, string.Empty),
+                            uniqueId = TryGetSafe(() => fm.Symbol.Family.UniqueId, Guid.Empty.ToString()),
+                            builtInCategory = TryGetSafe(() => fm.Symbol.Family.Category.BuiltInCategory.ToString(), string.Empty),
+                            familyCategory = TryGetSafe(() => fm.Symbol.Family.Category.Name, string.Empty),
+                            familyCategoryId = TryGetSafe(() => fm.Symbol.Family.Category.Id.Value, -1),
+                            familyPlacementType = TryGetSafe(() => fm.Symbol.Family.FamilyPlacementType.ToString(), string.Empty),
+                            isConceptualMassFamily = TryGetSafe(() => fm.Symbol.Family.IsConceptualMassFamily, false),
+                            isCurtainWallPanelFamily = TryGetSafe(() => fm.Symbol.Family.IsCurtainPanelFamily, false),
+                            isEditable = TryGetSafe(() => fm.Symbol.Family.IsEditable, false),
+                            isInPlace = TryGetSafe(() => fm.Symbol.Family.IsInPlace, false),
+                            isOwnerFamily = TryGetSafe(() => fm.Symbol.Family.IsOwnerFamily, false),
+                            isParametric = TryGetSafe(() => fm.Symbol.Family.IsParametric, false),
+                            isUserCreated = TryGetSafe(() => fm.Symbol.Family.IsUserCreated, false),
+                        };
+                        elementsByFamily.TryAdd(fin, instanceData);
+                    }
+                    ;
+                    #endregion
                     #region parameters
                     List<ParameterIntrospection> parameters = [];
-
                     switch (e?.Category?.CategoryType)
-
                     {
                         case CategoryType.Model:
                             isAnnotative = false;
@@ -333,8 +408,7 @@ namespace Direwolf.Revit.Howls.ModelHealth
                         default:
                             break;
                     }
-
-                    string getParameterData(Parameter parameter)
+                    static string getParameterData(Parameter parameter)
                     {
                         return parameter.StorageType switch
                         {
@@ -345,7 +419,6 @@ namespace Direwolf.Revit.Howls.ModelHealth
                             _ => string.Empty,
                         };
                     }
-
                     if (e?.GetOrderedParameters() is not null)
                     {
                         foreach (Parameter? p in e?.GetOrderedParameters())
@@ -374,39 +447,9 @@ namespace Direwolf.Revit.Howls.ModelHealth
                             }
                         }
                     }
-                    //individualElementInfo.Push(new _ElementInformation
-                    //{
-                    //    idValue = e.Id.Value,
-                    //    uniqueElementId = e.UniqueId,
-                    //    elementVersionId = e.VersionGuid.ToString(),
-                    //    familyName = familyName,
-                    //    category = builtInCategory,
-                    //    builtInCategory = builtInCategory,
-                    //    workset = workset,
-                    //    views = views,
-                    //    designOption = designOption,
-                    //    documentOwner = docOwner,
-                    //    ownerViewId = ownerViewId,
-                    //    worksetId = worksetId,
-                    //    levelId = levelId,
-                    //    createdPhaseId = createdPhaseId,
-                    //    demolishedPhaseId = demolishedPhaseId,
-                    //    groupId = groupId,
-                    //    workshareId = workshareId,
-                    //    isGrouped = isGrouped,
-                    //    isModifiable = isModifiable,
-                    //    isViewSpecific = isViewSpecific,
-                    //    isBuiltInCategory = isBuiltInCategory,
-                    //    isAnnotative = isAnnotative,
-                    //    isModel = isModel,
-                    //    isPinned = isPinned,
-                    //    isWorkshared = isWorkshared,
-                    //    Parameters = null
-                    //});
-
                     #endregion
-
                     #region element
+
                     individualElementInfo.Add(new ElementIntrospection()
                     {
                         id = e?.Id.Value,
@@ -438,47 +481,32 @@ namespace Direwolf.Revit.Howls.ModelHealth
                         name = TryGetSafe(() => e.Name, string.Empty),
                         workshareId = workshareId,
                         parameters = parameters
-
-                        //id = e.Id.Value,
-                        //uniqueId = e.UniqueId,
-                        //elementVersionId = e.VersionGuid.ToString(),
-                        //builtInCategory = builtInCategory,
-                        //worksetId = worksetId,
-                        //documentOwnerId = docOwner,
-                        //ownerViewId = ownerViewId,
-                        //levelId = levelId,
-                        //createdPhaseId = createdPhaseId,
-                        //demolishedPhaseId = demolishedPhaseId,
-                        //groupId = groupId,
-                        //workshareId = workshareId,
-                        //isGrouped = isGrouped,
-                        //isModifiable = isModifiable,
-                        //isViewSpecific = isViewSpecific,
-                        //isBuiltInCategory = isBuiltInCategory,
-                        //isAnnotative = isAnnotative,
-                        //isModel = isModel,
-                        //isPinned = isPinned,
-                        //isWorkshared = isWorkshared,
-                        //parameters = parameters,
-                        //assemblyInstanceId = TryGetSafe(() => e.AssemblyInstanceId.Value, -1)
                     });
                     #endregion
-                }
-            }
-            // view not in sheet. needs to be done after all are done.
-            HashSet<ElementId> viewsOnSheets = [.. viewports.Select(vp => (vp as Viewport).ViewId)];
-            foreach (Element viewElement in viewsInsideDocument)
-            {
-                if (viewElement is View view && !view.IsTemplate && !viewsOnSheets.Contains(view.Id))
-                {
-                    notInSheets.Add(view);
-                }
-            }
+                    HealthIndicatorIntrospection h = new()
+                    {
+                        viewsInsideDocument = viewsInsideDocument.Count,
+                        notInSheets = notInSheets.Count,
+                        annotativeElements = annotativeElements.Count,
+                        externalRefs = externalRefs.Count,
+                        modelGroups = modelGroups.Count,
+                        detailGroups = detailGroups.Count,
+                        designOptions = designOption?.Count(),
+                        levels = levels.Count,
+                        grids = grids.Count,
+                        warnings = warns.Select(x => x.GetDescriptionText()).ToList(),
+                        unenclosedRoom = unenclosedRoom.Count,
+                        viewports = viewports.Count,
+                        unconnectedDucts = unconnectedDucts.Count,
+                        unconnectedPipes = unconnectedPipes.Count,
+                        unconnectedElectrical = unconnectedElectrical.Count,
+                        nonNativeStyles = nonNativeStyles.Count,
+                        isFlipped = isFlipped.Count,
+                        worksetElementCount = worksetElementCount,
+                    };
 
-            foreach (ElementId reference in ExternalFileUtils.GetAllExternalFileReferences(doc))
-            {
-                Element ext = doc.GetElement(reference);
-                externalRefs.Add((ext.GetExternalFileReference().ExternalFileReferenceType, ext.GetExternalFileReference()));
+                }
+
             }
 
             ProjectInformationIntrospection pji = new()
@@ -506,9 +534,15 @@ namespace Direwolf.Revit.Howls.ModelHealth
                 documentSaveCount = TryGetSafe(() => Document.GetDocumentVersion(doc).NumberOfSaves, 0),
                 warnings = [.. warns.Select(x => x.GetDescriptionText())],
                 projectInformation = pji
-            };
 
-            return new Prey(results);
+            };
+            return new ModelDatabase()
+            { 
+                ElementsByCategory = elementsByCategory,
+                DocumentInfo = d,
+                ProjectInfo = pji,
+                Units = new UnitIntrospection(doc)
+            };
         }
 
         private static string TryGetSafe(Func<string> func, string defaultValue)
@@ -528,33 +562,11 @@ namespace Direwolf.Revit.Howls.ModelHealth
             try { return func(); } catch { return defaultValue; }
         }
 
-
         public override bool Execute()
         {
-            SendCatchToCallback(ProcessInfo());
+            SendCatchToCallback(new Prey(ProcessInfo()));
             return true;
         }
     }
 }
-//Dictionary<string, object> results = new()
-//{
-//    { "viewsInsideDocument", viewsInsideDocument.Count },
-//    { "notInSheets", notInSheets.Count },
-//    { "annotativeElements", annotativeElements.Count },
-//    { "externalRefs", externalRefs.Count },
-//    { "modelGroups", modelGroups.Count },
-//    { "detailGroups", detailGroups.Count },
-//    { "designOptions", designOptions.Count },
-//    { "levels", levels.Count },
-//    { "grids", grids.Count },
-//    { "warns", warns.Count },
-//    { "unenclosedRoom", unenclosedRoom.Count },
-//    { "viewports", viewports.Count },
-//    { "unconnectedDucts", unconnectedDucts.Count },
-//    { "unconnectedPipes", unconnectedPipes.Count },
-//    { "unconnectedElectrical", unconnectedElectrical.Count },
-//    { "nonNativeStyles", nonNativeStyles.Count },
-//    { "isFlipped", isFlipped.Count },
-//    { "worksetElementCount", worksetElementCount.Count }
-//};
 
