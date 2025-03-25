@@ -2,222 +2,44 @@
 
 namespace Direwolf.Revit.Definitions
 {
-    public readonly record struct ElementRetrospection(Element Element)
+    public readonly record struct ElementRetrospection
     {
-        public double id => Element.Id.Value;
-        public string uniqueId => Element.UniqueId;
-        public Category? category
-        {
-            get
-            {
-                try
-                {
-                    if (Element.Category is not null)
-                    {
-                        return Element.Category;
-                    }
-                }
-                catch
-                {
-                    return null;
-                }
-                return null;
-            }
-        }
-        public BuiltInCategory builtInCategory
-        {
-            get
-            {
-                try
-                {
-                    if (Element.Category is not null)
-                    {
-                        return Element.Category.BuiltInCategory;
-                    }
-                    else
-                    {
-                        return BuiltInCategory.INVALID;
-                    }
-                }
-                catch
-                {
-                    return BuiltInCategory.INVALID;
-                }
-            }
-        }
-        public double assemblyInstanceId
-        {
-            get
-            {
-                try
-                {
-                    return Element.AssemblyInstanceId.Value;
-                }
-                catch
-                {
-                    return -1;
-                }
-            }
-        }
-        public double createdPhaseId
-        {
-            get
-            {
-                try
-                {
-                    return Element.CreatedPhaseId.Value;
-                }
-                catch
-                {
-                    return -1;
-                }
-            }
-        }
-        public double demolishedPhaseId
-        {
-            get
-            {
-                try
-                {
-                    return Element.DemolishedPhaseId.Value;
-                }
-                catch
-                {
-                    return -1;
-                }
-            }
+        public double? Id { get; init; }
+        public string? UniqueId { get; init; }
+        public int? BuiltInCategory { get; init; }
+        public double? AssemblyInstanceId { get; init; }
+        public double? CreatedPhaseId { get; init; }
+        public double? DemolishedPhaseId { get; init; }
+        public bool? HasDesignOption { get; init; }
+        public double? GroupId { get; init; }
+        public double? LevelId { get; init; }
+        public string? Location { get; init; }
+        public string? Name { get; init; }
+        public double? OwnerViewId { get; init; }
+        public bool? IsPinned { get; init; }
+        public bool? IsViewSpecific { get; init; }
+        public double? WorksetId { get; init; }
 
-        }
-        public bool hasDesignOption
+        public ElementRetrospection(Element element)
         {
-            get
-            {
-                try
-                {
-                    if (Element.DesignOption is not null) return true;
-                    else return false;
-                }
-                catch
-                {
-                    return false;
-                }
-            }
+            Id = element.Id.Value;
+            UniqueId = element.UniqueId;
+            BuiltInCategory = (int)element.Category?.BuiltInCategory;
+            AssemblyInstanceId = element.AssemblyInstanceId?.Value ?? -1;
+            CreatedPhaseId = element.CreatedPhaseId?.Value ?? -1;
+            DemolishedPhaseId = element.DemolishedPhaseId?.Value ?? -1;
+            HasDesignOption = element.DesignOption is not null;
+            GroupId = element.GroupId?.Value != -1 ? element.GroupId.Value : -1;
+            LevelId = element.LevelId?.Value ?? -1;
+            Location = element.Location?.ToString() ?? string.Empty;
+            Name = element.Name ?? string.Empty;
+            OwnerViewId = element.OwnerViewId?.Value ?? -1;
+            IsPinned = element.Pinned;
+            IsViewSpecific = element.ViewSpecific;
+            WorksetId = element.WorksetId?.IntegerValue ?? -1;
         }
-        public double groupId
-        {
-            get
-            {
-                try
-                {
-                    if (Element.GroupId.Value != -1 || Element.GroupId is null) return -1;
-                    else return Element.GroupId.Value;
-                }
-                catch
-                {
-                    return -1;
-                }
-            }
-        }
-        public double levelId
-        {
-            get
-            {
-                try
-                {
-                    return Element.LevelId.Value;
-                }
-                catch
-                {
-                    return -1;
-                }
-            }
-        }
-        public string location
-        {
-            get
-            {
-                try
-                {
-                    if (Element.Location is not null) return Element.Location.ToString() ?? string.Empty;
-                    else return string.Empty;
-                }
-                catch
-                {
-                    return string.Empty;
-                }
-            }
 
-        }
-        public string name
-        {
-            get
-            {
-                try
-                {
-                    return Element.Name;
-                }
-                catch
-                {
-                    return string.Empty;
-                }
-            }
-        }
-        public double ownerViewId
-        {
-            get
-            {
-                try
-                {
-                    return Element.OwnerViewId.Value;
-                }
-                catch
-                {
-                    return -1;
-                }
-            }
-        }
-        public bool isPinned
-        {
-            get
-            {
-                try
-                {
-                    return Element.Pinned;
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-        }
-        public bool isViewSpecific
-        {
-            get
-            {
-                try
-                {
-                    return Element.ViewSpecific;
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-        }
-        public double worksetId
-        {
-            get
-            {
-                try
-                {
-                    return Element.WorksetId.IntegerValue;
-                }
-                catch
-                {
-                    return -1;
-                }
-            }
-        }
+        public ElementRetrospection() { }
 
     }
 

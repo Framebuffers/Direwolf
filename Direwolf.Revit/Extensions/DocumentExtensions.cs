@@ -90,29 +90,11 @@ namespace Direwolf.Revit.Extensions
             return elements;
         }
 
-        //public static IEnumerable<Element?> _GetDesignOptions(this Document doc)
-        //{
-        //    foreach (var e in from e in doc.GetAllValidElements()
-        //                      where e is DesignOption
-        //                      where e.Category.BuiltInCategory is BuiltInCategory.OST_DesignOptions
-        //                      select e)
-        //    {
-        //        yield return e;
-        //    }
-        //}
-
         public static Dictionary<string, List<string>> GetAllDetailGroupsInDocument(this Document doc)
         {
             return GetElementUniqueIdByBuiltInCategory(doc, BuiltInCategory.OST_IOSDetailGroups);
-            //foreach (var e in from e in doc.GetAllValidElements()
-            //                  where e is Group
-            //                  where e.Category is not null
-            //                  where e.Category.Name == "Detail Groups"
-            //                  select e)
-            //{
-            //    yield return e;
-            //}
         }
+
         public static IEnumerable<Element?> _GetModelGroups(this Document doc)
         {
             foreach (var e in from x in doc.GetAllValidElements()
@@ -168,7 +150,7 @@ namespace Direwolf.Revit.Extensions
                     case StorageType.ElementId:
                         parameters.Add("storageType", StorageType.ElementId.ToString());
                         parameters.Add("name", p.Definition.Name);
-                        parameters.Add("value", p.AsElementId());
+                        parameters.Add("value", p.AsElementId().Value);
                         break;
                     case StorageType.None:
                     default:
@@ -176,7 +158,7 @@ namespace Direwolf.Revit.Extensions
                 }
                 parameters.Add("isReadOnly", p.IsReadOnly);
                 parameters.Add("typeId", p.GetTypeId().TypeId ?? string.Empty);
-                parameters.Add("dataType", p.Definition.GetDataType());
+                parameters.Add("dataType", p.Definition.GetDataType().TypeId);
                 parameters.Add("groupTypeId", p.Definition.GetGroupTypeId().TypeId ?? string.Empty);
                 parameters.Add("hasValue", p.HasValue);
                 parameters.Add("isShared", p.IsShared);
