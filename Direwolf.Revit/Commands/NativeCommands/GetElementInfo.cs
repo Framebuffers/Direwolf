@@ -3,7 +3,6 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Direwolf.Revit.Utilities;
 using System.Diagnostics;
-using static Direwolf.Revit.Utilities.DirewolfExtensions;
 
 namespace Direwolf.Revit.Commands.NativeCommands;
 

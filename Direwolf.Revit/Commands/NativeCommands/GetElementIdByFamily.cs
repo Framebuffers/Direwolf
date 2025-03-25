@@ -18,7 +18,7 @@ public class GetElementIdByFamily : IExternalCommand
         try
         {
             var doc = commandData.GetDocument();
-            Common.WriteToFile($"{GetType().Name}_Native.json", RunBenchmark(doc));
+            //Common.WriteToFile($"{GetType().Name}_Native.json", RunBenchmark(doc));
             benchmarkTimer.Stop();
             TimeTaken += benchmarkTimer.Elapsed.TotalSeconds;
         }
@@ -30,30 +30,30 @@ public class GetElementIdByFamily : IExternalCommand
         return Result.Succeeded;
     }
 
-    public static Dictionary<string, object> RunBenchmark(Document RevitDocument)
-    {
-        ICollection<Element>? allValidElements = RevitDocument?._GetAllValidElements()?.Where(x => x is not null).ToList();
+    //public static Dictionary<string, object> RunBenchmark(Document RevitDocument)
+    //{
+    //    //ICollection<Element>? allValidElements = RevitDocument?.GetAllValidElements()?.Where(x => x is not null).ToList();
         
-        var elementsSortedByFamilyNative = new Dictionary<string, List<long>>();
-        foreach ((Element? e, string? familyName) in from Element? e in allValidElements
-                                                    where e is not null
-                                                    let f = e as FamilyInstance 
-                                                    where f is not null
-                                                    let familyName = f.Symbol.Family.Name           
-                                                    select (e, familyName)) 
-        {
-            if (!elementsSortedByFamilyNative.TryGetValue(familyName, out List<long>? value))
-            {
-                value = [];
-                elementsSortedByFamilyNative[familyName] = value;
-            }
-            value.Add(e.Id.Value);
-        }
-        return new Dictionary<string, object>()
-        {
-            ["ElementsByFamily"] = elementsSortedByFamilyNative
-        };
-    }
+    //    //var elementsSortedByFamilyNative = new Dictionary<string, List<long>>();
+    //    //foreach ((Element? e, string? familyName) in from Element? e in allValidElements
+    //    //                                            where e is not null
+    //    //                                            let f = e as FamilyInstance 
+    //    //                                            where f is not null
+    //    //                                            let familyName = f.Symbol.Family.Name           
+    //    //                                            select (e, familyName)) 
+    //    //{
+    //    //    if (!elementsSortedByFamilyNative.TryGetValue(familyName, out List<long>? value))
+    //    //    {
+    //    //        value = [];
+    //    //        elementsSortedByFamilyNative[familyName] = value;
+    //    //    }
+    //    //    value.Add(e.Id.Value);
+    //    //}
+    //    //return new Dictionary<string, object>()
+    //    //{
+    //    //    ["ElementsByFamily"] = elementsSortedByFamilyNative
+    //    //};
+    //}
 
 }
 

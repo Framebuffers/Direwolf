@@ -1,13 +1,10 @@
 ﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 using Direwolf.Definitions;
+using Direwolf.Extensions;
 using Direwolf.Revit.Extensions;
 using Direwolf.Revit.Howls;
-using Direwolf.Revit.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace Direwolf.Revit.Introspection
 {
@@ -17,42 +14,98 @@ namespace Direwolf.Revit.Introspection
     /// </summary>
     public record class ElementIntrospection : RevitHowl
     {
-        public ElementIntrospection(Document doc, ElementSet e)
+        public ElementIntrospection(Document doc, UIApplication app)
         {
             SetRevitDocument(doc);
-            _e = e;
+            _app = app;
         }
+        private readonly UIApplication? _app;
 
-        private readonly ElementSet? _e;
         public override bool Execute()
         {
             try
             {
-                if (_e is not null)
+                if (_app is not null)
                 {
-               
-                    foreach (Element sibling in from element in _e as IEnumerable<Element>
-                                            let fi = element as FamilyInstance
-                                            where fi?.Symbol.Family is not null
-                                            let f = fi.Symbol.Family
-                                            let instances = f.GetFamilySymbolIds()
-                                            from sibling in
-                                                from instance in instances
-                                                let sibling = GetRevitDocument().GetElement(instance)
-                                                where sibling is not null
-                                                select sibling
-                                            select sibling)
+                    var selection = _app.ActiveUIDocument.Selection.GetElementIds();
+                    Dictionary<string, object> elementData = [];
+                    foreach (var e in selection)
                     {
-                        try
+                        Element? selected = GetRevitDocument().GetElement(e);
+                        var elementId = selected?.GetTypeId();
+                        if (elementId is null) $"No type found".ToConsole();
+                        ElementType? elementType = selected?.Document?.GetElement(elementId) as ElementType;
+
+                        static Dictionary<string, object>? getParameters(Element e)
                         {
-                            SendCatchToCallback(new Prey(sibling._GetElementInformation(GetRevitDocument())));
+                            Dictionary<string, object>? results = [];
+                            if (e is not null && e.GetOrderedParameters() is not null)
+                            {
+                                IList<Parameter>? b = e.GetOrderedParameters();
+                                if (e?.Category is not null)
+                                {
+                                    foreach (var p in b)
+                                    {
+                                        var val = p._GetParameterValue();
+                                        foreach (var xd in val)
+                                        {
+                                            results.Add(xd.Key, xd.Value);
+                                        }
+                                    }
+                                }
+                                return results;
+                            }
+                            else
+                            {
+                                return new Dictionary<string, object>();
+                            }
                         }
-                        catch
+
+                        var d = new Dictionary<string, object>()
                         {
-                            continue;
-                        }
+                            ["familyName"] = elementType?.FamilyName ?? string.Empty,
+                            ["elementName"] = selected?.Name ?? string.Empty,
+                            ["elementParameters"] = getParameters(selected)
+                        };
+                        SendCatchToCallback(new Prey(d));
                     }
-                }
+
+                    //ICollection<ElementId> f = new FilteredElementCollector(GetRevitDocument()).WhereElementIsNotElementType().ToElementIds();
+
+                    //foreach (ElementId id in f)
+                    //{
+                    //    using StringWriter sw = new();
+                    //    try
+                    //    {
+                    //        var a = GetRevitDocument().GetAllValidElements().LongCount();
+                    //        $"{a}".ToConsole();
+                    //        Element? selected = GetRevitDocument().GetElement(id);
+                    //        var elementId = selected?.GetTypeId();
+                    //        if (elementId is null)
+                    //        {
+                    //            $"No type found".ToConsole();
+                    //        }
+
+                    //        ElementType? elementType = selected?.Document?.GetElement(elementId) as ElementType;
+                    //        sw.WriteLine($"{elementType?.FamilyName ?? string.Empty}");
+                    //        sw.WriteLine($"\tUUID: {elementType?.UniqueId}");
+                    //        IList<Parameter>? b = selected?.GetOrderedParameters();
+                    //        if (selected?.Category is not null) sw.WriteLine($"BuiltInCategory: \t{elementType?.Category.BuiltInCategory}");
+                    //        if (b is not null)
+                    //        {
+                    //            foreach (var p in b)
+                    //            {
+                    //                sw.WriteLine($"\t\t{JsonSerializer.Serialize(p._GetParameterValue())}");
+                    //            }
+                    //        }
+                    //        $"{sw}".ToConsole();
+
+
+                    //    }
+                    //    catch { continue; }
+                    }
+
+                
                 return true;
             }
             catch
