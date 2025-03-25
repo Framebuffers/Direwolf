@@ -145,7 +145,6 @@ namespace Direwolf.Revit.Extensions
 
         public static Dictionary<string, object>? GetParameterValue(this Parameter p)
         {
-
             Dictionary<string, object> parameters = [];
             if (p.Definition is not null)
             {
@@ -183,6 +182,14 @@ namespace Direwolf.Revit.Extensions
                 parameters.Add("isShared", p.IsShared);
                 parameters.Add("userModifiable", p.UserModifiable);
 
+                if (p.IsShared)
+                {
+                    parameters.Add("sharedParamGuid", p.GUID);
+                }
+                else
+                {
+                    parameters.Add("sharedParamGuid", Guid.Empty.ToString());
+                }
             }
             return parameters;
         }

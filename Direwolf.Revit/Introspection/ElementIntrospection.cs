@@ -1,4 +1,5 @@
-﻿using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.ApplicationServices;
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Direwolf.Definitions;
 using Direwolf.Extensions;
@@ -60,7 +61,7 @@ namespace Direwolf.Revit.Introspection
                         static Dictionary<string, object>? getCategory(Element e)
                         {
                             Dictionary<string, object> categoryInfo = [];
-                            
+
                             if (e is not null && e.Category is not null)
                             {
                                 categoryInfo.TryAdd("categoryId", e.Category.Id.Value);
@@ -73,6 +74,7 @@ namespace Direwolf.Revit.Introspection
                             return categoryInfo;
                         }
 
+
                         var d = new Dictionary<string, object>()
                         {
                             ["familyName"] = elementType?.FamilyName ?? string.Empty,
@@ -83,12 +85,12 @@ namespace Direwolf.Revit.Introspection
                         var category = getCategory(selected);
 
                         if (category is not null)
-                        foreach (var cat in category)
-                        {
-                            d.Add(cat.Key, cat.Value);
-                        }
-
-                       SendCatchToCallback(new Prey(d));
+                            foreach (var cat in category)
+                            {
+                                d.Add(cat.Key, cat.Value);
+                            }
+                        d.TryAdd("materials", selected?.GetMaterialIds(true));
+                        SendCatchToCallback(new Prey(d));
                     }
 
                     //ICollection<ElementId> f = new FilteredElementCollector(GetRevitDocument()).WhereElementIsNotElementType().ToElementIds();
