@@ -6,6 +6,8 @@ using Direwolf.Revit.Howlers;
 using Revit.Async;
 using Direwolf.Definitions;
 using Direwolf.Revit.Howls;
+using Direwolf.Revit.Introspection;
+using Direwolf.Extensions;
 
 namespace Direwolf.Revit.UI.Commands
 {
@@ -26,7 +28,8 @@ namespace Direwolf.Revit.UI.Commands
             {
                 RevitTask.Initialize(commandData.Application);
                 RevitHowler rh = new();
-                rh.CreateWolf(new Wolf(), new GetExtensionTest(doc));
+                rh.CreateWolf(new Wolf(), new ElementIntrospection(doc, elements));
+                $"elementsSelected = {elements.Size}".ToConsole();
                 Direwolf dw = new(commandData.Application);
                 dw.QueueHowler(rh);
                 dw.HuntAsync("Extension Test");
