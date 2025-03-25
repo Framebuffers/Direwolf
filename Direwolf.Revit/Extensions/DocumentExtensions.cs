@@ -112,24 +112,36 @@ namespace Direwolf.Revit.Extensions
                 {
                     case StorageType.Integer:
                         parameters.Add("storageType", StorageType.Integer.ToString());
-                        parameters.Add(p.Definition.Name, p.AsInteger());
+                        parameters.Add("name", p.Definition.Name);
+                        parameters.Add("value", p.AsInteger());
                         break;
                     case StorageType.Double:
                         parameters.Add("storageType", StorageType.Double.ToString());
-                        parameters.Add(p.Definition.Name, p.AsDouble());
+                        parameters.Add("name", p.Definition.Name);
+                        parameters.Add("value", p.AsDouble());
                         break;
                     case StorageType.String:
                         parameters.Add("storageType", StorageType.String.ToString());
-                        parameters.Add(p.Definition.Name, p.AsString());
+                        parameters.Add("name", p.Definition.Name);
+                        parameters.Add("value", p.AsString());
                         break;
                     case StorageType.ElementId:
                         parameters.Add("storageType", StorageType.ElementId.ToString());
-                        parameters.Add(p.Definition.Name, p.AsElementId());
+                        parameters.Add("name", p.Definition.Name);
+                        parameters.Add("value", p.AsElementId());
                         break;
                     case StorageType.None:
                     default:
                         break;
                 }
+                parameters.Add("isReadOnly", p.IsReadOnly);
+                parameters.Add("typeId", p.GetTypeId().TypeId ?? string.Empty);
+                parameters.Add("dataType", p.Definition.GetDataType());
+                parameters.Add("groupTypeId", p.Definition.GetGroupTypeId().TypeId ?? string.Empty);
+                parameters.Add("hasValue", p.HasValue);
+                parameters.Add("isShared", p.IsShared);
+                parameters.Add("userModifiable", p.UserModifiable);
+
             }
             return parameters;
         }
