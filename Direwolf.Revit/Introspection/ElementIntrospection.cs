@@ -36,9 +36,9 @@ namespace Direwolf.Revit.Introspection
                         if (elementId is null) $"No type found".ToConsole();
                         ElementType? elementType = selected?.Document?.GetElement(elementId) as ElementType;
 
-                        static Dictionary<string, object>? getParameters(Element e)
+                        static List<Dictionary<string, object>>? getParameters(Element e)
                         {
-                            Dictionary<string, object>? results = [];
+                            List<Dictionary<string, object>>? results = [];
                             if (e is not null && e.GetOrderedParameters() is not null)
                             {
                                 IList<Parameter>? b = e.GetOrderedParameters();
@@ -46,18 +46,14 @@ namespace Direwolf.Revit.Introspection
                                 {
                                     foreach (var p in b)
                                     {
-                                        var val = p._GetParameterValue();
-                                        foreach (var xd in val)
-                                        {
-                                            results.Add(xd.Key, xd.Value);
-                                        }
+                                        results.Add(p._GetParameterValue());
                                     }
                                 }
                                 return results;
                             }
                             else
                             {
-                                return new Dictionary<string, object>();
+                                return new List<Dictionary<string, object>>();
                             }
                         }
 
