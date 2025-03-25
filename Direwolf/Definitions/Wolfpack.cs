@@ -4,7 +4,12 @@ using System.Text.Json.Serialization;
 
 namespace Direwolf.Definitions
 {
-    public readonly record struct Wolfpack([property: JsonIgnore]IHowler Howler, string DocumentName = "", string FileOrigin = "", string DocumentVersion = "", bool WasCompleted = false, double TimeTaken = 0)
+    public readonly record struct Wolfpack([property: JsonIgnore] IHowler Howler,
+        string DocumentName = "",
+        string FileOrigin = "",
+        string DocumentVersion = "",
+        bool WasCompleted = false,
+        double TimeTaken = 0) : IWolfpack
     {
         public string TestName { get; init; } = string.Empty;
         public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
