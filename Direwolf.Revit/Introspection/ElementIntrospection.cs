@@ -46,7 +46,7 @@ namespace Direwolf.Revit.Introspection
                                 {
                                     foreach (var p in b)
                                     {
-                                        results.Add(p._GetParameterValue());
+                                        results.Add(p.GetParameterValue());
                                     }
                                 }
                                 return results;
@@ -57,13 +57,38 @@ namespace Direwolf.Revit.Introspection
                             }
                         }
 
+                        static Dictionary<string, object>? getCategory(Element e)
+                        {
+                            Dictionary<string, object> categoryInfo = [];
+                            
+                            if (e is not null && e.Category is not null)
+                            {
+                                categoryInfo.TryAdd("categoryId", e.Category.Id.Value);
+                                categoryInfo.TryAdd("categoryUniqueId", e.UniqueId ?? Guid.Empty.ToString());
+                                categoryInfo.TryAdd("categoryName", e.Category.Name ?? string.Empty);
+                                categoryInfo.TryAdd("builtInCategory", e.Category.BuiltInCategory.ToString() ?? string.Empty);
+                                categoryInfo.TryAdd("categoryType", e.Category.CategoryType.ToString() ?? string.Empty);
+                                categoryInfo.TryAdd("hasMaterialQuantities", e.Category.HasMaterialQuantities);
+                            }
+                            return categoryInfo;
+                        }
+
                         var d = new Dictionary<string, object>()
                         {
                             ["familyName"] = elementType?.FamilyName ?? string.Empty,
                             ["elementName"] = selected?.Name ?? string.Empty,
-                            ["elementParameters"] = getParameters(selected)
+                            ["elementParameters"] = getParameters(selected),
                         };
-                        SendCatchToCallback(new Prey(d));
+
+                        var category = getCategory(selected);
+
+                        if (category is not null)
+                        foreach (var cat in category)
+                        {
+                            d.Add(cat.Key, cat.Value);
+                        }
+
+                       SendCatchToCallback(new Prey(d));
                     }
 
                     //ICollection<ElementId> f = new FilteredElementCollector(GetRevitDocument()).WhereElementIsNotElementType().ToElementIds();
@@ -91,7 +116,7 @@ namespace Direwolf.Revit.Introspection
                     //        {
                     //            foreach (var p in b)
                     //            {
-                    //                sw.WriteLine($"\t\t{JsonSerializer.Serialize(p._GetParameterValue())}");
+                    //                sw.WriteLine($"\t\t{JsonSerializer.Serialize(p.GetParameterValue())}");
                     //            }
                     //        }
                     //        $"{sw}".ToConsole();
@@ -99,9 +124,9 @@ namespace Direwolf.Revit.Introspection
 
                     //    }
                     //    catch { continue; }
-                    }
+                }
 
-                
+
                 return true;
             }
             catch

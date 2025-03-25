@@ -2,6 +2,9 @@
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
+using Microsoft.EntityFrameworkCore.Query;
+using System.Linq;
+using System.Xml;
 
 namespace Direwolf.Revit.Extensions
 {
@@ -19,39 +22,96 @@ namespace Direwolf.Revit.Extensions
             }
         }
 
-        public static IEnumerable<Element?> _GetAnnotativeElements(this Document doc)
+        private static Dictionary<string, List<string>> GetElementUniqueIdByBuiltInCategory(this Document doc, BuiltInCategory b)
         {
-
-            foreach (var e in from e in doc.GetAllValidElements()
-                              where e.Category is not null
-                              where e.Category.CategoryType is CategoryType.Annotation
-                              select e)
+            var elements = new Dictionary<string, List<string>>();
+            IEnumerable<(string Name, string UniqueID)> pairs =
+                            new FilteredElementCollector(doc)
+                            .OfCategory(b)
+                            .ToElements()
+                            .Select(x => (x.Name, x.UniqueId));
+            foreach ((string Name, string UniqueID) in pairs)
             {
-                yield return e;
+                if (!elements.TryGetValue(Name, out List<string>? value))
+                {
+                    elements[Name] = [UniqueID];
+                }
+                else
+                {
+                    value.Add(UniqueID);
+                }
             }
+            return elements;
         }
 
-        public static IEnumerable<Element?> _GetDesignOptions(this Document doc)
+        public static Dictionary<string, List<string>> GetAllViewsInDocument(this Document doc)
         {
-            foreach (var e in from e in doc.GetAllValidElements()
-                              where e is DesignOption
-                              where e.Category.BuiltInCategory is BuiltInCategory.OST_DesignOptions
-                              select e)
+            var annotativeElements = new Dictionary<string, List<string>>();
+            IEnumerable<(string Name, string UniqueID)> pairs =
+                new FilteredElementCollector(doc)
+                .OfClass(typeof(ViewDrafting))
+                .ToElements()
+                .Select(x => (x.Name, x.UniqueId));
+
+            foreach ((string Name, string UniqueID) in pairs)
             {
-                yield return e;
+                if (!annotativeElements.TryGetValue(Name, out List<string>? value))
+                {
+                    annotativeElements[Name] = [UniqueID];
+                }
+                else
+                {
+                    value.Add(UniqueID);
+                }
             }
+            return annotativeElements;
         }
 
-        public static IEnumerable<Element?> _GetDetailGroups(this Document doc)
+        public static Dictionary<string, List<string>> GetAllDesignOptionsInDocument(this Document doc)
         {
-            foreach (var e in from e in doc.GetAllValidElements()
-                              where e is Group
-                              where e.Category is not null
-                              where e.Category.Name == "Detail Groups"
-                              select e)
+            var elements = new Dictionary<string, List<string>>();
+            IEnumerable<(string Name, string UniqueID)> pairs =
+                new FilteredElementCollector(doc)
+                .OfClass(typeof(DesignOption))
+                .ToElements()
+                .Select(x => (x.Name, x.UniqueId));
+
+            foreach ((string Name, string UniqueID) in pairs)
             {
-                yield return e;
+                if (!elements.TryGetValue(Name, out List<string>? value))
+                {
+                    elements[Name] = [UniqueID];
+                }
+                else
+                {
+                    value.Add(UniqueID);
+                }
             }
+            return elements;
+        }
+
+        //public static IEnumerable<Element?> _GetDesignOptions(this Document doc)
+        //{
+        //    foreach (var e in from e in doc.GetAllValidElements()
+        //                      where e is DesignOption
+        //                      where e.Category.BuiltInCategory is BuiltInCategory.OST_DesignOptions
+        //                      select e)
+        //    {
+        //        yield return e;
+        //    }
+        //}
+
+        public static Dictionary<string, List<string>> GetAllDetailGroupsInDocument(this Document doc)
+        {
+            return GetElementUniqueIdByBuiltInCategory(doc, BuiltInCategory.OST_IOSDetailGroups);
+            //foreach (var e in from e in doc.GetAllValidElements()
+            //                  where e is Group
+            //                  where e.Category is not null
+            //                  where e.Category.Name == "Detail Groups"
+            //                  select e)
+            //{
+            //    yield return e;
+            //}
         }
         public static IEnumerable<Element?> _GetModelGroups(this Document doc)
         {
@@ -83,26 +143,7 @@ namespace Direwolf.Revit.Extensions
             return worksetElementCount;
         }
 
-        public static IDictionary<string, object>? GetParametersFromElement(this Element e)
-        {
-            Dictionary<string, object> parameters = [];
-            foreach (Parameter p in e.GetOrderedParameters())
-            {
-                //parameters.Add("guid", p.GUID);
-                parameters.Add("hasValue", p.HasValue);
-                parameters.Add("id", p.Id.Value);
-                parameters.Add("isReadOnly", p.IsReadOnly);
-                parameters.Add("isShared", p.IsShared);
-                parameters.Add("isUserModifiable", p.UserModifiable);
-                foreach (KeyValuePair<string, object> x in p?._GetParameterValue())
-                {
-                    parameters.Add(x.Key, x.Value);
-                }
-            }
-            return parameters;
-        }
-
-        public static Dictionary<string, object>? _GetParameterValue(this Parameter p)
+        public static Dictionary<string, object>? GetParameterValue(this Parameter p)
         {
 
             Dictionary<string, object> parameters = [];
