@@ -10,6 +10,15 @@ using System.Threading.Tasks;
 
 namespace Direwolf
 {
+    public enum Target
+    {
+        Invalid,
+        JSON,
+        DB,
+        Excel,
+        Screen
+    }
+
     public partial class Direwolf
     {
         public event EventHandler? DatabaseConnectionEventHandler;
@@ -25,9 +34,23 @@ namespace Direwolf
             Debug.Print("Database connected!");
         }
 
+        public async void SendAllToJson()
+        {
+
+        }
+
         public async void SendAllToDB()
         {
             try { await Queries.Send(); } catch (Exception e) { Debug.Print(e.Message); }
+        }
+
+        public async void SendAllToExcel()
+        {
+
+        }
+        public async void SendAllToScreen()
+        {
+
         }
     }
 }
