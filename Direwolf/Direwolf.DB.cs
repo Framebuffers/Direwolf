@@ -19,6 +19,14 @@ namespace Direwolf
         Screen
     }
 
+    public enum DatabaseChoice
+    {
+        Invalid,
+        Postgres
+    }
+
+
+
     public partial class Direwolf
     {
         public event EventHandler? DatabaseConnectionEventHandler;

@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Direwolf.Revit.AI", "Direwo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Direwolf.Revit.Client", "Direwolf.Revit.Client\Direwolf.Revit.Client.csproj", "{2DCAB039-2CF1-4236-A391-CB1F2F44038D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Direwolf.Dynamo", "Direwolf.Dynamo\Direwolf.Dynamo.csproj", "{3864E9B7-22A8-432A-87D8-1AE392A9279A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,6 +50,10 @@ Global
 		{2DCAB039-2CF1-4236-A391-CB1F2F44038D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2DCAB039-2CF1-4236-A391-CB1F2F44038D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2DCAB039-2CF1-4236-A391-CB1F2F44038D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3864E9B7-22A8-432A-87D8-1AE392A9279A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3864E9B7-22A8-432A-87D8-1AE392A9279A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3864E9B7-22A8-432A-87D8-1AE392A9279A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3864E9B7-22A8-432A-87D8-1AE392A9279A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
