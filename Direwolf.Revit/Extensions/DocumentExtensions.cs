@@ -22,6 +22,19 @@ namespace Direwolf.Revit.Extensions
             }
         }
 
+        public static int GetSaveCount(this Document document)
+        {
+            BasicFileInfo f = BasicFileInfo.Extract(document.PathName);
+            return f.GetDocumentVersion().NumberOfSaves;
+        }
+
+        public static string GetCurrentDocumentGuid(this Document doc)
+        {
+            BasicFileInfo f = BasicFileInfo.Extract(doc.PathName);
+            return f.GetDocumentVersion().VersionGUID.ToString();
+        }
+
+
         private static Dictionary<string, List<string>> GetElementUniqueIdByBuiltInCategory(this Document doc, BuiltInCategory b)
         {
             var elements = new Dictionary<string, List<string>>();

@@ -56,6 +56,27 @@ namespace Direwolf.Revit.Definitions
             Warnings = [.. document.GetWarnings().Select(x => x.GetDescriptionText())];
         }
         public DocumentIntrospection() { }
+
+        public static string AsSql()
+        {
+            return """
+                INSERT INTO "DocumentInformation"(
+                "documentId",
+                "document,"
+                "name",
+                "path",
+                "uuid",
+                "saveCount",
+                ) VALUES (
+                @documentId,
+                @document,
+                @name,
+                @path,
+                @uuid,
+                @saveCount);
+                """;
+        }
+
     }
 
 }

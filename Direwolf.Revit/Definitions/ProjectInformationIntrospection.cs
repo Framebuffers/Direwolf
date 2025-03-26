@@ -32,6 +32,39 @@ namespace Direwolf.Revit.Definitions
         }
 
         public ProjectInformationIntrospection() { }
+
+        public static string AsSql()
+        {
+            return """
+                INSERT INTO ProjectInformation (
+                "projectId",
+                "projectName",
+                "client",
+                "address",
+                "author",
+                "buildingName",
+                "issueDate",
+                "location",
+                "projectNumber",
+                "organizationDescription",
+                "organizationName",
+                "status"
+                ) VALUES (
+                @projectId,
+                @projectName,
+                @client,
+                @address,
+                @author,
+                @buildingName,
+                @issueDate,
+                @location,
+                @projectNumber,
+                @organizationDescription,
+                @organizationName,
+                @status
+                );
+                """;
+        }
     }
 
 }

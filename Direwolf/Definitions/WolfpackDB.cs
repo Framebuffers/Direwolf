@@ -1,4 +1,5 @@
-﻿using Npgsql;
+﻿using Direwolf.Contracts;
+using Npgsql;
 using NpgsqlTypes;
 using System.Diagnostics;
 
@@ -6,7 +7,7 @@ namespace Direwolf.Definitions
 {
     public readonly record struct DbConnectionString(string Host, int Port, string Username, string Password, string Database) { }
 
-    public class WolfpackDB : Stack<Wolfpack>
+    public class WolfpackDB : Stack<Wolfpack>, IWolfpackDB
     {
         public event EventHandler DatabaseConnectedEventHandler;
         private readonly DbConnectionString _str;
@@ -17,12 +18,9 @@ namespace Direwolf.Definitions
             DatabaseConnectedEventHandler += WolfpackDB_DatabaseConnectedEventHandler;
         }
 
-        private void WolfpackDB_DatabaseConnectedEventHandler(object? sender, EventArgs e)
-        {
-            Debug.Print("Database Connected");
-        }
+        private void WolfpackDB_DatabaseConnectedEventHandler(object? sender, EventArgs e) => Debug.Print("Database Connected");
 
-        public async Task Send()
+        public virtual async Task Send()
         {
             DatabaseConnectedEventHandler?.Invoke(this, new EventArgs());
             string sqlQuery =
@@ -31,7 +29,6 @@ namespace Direwolf.Definitions
             try
             {
                 using NpgsqlConnection c = new($"Host={_str.Host};Port={_str.Port};Username={_str.Username};Password={_str.Password};Database={_str.Database}");
-                if (c is not null) Debug.Print("connection is not null");
                 DatabaseConnectedEventHandler?.Invoke(this, new EventArgs());
                 c.StateChange += C_StateChange;
                 c.Notice += C_Notice;
@@ -71,14 +68,7 @@ namespace Direwolf.Definitions
             }
         }
 
-        private void C_Notice(object sender, NpgsqlNoticeEventArgs e)
-        {
-            Debug.Print($"Postgres Notice: {e.Notice.Severity}; {e.Notice.MessageText}");
-        }
-
-        private void C_StateChange(object sender, System.Data.StateChangeEventArgs e)
-        {
-            Debug.Print($"Connection status: {e.CurrentState}");
-        }
+        private void C_Notice(object sender, NpgsqlNoticeEventArgs e) => Debug.Print($"Postgres Notice: {e.Notice.Severity}; {e.Notice.MessageText}");
+        private void C_StateChange(object sender, System.Data.StateChangeEventArgs e) => Debug.Print($"Connection status: {e.CurrentState}");
     }
 }

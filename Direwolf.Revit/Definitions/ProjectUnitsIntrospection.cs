@@ -33,5 +33,41 @@ namespace Direwolf.Revit.Definitions
             Volume = document.GetUnits().GetFormatOptions(SpecTypeId.Volume).GetUnitTypeId().TypeId;
         }
         public ProjectUnitsIntrospection() { }
+
+        public static string AsSql()
+        {
+            return """
+                INSERT INTO "UnitsInformation"(
+                "documentId",
+                "document",
+                "lengthUnits",
+                "areaUnits",
+                "angle",
+                "currency",
+                "number",
+                "rotationAngle",
+                "sheetLength",
+                "siteAngle",
+                "slope",
+                "speed",
+                "time",
+                "volume"
+                ) VALUES (
+                @documentId,
+                @document,
+                @lengthUnits,
+                @areaUnits,
+                @angle,
+                @currency,
+                @number,
+                @rotationAngle,
+                @sheetLength,
+                @siteAngle,
+                @slope,
+                @speed,
+                @time,
+                @volume);
+                """;
+        }
     }
 }

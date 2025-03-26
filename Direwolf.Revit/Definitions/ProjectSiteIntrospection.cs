@@ -23,6 +23,32 @@ namespace Direwolf.Revit.Definitions
             GeoCoordinateSystemDefinition = document.SiteLocation.GeoCoordinateSystemDefinition ?? string.Empty;
         }
         public ProjectSiteIntrospection() { }
+
+        public static string AsSql()
+        {
+            return """
+                INSERT INTO "SiteInformation"(
+                "documentId",
+                "document",
+                "placeName",
+                "elevation",
+                "latitude",
+                "longitude",
+                "timeZone",
+                "coordinatedSystemId",
+                "coordinateSystemDefinition"
+                ) VALUES (
+                @documentId,
+                @document,
+                @placeName,
+                @elevation,
+                @latitude,
+                @longitude,
+                @timeZone,
+                @coordinatedSystemId,
+                @coordinateSystemDefinition);
+                """;
+        }
     }
 
 }

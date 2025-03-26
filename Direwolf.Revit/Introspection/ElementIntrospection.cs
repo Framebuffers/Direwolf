@@ -72,7 +72,6 @@ namespace Direwolf.Revit.Introspection
                                 ProjectInformationIntrospection pi = new(GetRevitDocument());
                                 ProjectSiteIntrospection ps = new(GetRevitDocument());
                                 ProjectUnitsIntrospection ui = new(GetRevitDocument());
-                                BasicFileInfo b = BasicFileInfo.Extract(GetRevitDocument().PathName);
                                 
 
                                 // Success!
@@ -81,9 +80,6 @@ namespace Direwolf.Revit.Introspection
                                 SendCatchToCallback(new Prey(pi));
                                 SendCatchToCallback(new Prey(ui));
                                 SendCatchToCallback(new Prey(ps));
-                                SendCatchToCallback(new Prey(GetRevitDocument().CreationGUID));
-                                //SendCatchToCallback(new Prey(b.GetDocumentVersion().VersionGUID));
-                                //SendCatchToCallback(new Prey(b.GetDocumentVersion().NumberOfSaves));
 
                             }
                         }

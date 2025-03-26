@@ -13,7 +13,7 @@ namespace Direwolf.Definitions
     {
         public string TestName { get; init; } = string.Empty;
         public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
-        public Guid GUID { get; init; } = Guid.NewGuid();
+        public string GUID { get; init; } = Guid.NewGuid().ToString();
         public int ResultCount { get => Howler.Den.Count; }
         public string? Results => Howler?.ToString();
         public override string ToString()

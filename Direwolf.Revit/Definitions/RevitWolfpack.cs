@@ -22,7 +22,7 @@ namespace Direwolf.Revit.Definitions
         {
             CreatedAt = DateTime.UtcNow;
             FileOrigin = fileOrigin;
-            GUID = new Guid();
+            GUID = new Guid().ToString();
             ResultCount = howler.Den.Count;
             TestName = testName;
             TimeTaken = timeTaken;
@@ -36,10 +36,18 @@ namespace Direwolf.Revit.Definitions
                 Warnings.Add(new WarningIntrospection(w));
             }
             Results = howler.ToString();
+
+            BasicFileInfo b = BasicFileInfo.Extract(doc.PathName);
+            DocumentSessionId = b.GetDocumentVersion().VersionGUID.ToString();
+            DocumentCreationId = doc.CreationGUID.ToString();
+            ChangedElements = [.. doc.GetChangedElements(b.GetDocumentVersion().VersionGUID).GetCreatedElementIds().Select(x => x.Value)];
         }
         public DateTime CreatedAt { get; init; }
         public string FileOrigin { get; init; }
-        public Guid GUID { get; init; }
+        public string GUID { get; init; }
+        public string DocumentSessionId { get; init; }
+        public string DocumentCreationId { get; init; }
+        public List<long> ChangedElements { get; init; }
         public int ResultCount { get; init; }
         public string? Results { get; init; }
         public string TestName { get; init; }
@@ -50,5 +58,46 @@ namespace Direwolf.Revit.Definitions
         public ProjectSiteIntrospection Site { get; init; }
         public ProjectUnitsIntrospection Units { get; init; }
         public List<WarningIntrospection> Warnings { get; init; } = [];
+
+        public static string ToSql()
+        {
+            return """
+                INSERT INTO "Wolfpack"(
+                "projectInformation",
+                "documentInformation",
+                "siteInformation",
+                "unitsInformation",
+                "warnings",
+                "documentSessionId",
+                "documentCreationId",
+                "changedElements",
+                "fileOrigin",
+                "wasCompleted",
+                "timeTaken",
+                "createdAt",
+                "guid",
+                "resultCount",
+                "testName",
+                "results",
+                "elementInfo"
+                ) VALUES (
+                @projectInformation,
+                @documentInformation,
+                @siteInformation,
+                @warnings,
+                @documentSessionId,
+                @changedElements,
+                @fileOrigin,
+                @wasCompleted,
+                @timeTaken,
+                @createdAt,
+                @guid,
+                @resultCount,
+                @testName,
+                @results,
+                @elementInfo)
+                ON CONFLICT (guid) DO NOTHING;
+                """;
+        }
     }
 }
