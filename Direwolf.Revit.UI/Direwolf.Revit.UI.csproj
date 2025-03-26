@@ -13,7 +13,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Direwolf.Dynamo\Direwolf.Dynamo.csproj" />
     <ProjectReference Include="..\Direwolf.Revit\Direwolf.Revit.csproj" />
+    <ProjectReference Include="..\Direwolf\Direwolf.csproj" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

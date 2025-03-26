@@ -9,7 +9,7 @@ using System.Text.Json.Serialization;
 
 namespace Direwolf
 {
-    public partial class Direwolf
+    public partial class Direwolf : IDirewolf
     {
         public event EventHandler? AsyncHuntCompletedEventHandler;
 

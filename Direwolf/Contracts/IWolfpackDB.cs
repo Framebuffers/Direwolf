@@ -4,6 +4,5 @@
     {
         public Task Send();
         public event EventHandler DatabaseConnectedEventHandler;
-       
     }
 }

@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Direwolf.Revit", "Direwolf.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Direwolf.Revit.UI", "Direwolf.Revit.UI\Direwolf.Revit.UI.csproj", "{88813FC1-5A4E-4AA7-AC20-3127C1685717}"
 	ProjectSection(ProjectDependencies) = postProject
+		{3864E9B7-22A8-432A-87D8-1AE392A9279A} = {3864E9B7-22A8-432A-87D8-1AE392A9279A}
+		{8BEADF2D-7A59-4D88-A1B1-37962D2982AD} = {8BEADF2D-7A59-4D88-A1B1-37962D2982AD}
 		{C9A1B9C1-55DC-4F89-A032-D534B884A05E} = {C9A1B9C1-55DC-4F89-A032-D534B884A05E}
 	EndProjectSection
 EndProject
@@ -19,6 +21,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Direwolf.Revit.Client", "Direwolf.Revit.Client\Direwolf.Revit.Client.csproj", "{2DCAB039-2CF1-4236-A391-CB1F2F44038D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Direwolf.Dynamo", "Direwolf.Dynamo\Direwolf.Dynamo.csproj", "{3864E9B7-22A8-432A-87D8-1AE392A9279A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C9A1B9C1-55DC-4F89-A032-D534B884A05E} = {C9A1B9C1-55DC-4F89-A032-D534B884A05E}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

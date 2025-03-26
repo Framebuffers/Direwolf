@@ -1,6 +1,8 @@
 ﻿using Direwolf.Definitions;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 
 namespace Forest.MockAttributesTest
 {
@@ -11,26 +13,9 @@ namespace Forest.MockAttributesTest
         //private const string db = @"postgresql://wolf:awoo@127.0.0.1:5432/direwolf?schema=public";
         public static void Main(string[] args)
         {
-            Stack<Prey> prey = [];
-            Prey p = new(new Dictionary<string, object>()
-            {
-                ["Test"] = "result"
-            });
-            prey.Push(p);
-
-            Howler h = new();
-            h.Den.Push(p);
-            
-            Wolfpack w = new(h, "Document", "Origin", Guid.NewGuid().ToString(), true, 3.1415)
-            {
-            };
-
-
-            WolfpackDB wp = new(_default);
-            wp.Push(w);
-            wp.Send();
-
-
+            FileInfo f = new(args[0]);
+            Assembly a = Assembly.LoadFile(args[0]);
+            Console.WriteLine(a.FullName);
         }
 
         public async void Send(WolfpackDB d)

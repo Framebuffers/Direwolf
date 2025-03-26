@@ -1,0 +1,22 @@
+{
+  "license": "GPL-3.0",
+  "file_hash": null,
+  "name": "Direwolf Connector for Autodesk Revit",
+  "version": "1.0.0",
+  "description": "Allows data created using Dynamo to be exported and processed with Direwolf.",
+  "group": "",
+  "keywords": [ "Direwolf", "data-analysis", "dynamo" ],
+  "dependencies": [ "Direwolf.dll", "Direwolf.Revit.dll" ],
+  "contents": "Data analysis and export nodes.",
+  "engine_version": "1.0.0",
+  "engine": "dynamo",
+  "engine_metadata": "",
+  "site_url": "https://github.com/Framebuffers/Direwolf",
+  "repository_url": "https://github.com/Framebuffers/Direwolf",
+  "contains_binaries": true,
+  "node_libraries": [
+    "Direwolf, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "Direwolf.Revit, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "Direwolf.Dynamo, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+  ]
+}

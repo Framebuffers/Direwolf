@@ -60,5 +60,13 @@ namespace Direwolf
         {
 
         }
+        public async void SendToDynamo()
+        {
+
+        }
+        public async void GetFromDynamo(IWolfpack wolfpack)
+        {
+
+        }
     }
 }

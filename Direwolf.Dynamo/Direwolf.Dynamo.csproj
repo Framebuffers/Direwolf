@@ -6,4 +6,15 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="DynamoVisualProgramming.Core" Version="3.4.2.7731" />
+    <PackageReference Include="DynamoVisualProgramming.Revit" Version="3.0.0.3416" />
+    <PackageReference Include="DynamoVisualProgramming.WpfUILibrary" Version="3.4.2.7731" />
+    <PackageReference Include="DynamoVisualProgramming.ZeroTouchLibrary" Version="3.4.2.7731" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Direwolf\Direwolf.csproj" />
+  </ItemGroup>
+
 </Project>
