@@ -1,11 +1,8 @@
 {
   "profiles": {
-    "Forest": {
+    "Direwolf.Revit": {
       "commandName": "Project",
       "nativeDebugging": true
-    },
-    "Container (Dockerfile)": {
-      "commandName": "Docker"
     }
   }
 }

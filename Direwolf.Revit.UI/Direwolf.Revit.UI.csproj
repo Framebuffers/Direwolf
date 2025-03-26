@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,6 +17,19 @@
     <ProjectReference Include="..\Direwolf.Dynamo\Direwolf.Dynamo.csproj" />
     <ProjectReference Include="..\Direwolf.Revit\Direwolf.Revit.csproj" />
     <ProjectReference Include="..\Direwolf\Direwolf.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Commands\Actions\Elements\" />
+    <Folder Include="Commands\Actions\Categories\" />
+    <Folder Include="Commands\Actions\Documents\" />
+    <Folder Include="Commands\Actions\Others\" />
+    <Folder Include="Commands\Actions\Parameters\" />
+    <Folder Include="Commands\Introspections\Categories\" />
+    <Folder Include="Commands\Introspections\Documents\" />
+    <Folder Include="Commands\Introspections\Elements\" />
+    <Folder Include="Commands\Introspections\Others\" />
+    <Folder Include="Commands\Introspections\Parameters\" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

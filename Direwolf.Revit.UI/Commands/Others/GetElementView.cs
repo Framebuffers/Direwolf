@@ -7,11 +7,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Direwolf.Revit.UI.Commands
+namespace Direwolf.Revit.UI.Commands.Other
 {
-    // View -> ElementIntrospection
     [Transaction(TransactionMode.Manual)]
-    public class GetViewIntrospection : IExternalCommand
+    public class GetElementView : IExternalCommand
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {

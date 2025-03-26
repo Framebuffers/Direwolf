@@ -8,7 +8,7 @@ using Direwolf.Revit.Introspection;
 using Revit.Async;
 using System.Diagnostics;
 
-namespace Direwolf.Revit.UI.Commands
+namespace Direwolf.Revit.UI.Commands.Other
 {
     [Transaction(TransactionMode.Manual)]
     public class GetSelectedElementIntrospection : IExternalCommand

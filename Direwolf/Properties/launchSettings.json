@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Direwolf": {
+      "commandName": "Project",
+      "nativeDebugging": false
+    }
+  }
+}

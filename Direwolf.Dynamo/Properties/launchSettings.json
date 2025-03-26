@@ -1,11 +1,8 @@
 {
   "profiles": {
-    "Forest": {
+    "Direwolf.Dynamo": {
       "commandName": "Project",
       "nativeDebugging": true
-    },
-    "Container (Dockerfile)": {
-      "commandName": "Docker"
     }
   }
 }

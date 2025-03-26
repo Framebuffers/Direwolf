@@ -17,12 +17,11 @@ namespace Direwolf.Revit.UI.Commands
     /// </summary>
     [Transaction(TransactionMode.Manual)]
 
-    public partial class GetModelHealth : IExternalCommand
+    public partial class GetModelHealth : DirewolfRevitCommand
     {
-        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
+        public override Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            Stopwatch s = new();
-            s.Start();
+            StartTime();
             Document doc = commandData.Application.ActiveUIDocument.Document;
             try
             {
@@ -33,6 +32,8 @@ namespace Direwolf.Revit.UI.Commands
                 Direwolf dw = new(commandData.Application);
                 dw.QueueHowler(rh);
                 dw.HuntAsync("Extension Test");
+                var s = StopTime();
+                Debug.Print($"Time taken: {s}");
                 dw.SendAllToDB();
             }
             catch
@@ -40,8 +41,6 @@ namespace Direwolf.Revit.UI.Commands
                 return Result.Failed;
             }
 
-            s.Stop();
-            Debug.Print($"Time taken: {s.Elapsed.Seconds}");
             return Result.Succeeded;
         }
     }

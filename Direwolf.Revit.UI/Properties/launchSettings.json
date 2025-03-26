@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Direwolf.Revit.UI": {
+      "commandName": "Project",
+      "nativeDebugging": true,
+      "executablePath": "C:\\Program Files\\Autodesk\\Revit 2025\\Revit.exe"
+
+    }
+  }
+}

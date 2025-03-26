@@ -7,10 +7,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Direwolf.Revit.UI.Commands
+namespace Direwolf.Revit.UI.Commands.Other
 {
     [Transaction(TransactionMode.Manual)]
-    public class GetElementView : IExternalCommand
+    public class ElementToExcel : IExternalCommand
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {

@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Direwolf.Dynamo", "Direwolf
 		{C9A1B9C1-55DC-4F89-A032-D534B884A05E} = {C9A1B9C1-55DC-4F89-A032-D534B884A05E}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Direwolf.Bootstrap", "Direwolf.Bootstrap\Direwolf.Bootstrap.csproj", "{EBF427E9-BB46-4B80-BB63-7C3F9B4216F4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +61,10 @@ Global
 		{3864E9B7-22A8-432A-87D8-1AE392A9279A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3864E9B7-22A8-432A-87D8-1AE392A9279A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3864E9B7-22A8-432A-87D8-1AE392A9279A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBF427E9-BB46-4B80-BB63-7C3F9B4216F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBF427E9-BB46-4B80-BB63-7C3F9B4216F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBF427E9-BB46-4B80-BB63-7C3F9B4216F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBF427E9-BB46-4B80-BB63-7C3F9B4216F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
