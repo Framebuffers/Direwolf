@@ -1,9 +1,11 @@
-﻿namespace Direwolf.Revit.Definitions
+﻿using Npgsql.EntityFrameworkCore.PostgreSQL.Query.Expressions.Internal;
+
+namespace Direwolf.Revit.Definitions
 {
 
     public readonly record struct ElementRecord()
     {
-        public Guid RecordUniqueId { get; init; }
+        public Guid RecordUniqueId { get; init; } = Guid.NewGuid();
         public required double IdValue { get; init; }
         public required string UniqueElementId { get; init; }
         public required string ElementVersionId { get; init; }
@@ -28,29 +30,6 @@
         public bool? IsModel { get; init; }
         public bool? IsPinned { get; init; }
         public bool? IsWorkshared { get; init; }
-
-        //public static string ToSql()
-        //{
-        //    return """
-        //        INSERT INTO "ElementInformation"(
-        //        "uniqueElementId",
-        //        "wolfpackId"
-        //        "idValue",
-        //        "elementVersionId",
-        //        "familyName",
-        //        "builtInCategory",
-        //        "name",
-        //        "parameters"
-        //        ) VALUES (
-        //        @uniqueElementId,
-        //        @wolfpackId,
-        //        @idValue,
-        //        @elementVersionId,
-        //        @familyName,
-        //        @builtInCategory,
-        //        @name,
-        //        @parameters);
-        //        """;
-        //}
+        public ParameterRecord[]? Parameters { get; init; }
     }
 }

@@ -18,9 +18,10 @@ namespace Direwolf.Revit.Definitions
 
         public WarningRecord(FailureMessage f)
         {
+            RecordUniqueId = Guid.NewGuid();
             Message = f.GetDescriptionText();
             Severity = f.GetSeverity().ToString();
-            FailingElements = f.GetFailingElements().Select(x => x.Value).ToList();
+            FailingElements = [.. f.GetFailingElements().Select(x => x.Value)];
         }
 
         //public static string AsSql()
