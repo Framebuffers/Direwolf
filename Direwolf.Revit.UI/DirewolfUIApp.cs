@@ -1,4 +1,8 @@
 ﻿using Autodesk.Revit.UI;
+using Direwolf.Revit.Howls;
+using System.Diagnostics;
+using Direwolf.Revit.UI.Commands;
+using GetModelHealth = Direwolf.Revit.UI.Commands.GetModelHealth;
 
 namespace Direwolf.Revit.UI
 {
@@ -13,7 +17,7 @@ namespace Direwolf.Revit.UI
         public Result OnStartup(UIControlledApplication application)
         {
             RibbonPanel rp = application.CreateRibbonPanel("Direwolf");
-            Buttons.AddGetModelHealthButton(rp);
+            Buttons.CreateButton(GetModelHealth.GetButtonData(), rp);
             //Buttons.AddPushToDBButton(rp);
             
             return Result.Succeeded;

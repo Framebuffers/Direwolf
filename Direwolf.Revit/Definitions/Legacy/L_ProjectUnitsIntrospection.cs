@@ -1,8 +1,8 @@
 ﻿using Autodesk.Revit.DB;
 
-namespace Direwolf.Revit.Definitions
+namespace Direwolf.Revit.Definitions.Legacy
 {
-    public readonly record struct ProjectUnitsIntrospection
+    public readonly record struct L_ProjectUnitsIntrospection
     {
         public string? LengthUnits { get; init; }
         public string? AreaUnits { get; init; }
@@ -17,7 +17,7 @@ namespace Direwolf.Revit.Definitions
         public string? Time { get; init; }
         public string? Volume { get; init; }
 
-        public ProjectUnitsIntrospection(Document document)
+        public L_ProjectUnitsIntrospection(Document document)
         {
             LengthUnits = document.GetUnits().GetFormatOptions(SpecTypeId.Length).GetUnitTypeId().TypeId;
             AreaUnits = document.GetUnits().GetFormatOptions(SpecTypeId.Area).GetUnitTypeId().TypeId;
@@ -32,7 +32,7 @@ namespace Direwolf.Revit.Definitions
             Time = document.GetUnits().GetFormatOptions(SpecTypeId.Time).GetUnitTypeId().TypeId;
             Volume = document.GetUnits().GetFormatOptions(SpecTypeId.Volume).GetUnitTypeId().TypeId;
         }
-        public ProjectUnitsIntrospection() { }
+        public L_ProjectUnitsIntrospection() { }
 
         public static string AsSql()
         {

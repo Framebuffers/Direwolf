@@ -19,28 +19,48 @@ namespace Direwolf.Revit.UI.Commands
 
     public partial class GetModelHealth : DirewolfRevitCommand
     {
+        public static LocationInformation GetButtonData()
+        {
+            return new LocationInformation()
+            {
+                ButtonName = "GetModelHealth",
+                Descriptor = "Get Model Health",
+                AssemblyLocation = typeof(GetModelHealth).Assembly.Location,
+                ClassName = typeof(GetModelHealth).FullName ?? string.Empty
+            };
+        }
+
         public override Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             StartTime();
-            Document doc = commandData.Application.ActiveUIDocument.Document;
+            UIApplication app = commandData.Application;
+            Document doc = app.ActiveUIDocument.Document;
+            IEnumerable<ElementId> selectedElementIds = app.ActiveUIDocument.Selection.GetElementIds();
+            BasicFileInfo fileInfo = BasicFileInfo.Extract(doc.PathName);
+
             try
             {
-                RevitTask.Initialize(commandData.Application);
+                RevitTask.Initialize(app);
+                //PrintAsmInfo();
+                foreach (var r in app.GetRibbonPanels())
+                {
+                    r.Name.ToConsole();
+                    r.Title.ToConsole();
+                    r.Visible.ToString().ToConsole();
+                }
                 RevitHowler rh = new();
-                rh.CreateWolf(new Wolf(), new ElementIntrospection(doc, commandData.Application));
-                $"elementsSelected = {elements.Size}".ToConsole();
-                Direwolf dw = new(commandData.Application);
+                rh.CreateWolf(new Wolf(), new ElementIntrospection(doc, app));
+                Direwolf dw = new(app);
                 dw.QueueHowler(rh);
                 dw.HuntAsync("Extension Test");
                 var s = StopTime();
-                Debug.Print($"Time taken: {s}");
+                Debug.Print($"Time taken to dispatch: {s}");
                 dw.SendAllToDB();
             }
             catch
             {
                 return Result.Failed;
             }
-
             return Result.Succeeded;
         }
     }

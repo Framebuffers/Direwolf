@@ -1,8 +1,8 @@
 ﻿using Autodesk.Revit.DB;
 
-namespace Direwolf.Revit.Definitions
+namespace Direwolf.Revit.Definitions.Legacy
 {
-    public readonly record struct ProjectInformationIntrospection
+    public readonly record struct L_ProjectInformationIntrospection
     {
         public string? ProjectName { get; init; }
         public string? Client { get; init; }
@@ -16,7 +16,7 @@ namespace Direwolf.Revit.Definitions
         public string? OrganizationName { get; init; }
         public string? Status { get; init; }
 
-        public ProjectInformationIntrospection(Document document)
+        public L_ProjectInformationIntrospection(Document document)
         {
             ProjectName = document.ProjectInformation.Name ?? string.Empty;
             Client = document.ProjectInformation.ClientName ?? string.Empty;
@@ -31,7 +31,7 @@ namespace Direwolf.Revit.Definitions
             Status = document.ProjectInformation.Status ?? string.Empty;
         }
 
-        public ProjectInformationIntrospection() { }
+        public L_ProjectInformationIntrospection() { }
 
         public static string AsSql()
         {

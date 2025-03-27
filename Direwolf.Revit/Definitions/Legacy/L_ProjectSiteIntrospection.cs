@@ -1,8 +1,8 @@
 ﻿using Autodesk.Revit.DB;
 
-namespace Direwolf.Revit.Definitions
+namespace Direwolf.Revit.Definitions.Legacy
 {
-    public readonly record struct ProjectSiteIntrospection
+    public readonly record struct L_ProjectSiteIntrospection
     {
         public string? PlaceName { get; init; }
         public double? Elevation { get; init; }
@@ -12,7 +12,7 @@ namespace Direwolf.Revit.Definitions
         public string? GeoCoordinateSystemId { get; init; }
         public string? GeoCoordinateSystemDefinition { get; init; }
 
-        public ProjectSiteIntrospection(Document document)
+        public L_ProjectSiteIntrospection(Document document)
         {
             PlaceName = document.SiteLocation.PlaceName ?? string.Empty;
             Elevation = document.SiteLocation.Elevation;
@@ -22,7 +22,7 @@ namespace Direwolf.Revit.Definitions
             GeoCoordinateSystemId = document.SiteLocation.GeoCoordinateSystemId ?? string.Empty;
             GeoCoordinateSystemDefinition = document.SiteLocation.GeoCoordinateSystemDefinition ?? string.Empty;
         }
-        public ProjectSiteIntrospection() { }
+        public L_ProjectSiteIntrospection() { }
 
         public static string AsSql()
         {

@@ -14,11 +14,11 @@ using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Xml;
 
-namespace Direwolf.Revit.Definitions
+namespace Direwolf.Revit.Definitions.Legacy
 {
-    public class RevitWolfpackDB : Stack<RevitWolfpack>, IWolfpackDB
+    public class L_RevitWolfpackDB : Stack<L_RevitWolfpack>, IWolfpackDB
     {
-        public RevitWolfpackDB(DbConnectionString str, Document doc)
+        public L_RevitWolfpackDB(DbConnectionString str, Document doc)
         {
             _str = str;
             _doc = doc;
@@ -44,19 +44,19 @@ namespace Direwolf.Revit.Definitions
                 while (Count > 0)
                 {
                     // unpack the Wolfpack
-                    RevitWolfpack rp = Pop();
-                    DocumentIntrospection introspection = rp.Document;
-                    ProjectInformationIntrospection project = rp.ProjectInformation;
-                    ProjectSiteIntrospection pjs = rp.Site;
-                    ProjectUnitsIntrospection units = rp.Units;
-                    List<WarningIntrospection> warn = rp.Warnings;
+                    L_RevitWolfpack rp = Pop();
+                    //DocumentIntrospection introspection = rp.Document;
+                    L_ProjectInformationIntrospection project = rp.ProjectInformation;
+                    L_ProjectSiteIntrospection pjs = rp.Site;
+                    L_ProjectUnitsIntrospection units = rp.Units;
+                    List<WarningRecord> warn = rp.Warnings;
 
 
-                    string diSql = DocumentIntrospection.AsSql();
-                    string piSql = ProjectInformationIntrospection.AsSql();
-                    string psSql = ProjectSiteIntrospection.AsSql();
-                    string puSql = ProjectUnitsIntrospection.AsSql();
-                    string waSql = WarningIntrospection.AsSql();
+                    //string diSql = DocumentIntrospection.AsSql();
+                    string piSql = L_ProjectInformationIntrospection.AsSql();
+                    string psSql = L_ProjectSiteIntrospection.AsSql();
+                    string puSql = L_ProjectUnitsIntrospection.AsSql();
+                    //string waSql = WarningRecord.AsSql();
 
                     string sessionId = rp.DocumentSessionId;
                     string creationId = rp.DocumentCreationId;

@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace Direwolf.Revit.Definitions
 {
-    public readonly record struct ParameterIntrospection
+    public readonly record struct ParameterRecord
     {
+        public Guid RecordUniqueId { get; init; }
         public DateTime CreatedAt { get; init; }
-        public string ParameterGuid { get; init; }
         public string DocumentOwner { get; init; }
         public string ParentElementInfo { get; init; }
         public StorageType StorageType { get; init; }
@@ -24,6 +24,5 @@ namespace Direwolf.Revit.Definitions
         public bool IsShared { get; init; }
         public bool IsUserModifiable { get; init; }
         public string SharedParameterGuid { get; init; }
-
     }
 }

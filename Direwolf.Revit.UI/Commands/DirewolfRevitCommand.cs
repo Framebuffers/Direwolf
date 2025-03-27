@@ -1,5 +1,8 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Direwolf.Extensions;
+using Direwolf.Revit.Howls;
+using Dynamo.PackageManager.UI;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,8 +12,15 @@ using System.Threading.Tasks;
 
 namespace Direwolf.Revit.UI.Commands
 {
-    public abstract class DirewolfRevitCommand : IExternalCommand
+    public abstract partial class DirewolfRevitCommand : IExternalCommand
     {
+        protected string? Descriptor { get; set; }
+
+        protected void PrintAsmInfo()
+        {
+            $"GetType().Name: {this.GetType().FullName}\ntypeof.Asm.Location:\n\t{typeof(DirewolfUIApp).Assembly.Location}\n\t{typeof(Direwolf).Assembly.Location}\n\t{typeof(RevitHowl).Assembly.Location}".ToConsole();
+        }
+
         protected Stopwatch TimeTaken { get; set; } = new();
         protected void StartTime()
         {

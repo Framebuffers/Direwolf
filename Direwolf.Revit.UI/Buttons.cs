@@ -1,14 +1,24 @@
 ﻿using Autodesk.Revit.UI;
+using Direwolf.Revit.UI.Commands;
+using static Direwolf.Revit.UI.Commands.DirewolfRevitCommand;
 
 namespace Direwolf.Revit.UI
 {
     public static class Buttons
     {
-        public static PushButton? AddGetModelHealthButton(RibbonPanel? rp)
+        public static PushButton? CreateButton(LocationInformation l, RibbonPanel? rp)
         {
-            PushButtonData b = new("modelHealth", "Get Model Health", References.AssemblyLocation, "Direwolf.Revit.UI.Commands.GetModelHealth");
-            return rp?.AddItem(b) as PushButton;
+            PushButtonData pb = new(l.ButtonName, l.Descriptor, l.AssemblyLocation, l.ClassName);
+            return rp?.AddItem(pb) as PushButton;
         }
+
+        //public static PushButton? AddGetModelHealthButton(RibbonPanel? rp)
+        //{
+        //    var b = GetModelHealth.GetButtonData();
+        //    PushButtonData p = 
+        //        new(b.ButtonName, b.Descriptor, b.AssemblyLocation, b.ClassName);
+        //    return rp?.AddItem(p) as PushButton;
+        //}
 
         //public static PushButton? AddPushToDBButton(RibbonPanel? rp)
         //{

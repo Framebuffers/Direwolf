@@ -9,11 +9,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Direwolf.Revit.Definitions
+namespace Direwolf.Revit.Definitions.Legacy
 {
-    public readonly record struct RevitWolfpack : IWolfpack
+    public readonly record struct L_RevitWolfpack : IWolfpack
     {
-        public RevitWolfpack(Document doc,
+        public L_RevitWolfpack(Document doc,
             IHowler howler,
             string fileOrigin = "",
             string testName = "",
@@ -27,13 +27,13 @@ namespace Direwolf.Revit.Definitions
             TestName = testName;
             TimeTaken = timeTaken;
             WasCompleted = wasCompleted;
-            Document = new DocumentIntrospection(doc);
-            ProjectInformation = new ProjectInformationIntrospection(doc);
-            Site = new ProjectSiteIntrospection(doc);
-            Units = new ProjectUnitsIntrospection(doc);
+            //Document = new DocumentIntrospection(doc);
+            ProjectInformation = new L_ProjectInformationIntrospection(doc);
+            Site = new L_ProjectSiteIntrospection(doc);
+            Units = new L_ProjectUnitsIntrospection(doc);
             foreach (var w in doc.GetWarnings())
             {
-                Warnings.Add(new WarningIntrospection(w));
+                Warnings.Add(new WarningRecord(w));
             }
             Results = howler.ToString();
 
@@ -53,11 +53,11 @@ namespace Direwolf.Revit.Definitions
         public string TestName { get; init; }
         public double TimeTaken { get; init; }
         public bool WasCompleted { get; init; }
-        public DocumentIntrospection Document { get; init; }
-        public ProjectInformationIntrospection ProjectInformation { get; init; }
-        public ProjectSiteIntrospection Site { get; init; }
-        public ProjectUnitsIntrospection Units { get; init; }
-        public List<WarningIntrospection> Warnings { get; init; } = [];
+        //public DocumentIntrospection Document { get; init; }
+        public L_ProjectInformationIntrospection ProjectInformation { get; init; }
+        public L_ProjectSiteIntrospection Site { get; init; }
+        public L_ProjectUnitsIntrospection Units { get; init; }
+        public List<WarningRecord> Warnings { get; init; } = [];
 
         public static string ToSql()
         {
