@@ -11,36 +11,17 @@ namespace Direwolf.Revit.Definitions
 {
     public readonly record struct WarningRecord
     {
-        public Guid RecordUniqueId { get; init; }
+        public Guid WarningUniqueId { get; init; }
         public string Message { get; init; }
         public string Severity { get; init; }
         public List<long> FailingElements { get; init; }
 
         public WarningRecord(FailureMessage f)
         {
-            RecordUniqueId = Guid.NewGuid();
+            WarningUniqueId = Guid.NewGuid();
             Message = f.GetDescriptionText();
             Severity = f.GetSeverity().ToString();
             FailingElements = [.. f.GetFailingElements().Select(x => x.Value)];
         }
-
-        //public static string AsSql()
-        //{
-        //    return """
-        //        INSERT INTO "DocumentWarning" (
-        //        "documentId",
-        //        "document",
-        //        "createdAt",
-        //        "severity",
-        //        "message",
-        //        "failingElements"
-        //        ) VALUES (
-        //        @documentId,
-        //        @document,
-        //        @createdAt,
-        //        @severity,
-        //        @message);
-        //        """;
-        //}
     }
 }

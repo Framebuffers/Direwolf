@@ -35,7 +35,7 @@ namespace Direwolf.Revit.UI.Commands.Other
             }
 
             s.Stop();
-            Debug.Print($"Time taken: {s.Elapsed.Seconds}");
+            Debug.Print($"ProjectSpecTime taken: {s.Elapsed.Seconds}");
             return Result.Succeeded;
         }
     }

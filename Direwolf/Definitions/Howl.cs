@@ -7,18 +7,7 @@ namespace Direwolf.Definitions
     public record class Howl : IHowl
     {
         [JsonIgnore] public IWolf? Callback { get; set; }
-        public void SendCatchToCallback(Prey c)
-        {
-            //var d = new Dictionary<string, object>()
-            //{
-
-            //    ["id"] = Guid.NewGuid(),
-            //    ["createdAt"] = DateTime.UtcNow,
-            //    ["wasCompleted"] = true,
-            //    ["data"] = c
-            //};
-            Callback?.Catches.Push(c);
-        }
+        public void SendCatchToCallback(Prey c) => Callback?.Catches.Push(c);
 
         protected Stopwatch TimeTaken { get; set; } = new();
 

@@ -40,7 +40,7 @@ namespace Direwolf.Definitions
                 s.Stop();
                 return new Wolfpack(this, "", "", "", true, s.Elapsed.TotalSeconds)
                 {
-                    TestName = testName
+                    Name = testName
                 };
             }
             catch

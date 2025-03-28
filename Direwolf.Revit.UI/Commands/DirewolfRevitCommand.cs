@@ -18,7 +18,7 @@ namespace Direwolf.Revit.UI.Commands
 
         protected void PrintAsmInfo()
         {
-            $"GetType().Name: {this.GetType().FullName}\ntypeof.Asm.Location:\n\t{typeof(DirewolfUIApp).Assembly.Location}\n\t{typeof(Direwolf).Assembly.Location}\n\t{typeof(RevitHowl).Assembly.Location}".ToConsole();
+            $"GetType().Name: {this.GetType().FullName}\ntypeof.Asm.ProjectLocation:\n\t{typeof(DirewolfUIApp).Assembly.Location}\n\t{typeof(Direwolf).Assembly.Location}\n\t{typeof(RevitHowl).Assembly.Location}".ToConsole();
         }
 
         protected Stopwatch TimeTaken { get; set; } = new();

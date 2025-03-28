@@ -10,43 +10,43 @@ namespace Direwolf.Revit.Definitions
 {
     public readonly record struct DocumentRecord
     {
-        public Guid RecordUniqueId { get; init; } = Guid.NewGuid();
+        public Guid RecordUniqueId { get; init; }
         public string? DocumentName { get; init; }
         public string? DocumentPath { get; init; }
         public required string DocumentUniqueId { get; init; }
         public string? DocumentVersionId { get; init; }
         public int DocumentSaveCount { get; init; }
         public string? ProjectName { get; init; }
-        public string? Client { get; init; }
-        public string? Address { get; init; }
-        public string? Author { get; init; }
-        public string? BuildingName { get; init; }
-        public string? IssueDate { get; init; }
-        public string? Location { get; init; }
+        public string? ProjectClient { get; init; }
+        public string? ProjectAddress { get; init; }
+        public string? ProjectAuthor { get; init; }
+        public string? ProjectBuildingName { get; init; }
+        public string? ProjectIssueDate { get; init; }
+        public string? ProjectLocation { get; init; }
         public string? ProjectNumber { get; init; }
-        public string? OrganizationDescription { get; init; }
-        public string? OrganizationName { get; init; }
-        public string? Status { get; init; }
-        public string? PlaceName { get; init; }
-        public double? Elevation { get; init; }
-        public double? Latitude { get; init; }
-        public double? Longitude { get; init; }
-        public double? TimeZone { get; init; }
-        public string? GeoCoordinateSystemId { get; init; }
-        public string? GeoCoordinateSystemDefinition { get; init; }
-        public string? LengthUnits { get; init; }
-        public string? AreaUnits { get; init; }
-        public string? Angle { get; init; }
-        public string? Currency { get; init; }
-        public string? Number { get; init; }
-        public string? RotationAngle { get; init; }
-        public string? SheetLength { get; init; }
-        public string? SiteAngle { get; init; }
-        public string? Slope { get; init; }
-        public string? Speed { get; init; }
-        public string? Time { get; init; }
-        public string? Volume { get; init; }
-        public WarningRecords? Warnings { get; init; }
+        public string? ProjectOrganizationDescription { get; init; }
+        public string? ProjectOrganizationName { get; init; }
+        public string? ProjectStatus { get; init; }
+        public string? ProjectPlaceName { get; init; }
+        public double? ProjectElevation { get; init; }
+        public double? ProjectLatitude { get; init; }
+        public double? ProjectLongitude { get; init; }
+        public double? ProjectTimeZone { get; init; }
+        public string? ProjectGeoCoordinateSystemId { get; init; }
+        public string? ProjectGeoCoordinateSystemDefinition { get; init; }
+        public string? ProjectSpecLength { get; init; }
+        public string? ProjectSpecArea { get; init; }
+        public string? ProjectSpecAngle { get; init; }
+        public string? ProjectSpecCurrency { get; init; }
+        public string? ProjectSpecNumber { get; init; }
+        public string? ProjectSpecRotationAngle { get; init; }
+        public string? ProjectSpecSheetLength { get; init; }
+        public string? ProjectSpecSiteAngle { get; init; }
+        public string? ProjectSpecSlope { get; init; }
+        public string? ProjectSpecSpeed { get; init; }
+        public string? ProjectSpecTime { get; init; }
+        public string? ProjectSpecVolume { get; init; }
+        public Guid ProjectWarningsFK { get; init; }
         public DocumentRecord(Document document)
         {
             // Document
@@ -56,44 +56,44 @@ namespace Direwolf.Revit.Definitions
             DocumentVersionId = Document.GetDocumentVersion(document).VersionGUID.ToString();
             DocumentSaveCount = Document.GetDocumentVersion(document).NumberOfSaves;
 
-            // Warnings
-            Warnings = new(document);
+            // ProjectWarnings
+            //ProjectWarnings = new(document);
 
             // Project
             ProjectName = document.ProjectInformation.Name ?? string.Empty;
-            Client = document.ProjectInformation.ClientName ?? string.Empty;
-            Address = document.ProjectInformation.Address ?? string.Empty;
-            Author = document.ProjectInformation.Author ?? string.Empty;
-            BuildingName = document.ProjectInformation.BuildingName ?? string.Empty;
-            IssueDate = document.ProjectInformation.IssueDate ?? string.Empty;
-            Location = document.ProjectInformation.Location?.ToString() ?? string.Empty;
+            ProjectClient = document.ProjectInformation.ClientName ?? string.Empty;
+            ProjectAddress = document.ProjectInformation.Address ?? string.Empty;
+            ProjectAuthor = document.ProjectInformation.Author ?? string.Empty;
+            ProjectBuildingName = document.ProjectInformation.BuildingName ?? string.Empty;
+            ProjectIssueDate = document.ProjectInformation.IssueDate ?? string.Empty;
+            ProjectLocation = document.ProjectInformation.Location?.ToString() ?? string.Empty;
             ProjectNumber = document.ProjectInformation.Number ?? string.Empty;
-            OrganizationDescription = document.ProjectInformation.OrganizationDescription ?? string.Empty;
-            OrganizationName = document.ProjectInformation.OrganizationName ?? string.Empty;
-            Status = document.ProjectInformation.Status ?? string.Empty;
+            ProjectOrganizationDescription = document.ProjectInformation.OrganizationDescription ?? string.Empty;
+            ProjectOrganizationName = document.ProjectInformation.OrganizationName ?? string.Empty;
+            ProjectStatus = document.ProjectInformation.Status ?? string.Empty;
 
             // Place
-            PlaceName = document.SiteLocation.PlaceName ?? string.Empty;
-            Elevation = document.SiteLocation.Elevation;
-            Latitude = document.SiteLocation.Latitude;
-            Longitude = document.SiteLocation.Longitude;
-            TimeZone = document.SiteLocation.TimeZone;
-            GeoCoordinateSystemId = document.SiteLocation.GeoCoordinateSystemId ?? string.Empty;
-            GeoCoordinateSystemDefinition = document.SiteLocation.GeoCoordinateSystemDefinition ?? string.Empty;
+            ProjectPlaceName = document.SiteLocation.PlaceName ?? string.Empty;
+            ProjectElevation = document.SiteLocation.Elevation;
+            ProjectLatitude = document.SiteLocation.Latitude;
+            ProjectLongitude = document.SiteLocation.Longitude;
+            ProjectTimeZone = document.SiteLocation.TimeZone;
+            ProjectGeoCoordinateSystemId = document.SiteLocation.GeoCoordinateSystemId ?? string.Empty;
+            ProjectGeoCoordinateSystemDefinition = document.SiteLocation.GeoCoordinateSystemDefinition ?? string.Empty;
 
             // Units
-            LengthUnits = document.GetUnits().GetFormatOptions(SpecTypeId.Length).GetUnitTypeId().TypeId;
-            AreaUnits = document.GetUnits().GetFormatOptions(SpecTypeId.Area).GetUnitTypeId().TypeId;
-            Angle = document.GetUnits().GetFormatOptions(SpecTypeId.Angle).GetUnitTypeId().TypeId;
-            Currency = document.GetUnits().GetFormatOptions(SpecTypeId.Currency).GetUnitTypeId().TypeId;
-            Number = document.GetUnits().GetFormatOptions(SpecTypeId.Number).GetUnitTypeId().TypeId;
-            RotationAngle = document.GetUnits().GetFormatOptions(SpecTypeId.RotationAngle).GetUnitTypeId().TypeId;
-            SheetLength = document.GetUnits().GetFormatOptions(SpecTypeId.SheetLength).GetUnitTypeId().TypeId;
-            SiteAngle = document.GetUnits().GetFormatOptions(SpecTypeId.SiteAngle).GetUnitTypeId().TypeId;
-            Slope = document.GetUnits().GetFormatOptions(SpecTypeId.Slope).GetUnitTypeId().TypeId;
-            Speed = document.GetUnits().GetFormatOptions(SpecTypeId.Speed).GetUnitTypeId().TypeId;
-            Time = document.GetUnits().GetFormatOptions(SpecTypeId.Time).GetUnitTypeId().TypeId;
-            Volume = document.GetUnits().GetFormatOptions(SpecTypeId.Volume).GetUnitTypeId().TypeId;
+            ProjectSpecLength = document.GetUnits().GetFormatOptions(SpecTypeId.Length).GetUnitTypeId().TypeId;
+            ProjectSpecArea = document.GetUnits().GetFormatOptions(SpecTypeId.Area).GetUnitTypeId().TypeId;
+            ProjectSpecAngle = document.GetUnits().GetFormatOptions(SpecTypeId.Angle).GetUnitTypeId().TypeId;
+            ProjectSpecCurrency = document.GetUnits().GetFormatOptions(SpecTypeId.Currency).GetUnitTypeId().TypeId;
+            ProjectSpecNumber = document.GetUnits().GetFormatOptions(SpecTypeId.Number).GetUnitTypeId().TypeId;
+            ProjectSpecRotationAngle = document.GetUnits().GetFormatOptions(SpecTypeId.RotationAngle).GetUnitTypeId().TypeId;
+            ProjectSpecSheetLength = document.GetUnits().GetFormatOptions(SpecTypeId.SheetLength).GetUnitTypeId().TypeId;
+            ProjectSpecSiteAngle = document.GetUnits().GetFormatOptions(SpecTypeId.SiteAngle).GetUnitTypeId().TypeId;
+            ProjectSpecSlope = document.GetUnits().GetFormatOptions(SpecTypeId.Slope).GetUnitTypeId().TypeId;
+            ProjectSpecSpeed = document.GetUnits().GetFormatOptions(SpecTypeId.Speed).GetUnitTypeId().TypeId;
+            ProjectSpecTime = document.GetUnits().GetFormatOptions(SpecTypeId.Time).GetUnitTypeId().TypeId;
+            ProjectSpecVolume = document.GetUnits().GetFormatOptions(SpecTypeId.Volume).GetUnitTypeId().TypeId;
         }
     }
 }

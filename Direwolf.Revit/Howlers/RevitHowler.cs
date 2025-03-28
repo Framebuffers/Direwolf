@@ -50,7 +50,7 @@ namespace Direwolf.Revit.Howlers
                 _timeTaken.Stop();
                 Wolfpack w = new(this, title, path, version, true, _timeTaken.Elapsed.TotalSeconds)
                 {
-                    TestName = testName
+                    Name = testName
                 };
                 HuntCompleted?.Invoke(this, new HuntCompletedEventArgs() { IsSuccessful = true});
                 return w;

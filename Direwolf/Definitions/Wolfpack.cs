@@ -4,33 +4,15 @@ using System.Text.Json.Serialization;
 
 namespace Direwolf.Definitions
 {
-    public readonly record struct Wolfpack([property: JsonIgnore] IHowler Howler,
-        string DocumentName = "",
-        string FileOrigin = "",
-        string DocumentVersion = "",
-        bool WasCompleted = false,
-        double TimeTaken = 0) : IWolfpack
+    public readonly record struct Wolfpack() : IWolfpack
     {
-        public string TestName { get; init; } = string.Empty;
+        public Guid WolfpackUniqueId { get; init; }
         public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
-        public string GUID { get; init; } = Guid.NewGuid().ToString();
-        public int ResultCount { get => Howler.Den.Count; }
-        public string? Results => Howler?.ToString();
-        public override string ToString()
-        {
-            return JsonSerializer.Serialize(new Dictionary<string, object>()
-            {
-                ["id"] = GUID,
-                ["createdAt"] = CreatedAt,
-                ["timeTaken"] = TimeTaken,
-                ["resultCount"] = ResultCount,
-                ["howlerName"] = TestName,
-                ["fileName"] = DocumentName,
-                ["fileVersion"] = DocumentVersion,
-                ["fileOrigin"] = FileOrigin,
-                ["wasCompleted"] = WasCompleted,
-                ["data"] = Howler.Den
-            });
-        }
+        public string? Name { get; init; }
+        public double? TimeTaken { get; init; }
+        public string? Source { get; init; }
+        public bool? WasCompleted { get;  init; }
+        public int? ResultCount { get; init; }
+        public string? Result { get; init; }
     }
 }

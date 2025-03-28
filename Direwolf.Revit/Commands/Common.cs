@@ -33,7 +33,7 @@ namespace Direwolf.Revit.Commands
 
                     Dictionary<string, string> data = new()
                     {
-                        ["GUID"] = p.GUID.ToString(),
+                        ["WolfpackUniqueId"] = p.GUID.ToString(),
                         ["Type"] = p.GetTypeId().TypeId,
                         ["HasValue"] = p.HasValue.ToString(),
                         ["Value"] = GetValue()

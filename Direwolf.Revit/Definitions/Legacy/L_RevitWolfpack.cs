@@ -24,7 +24,7 @@ namespace Direwolf.Revit.Definitions.Legacy
             FileOrigin = fileOrigin;
             GUID = new Guid().ToString();
             ResultCount = howler.Den.Count;
-            TestName = testName;
+            Name = testName;
             TimeTaken = timeTaken;
             WasCompleted = wasCompleted;
             //Document = new DocumentIntrospection(doc);
@@ -50,7 +50,7 @@ namespace Direwolf.Revit.Definitions.Legacy
         public List<long> ChangedElements { get; init; }
         public int ResultCount { get; init; }
         public string? Results { get; init; }
-        public string TestName { get; init; }
+        public string Name { get; init; }
         public double TimeTaken { get; init; }
         public bool WasCompleted { get; init; }
         //public DocumentIntrospection Document { get; init; }

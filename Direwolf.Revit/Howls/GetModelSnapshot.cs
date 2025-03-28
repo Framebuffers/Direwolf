@@ -28,7 +28,7 @@ namespace Direwolf.Revit.Howls
         private List<GraphicsStyle> nonNativeStyles = [];
         private List<Element> isFlipped = [];
         private Dictionary<string, int> worksetElementCount = [];
-        private Stack<Definitions.ElementRecord> individualElementInfo = [];
+        private Stack<Definitions.InstanceRecord> individualElementInfo = [];
 
         private Prey ProcessInfo()
         {
@@ -303,20 +303,20 @@ namespace Direwolf.Revit.Howls
                             break;
                     }
 
-                    individualElementInfo.Push(new Definitions.ElementRecord
+                    individualElementInfo.Push(new Definitions.InstanceRecord
                     {
-                        IdValue = e.Id.Value,
-                        UniqueElementId = e.UniqueId,
+                        ElementValueId = e.Id.Value,
+                        ElementUniqueId = e.UniqueId,
                         ElementVersionId = e.VersionGuid.ToString(),
-                        FamilyName = familyName,
-                        category = builtInCategory,
-                        BuiltInCategory = builtInCategory,
-                        Workset = workset,
-                        Views = views,
-                        DesignOption = designOption,
-                        DocumentOwner = docOwner,
-                        OwnerViewId = ownerViewId,
-                        WorksetId = worksetId,
+                        ElementFamilyName = familyName,
+                        //category = builtInCategory,
+                        ElementBuiltInCategory = builtInCategory,
+                        ElementWorkset = workset,
+                        ElementViews = views,
+                        ElementDesignOption = designOption,
+                        ElementDocumentOwner = docOwner,
+                        ElementOwnerViewId = ownerViewId,
+                        ElementWorksetId = worksetId,
                         LevelId = levelId,
                         CreatedPhaseId = createdPhaseId,
                         DemolishedPhaseId = demolishedPhaseId,

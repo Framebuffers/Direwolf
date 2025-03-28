@@ -67,7 +67,7 @@ namespace Direwolf.Revit.Definitions.Legacy
                     DateTime createdAt = rp.CreatedAt;
                     string guid = rp.GUID;
                     int resultCount = rp.ResultCount;
-                    string testName = rp.TestName;
+                    string testName = rp.Name;
                     string results = rp.Results;
 
 
@@ -80,15 +80,15 @@ namespace Direwolf.Revit.Definitions.Legacy
                     //    resultJson.ParameterName = "result";
                     //    resultJson.NpgsqlDbType = NpgsqlDbType.Json;
                     //    resultJson.Value = wolfpack.Results;
-                    //    cmd.Parameters.AddWithValue("docName", wolfpack.DocumentName);
+                    //    cmd.Parameters.AddWithValue("docName", wolfpack.Source);
                     //    cmd.Parameters.AddWithValue("origin", wolfpack.FileOrigin);
                     //    cmd.Parameters.AddWithValue("version", wolfpack.DocumentVersion);
                     //    cmd.Parameters.AddWithValue("completed", wolfpack.WasCompleted);
                     //    cmd.Parameters.AddWithValue("time", wolfpack.TimeTaken);
                     //    cmd.Parameters.AddWithValue("creation", wolfpack.CreatedAt);
-                    //    cmd.Parameters.AddWithValue("id", wolfpack.GUID);
+                    //    cmd.Parameters.AddWithValue("id", wolfpack.WolfpackUniqueId);
                     //    cmd.Parameters.AddWithValue("resCount", wolfpack.ResultCount);
-                    //    cmd.Parameters.AddWithValue("name", wolfpack.TestName);
+                    //    cmd.Parameters.AddWithValue("name", wolfpack.Name);
                     //    cmd.Parameters.Add(resultJson);
 
                     //    int rowsAffected = await cmd.ExecuteNonQueryAsync();

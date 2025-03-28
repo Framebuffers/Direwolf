@@ -3,15 +3,14 @@ namespace Direwolf.Definitions
 {
     public interface IWolfpack
     {
+        Guid WolfpackUniqueId { get; init; }
         DateTime CreatedAt { get; init; }
-        string FileOrigin { get; init; }
-        string GUID { get; init; }
-        int ResultCount { get; }
-        string? Results { get; }
-        string TestName { get; init; }
-        double TimeTaken { get; init; }
-        bool WasCompleted { get; init; }
-
+        string? Name { get; init; }
+        double? TimeTaken { get; init; }
+        string? Source { get; init; }
+        bool? WasCompleted { get; init; }
+        int?  ResultCount { get; init; }
+        string? Result { get; init; }
         int GetHashCode();
         string ToString();
     }

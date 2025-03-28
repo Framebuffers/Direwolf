@@ -54,7 +54,7 @@ namespace Direwolf.Revit.UI.Commands
                 dw.QueueHowler(rh);
                 dw.HuntAsync("Extension Test");
                 var s = StopTime();
-                Debug.Print($"Time taken to dispatch: {s}");
+                Debug.Print($"ProjectSpecTime taken to dispatch: {s}");
                 dw.SendAllToDB();
             }
             catch

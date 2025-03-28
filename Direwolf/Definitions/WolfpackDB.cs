@@ -45,15 +45,15 @@ namespace Direwolf.Definitions
                         resultJson.NpgsqlDbType = NpgsqlDbType.Json;
                         resultJson.Value = wolfpack.Results;
 
-                        cmd.Parameters.AddWithValue("docName", wolfpack.DocumentName);
-                        cmd.Parameters.AddWithValue("origin", wolfpack.FileOrigin);
+                        cmd.Parameters.AddWithValue("docName", wolfpack.Source);
+                        cmd.Parameters.AddWithValue("origin", wolfpack.Source);
                       
                         cmd.Parameters.AddWithValue("completed", wolfpack.WasCompleted);
                         cmd.Parameters.AddWithValue("time", wolfpack.TimeTaken);
                         cmd.Parameters.AddWithValue("creation", wolfpack.CreatedAt);
-                        cmd.Parameters.AddWithValue("id", wolfpack.GUID);
+                        cmd.Parameters.AddWithValue("id", wolfpack.WolfpackUniqueId);
                         cmd.Parameters.AddWithValue("resCount", wolfpack.ResultCount);
-                        cmd.Parameters.AddWithValue("name", wolfpack.TestName);
+                        cmd.Parameters.AddWithValue("name", wolfpack.Name);
                         cmd.Parameters.Add(resultJson);
 
                         int rowsAffected = await cmd.ExecuteNonQueryAsync();

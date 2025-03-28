@@ -34,7 +34,6 @@ namespace Direwolf.Revit.Extensions
             return f.GetDocumentVersion().VersionGUID.ToString();
         }
 
-
         private static Dictionary<string, List<string>> GetElementUniqueIdByBuiltInCategory(this Document doc, BuiltInCategory b)
         {
             var elements = new Dictionary<string, List<string>>();
