@@ -20,16 +20,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Commands\Actions\Elements\" />
-    <Folder Include="Commands\Actions\Categories\" />
     <Folder Include="Commands\Actions\Documents\" />
-    <Folder Include="Commands\Actions\Others\" />
+    <Folder Include="Commands\Actions\Instances\" />
     <Folder Include="Commands\Actions\Parameters\" />
-    <Folder Include="Commands\Introspections\Categories\" />
-    <Folder Include="Commands\Introspections\Documents\" />
-    <Folder Include="Commands\Introspections\Elements\" />
-    <Folder Include="Commands\Introspections\Others\" />
-    <Folder Include="Commands\Introspections\Parameters\" />
+    <Folder Include="Commands\Others\" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

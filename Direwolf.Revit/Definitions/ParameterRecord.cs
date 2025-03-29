@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Direwolf.Revit.Definitions
 {
-    public readonly record struct ParameterRecord()
+    public readonly record struct ParameterRecord
     {
         public Guid ParameterRecordUniqueId { get; init; }
         public Guid ParentInstanceFK { get; init; }

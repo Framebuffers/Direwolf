@@ -2,7 +2,6 @@
 
 namespace Direwolf.Revit.Definitions
 {
-
     public readonly record struct InstanceRecord()
     {
         public Guid InstanceRecordUniqueId { get; init; }

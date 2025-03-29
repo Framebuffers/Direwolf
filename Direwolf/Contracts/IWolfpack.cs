@@ -9,7 +9,7 @@ namespace Direwolf.Definitions
         double? TimeTaken { get; init; }
         string? Source { get; init; }
         bool? WasCompleted { get; init; }
-        int?  ResultCount { get; init; }
+        int? ResultCount { get; init; }
         string? Result { get; init; }
         int GetHashCode();
         string ToString();

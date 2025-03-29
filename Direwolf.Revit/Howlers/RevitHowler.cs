@@ -48,7 +48,7 @@ namespace Direwolf.Revit.Howlers
                     wolf.Run();
                 }
                 _timeTaken.Stop();
-                Wolfpack w = new(this, title, path, version, true, _timeTaken.Elapsed.TotalSeconds)
+                Wolfpack w = new()
                 {
                     Name = testName
                 };

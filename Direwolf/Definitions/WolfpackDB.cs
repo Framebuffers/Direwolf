@@ -43,7 +43,7 @@ namespace Direwolf.Definitions
                         var resultJson = cmd.CreateParameter();
                         resultJson.ParameterName = "result";
                         resultJson.NpgsqlDbType = NpgsqlDbType.Json;
-                        resultJson.Value = wolfpack.Results;
+                        //resultJson.Value = wolfpack.Results;
 
                         cmd.Parameters.AddWithValue("docName", wolfpack.Source);
                         cmd.Parameters.AddWithValue("origin", wolfpack.Source);

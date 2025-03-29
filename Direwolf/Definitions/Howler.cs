@@ -38,7 +38,7 @@ namespace Direwolf.Definitions
 
                 HuntCompleted?.Invoke(this, new HuntCompletedEventArgs() { IsSuccessful = true });
                 s.Stop();
-                return new Wolfpack(this, "", "", "", true, s.Elapsed.TotalSeconds)
+                return new Wolfpack()
                 {
                     Name = testName
                 };

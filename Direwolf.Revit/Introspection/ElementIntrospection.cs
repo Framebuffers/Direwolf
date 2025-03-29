@@ -10,6 +10,8 @@ using System.Linq;
 using Direwolf.Revit.Definitions.Legacy;
 using Direwolf.Revit.Definitions;
 using Autodesk.Revit.DB.Mechanical;
+using Microsoft.EntityFrameworkCore.Storage;
+using Autodesk.Revit.UI.Selection;
 
 namespace Direwolf.Revit.Introspection
 {
@@ -19,6 +21,8 @@ namespace Direwolf.Revit.Introspection
     /// </summary>
     public record class ElementIntrospection : RevitHowl
     {
+
+
         public ElementIntrospection(Document doc, UIApplication app)
         {
             SetRevitDocument(doc);
@@ -28,23 +32,52 @@ namespace Direwolf.Revit.Introspection
 
         public override bool Execute()
         {
+
             if (_app is not null)
             {
-                foreach (var (element, elementType, familyInstance) in from x in GetRevitDocument().GetAllValidElements()
-                                                                       let t = x?.GetTypeId()
-                                                                       let f = x as FamilyInstance
-                                                                       select (x, t, f))
+                var doc = GetRevitDocument();
+                using StringWriter s = new();
+                foreach (var x in GetRevitDocument().GetAllValidElements())
                 {
-                    if (familyInstance is not null)
+                    if (x is not null)
                     {
-                        SendCatchToCallback(new Prey(new Definitions.ElementRecord(GetRevitDocument(), familyInstance)));
+                        ElementType? type = doc.GetElement(x.GetTypeId()) as ElementType;
+                        if (type is not null)
+                        {
+                            s.WriteLine(type.GetType().DeclaringType);
+                            foreach (var t in type.GetSimilarTypes())
+                            {
+                                s.WriteLine($"\t{t}");
+                            }
+                        }
+
                     }
-                    return true;
+
                 }
+                s.ToString().ToConsole();
+                return true;
+
+
+
+                //{
+                //    foreach ((Element element, ElementId elementType, FamilyInstance familyInstance) in from x in GetRevitDocument().GetAllValidElements()
+                //                                                           let t = x?.GetTypeId()
+                //                                                           let f = x as FamilyInstance
+                //                                                           select (x, t, f))
+                //    {
+                //        int elementCount = GetRevitDocument().GetAllValidElements().Count();
+
+
+                //        if (familyInstance is not null)
+                //            var similar[] = element?.Document.GetElement(element) as ElementType;
+                //            //SendCatchToCallback(new Prey(new Definitions.ElementRecord(GetRevitDocument(), familyInstance)));
+                //        }
+                //        return true;
+                //    }
             }
             return false;
         }
-        
+
 
         //public override bool Execute()
         //{

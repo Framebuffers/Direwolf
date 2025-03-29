@@ -302,55 +302,56 @@ namespace Direwolf.Revit.Howls
                         default:
                             break;
                     }
+                    return new Prey();
 
-                    individualElementInfo.Push(new Definitions.InstanceRecord
-                    {
-                        ElementValueId = e.Id.Value,
-                        ElementUniqueId = e.UniqueId,
-                        ElementVersionId = e.VersionGuid.ToString(),
-                        ElementFamilyName = familyName,
-                        //category = builtInCategory,
-                        ElementBuiltInCategory = builtInCategory,
-                        ElementWorkset = workset,
-                        ElementViews = views,
-                        ElementDesignOption = designOption,
-                        ElementDocumentOwner = docOwner,
-                        ElementOwnerViewId = ownerViewId,
-                        ElementWorksetId = worksetId,
-                        LevelId = levelId,
-                        CreatedPhaseId = createdPhaseId,
-                        DemolishedPhaseId = demolishedPhaseId,
-                        GroupId = groupId,
-                        WorkshareId = workshareId,
-                        IsGrouped = isGrouped,
-                        IsModifiable = isModifiable,
-                        IsViewSpecific = isViewSpecific,
-                        IsBuiltInCategory = isBuiltInCategory,
-                        IsAnnotative = isAnnotative,
-                        IsModel = isModel,
-                        IsPinned = isPinned,
-                        IsWorkshared = isWorkshared,
-                        Parameters = null
-                    });
+                    //    individualElementInfo.Push(new Definitions.InstanceRecord
+                    //    {
+                    //        ElementValueId = e.Id.Value,
+                    //        ElementUniqueId = e.UniqueId,
+                    //        ElementVersionId = e.VersionGuid.ToString(),
+                    //        ElementFamilyName = familyName,
+                    //        //category = builtInCategory,
+                    //        ElementBuiltInCategory = builtInCategory,
+                    //        ElementWorkset = workset,
+                    //        ElementViews = views,
+                    //        ElementDesignOption = designOption,
+                    //        ElementDocumentOwner = docOwner,
+                    //        ElementOwnerViewId = ownerViewId,
+                    //        ElementWorksetId = worksetId,
+                    //        LevelId = levelId,
+                    //        CreatedPhaseId = createdPhaseId,
+                    //        DemolishedPhaseId = demolishedPhaseId,
+                    //        GroupId = groupId,
+                    //        WorkshareId = workshareId,
+                    //        IsGrouped = isGrouped,
+                    //        IsModifiable = isModifiable,
+                    //        IsViewSpecific = isViewSpecific,
+                    //        IsBuiltInCategory = isBuiltInCategory,
+                    //        IsAnnotative = isAnnotative,
+                    //        IsModel = isModel,
+                    //        IsPinned = isPinned,
+                    //        IsWorkshared = isWorkshared,
+                    //        Parameters = null
+                    //    });
+                    //}
                 }
-            }
-            // view not in sheet. needs to be done after all are done.
-            HashSet<ElementId> viewsOnSheets = [.. viewports.Select(vp => (vp as Viewport).ViewId)];
-            foreach (Element viewElement in viewsInsideDocument)
-            {
-                if (viewElement is View view && !view.IsTemplate && !viewsOnSheets.Contains(view.Id))
+                // view not in sheet. needs to be done after all are done.
+                HashSet<ElementId> viewsOnSheets = [.. viewports.Select(vp => (vp as Viewport).ViewId)];
+                foreach (Element viewElement in viewsInsideDocument)
                 {
-                    notInSheets.Add(view);
+                    if (viewElement is View view && !view.IsTemplate && !viewsOnSheets.Contains(view.Id))
+                    {
+                        notInSheets.Add(view);
+                    }
                 }
-            }
 
-            foreach (ElementId reference in ExternalFileUtils.GetAllExternalFileReferences(doc))
-            {
-                Element ext = doc.GetElement(reference);
-                externalRefs.Add((ext.GetExternalFileReference().ExternalFileReferenceType, ext.GetExternalFileReference()));
-            }
+                foreach (ElementId reference in ExternalFileUtils.GetAllExternalFileReferences(doc))
+                {
+                    Element ext = doc.GetElement(reference);
+                    externalRefs.Add((ext.GetExternalFileReference().ExternalFileReferenceType, ext.GetExternalFileReference()));
+                }
 
-            Dictionary<string, object> results = new()
+                Dictionary<string, object> results = new()
             {
                 { "viewsInsideDocument", viewsInsideDocument.Count },
                 { "notInSheets", notInSheets.Count },
@@ -371,7 +372,8 @@ namespace Direwolf.Revit.Howls
                 { "isFlipped", isFlipped.Count },
                 { "worksetElementCount", worksetElementCount.Count }
             };
-            return new Prey(results);
+            }
+            return new Prey();
         }
 
         public override bool Execute()
