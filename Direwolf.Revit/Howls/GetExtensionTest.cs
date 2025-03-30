@@ -1,7 +1,5 @@
-﻿using Autodesk.Revit.DB;
-using Direwolf.Definitions;
+﻿using Direwolf.Definitions;
 using Direwolf.Revit.Extensions;
-using System.Diagnostics;
 
 namespace Direwolf.Revit.Howls
 {

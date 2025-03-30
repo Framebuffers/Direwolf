@@ -24,7 +24,7 @@ namespace Direwolf.Definitions
         {
             DatabaseConnectedEventHandler?.Invoke(this, new EventArgs());
             string sqlQuery =
-                """INSERT INTO "Wolfpack" ("documentName", "fileOrigin", "wasCompleted", "timeTaken", "createdAt", "guid", "resultCount", "testName", "results") VALUES (@docName, @origin, @completed, @time, @creation, @id, @resCount, @name, @result)""";
+                """INSERT INTO "Wolfpack" ("documentName", "fileOrigin", "wasCompleted", "timeTaken", "createdAt", "guid", "resultCount", "testName", "results", "documentVersion") VALUES (@docName, @origin, @completed, @time, @creation, @id, @resCount, @name, @result, @docVersion)""";
 
             try
             {
@@ -47,7 +47,7 @@ namespace Direwolf.Definitions
 
                         cmd.Parameters.AddWithValue("docName", wolfpack.DocumentName);
                         cmd.Parameters.AddWithValue("origin", wolfpack.FileOrigin);
-                      
+                        cmd.Parameters.AddWithValue("docVersion", wolfpack.DocumentVersion);
                         cmd.Parameters.AddWithValue("completed", wolfpack.WasCompleted);
                         cmd.Parameters.AddWithValue("time", wolfpack.TimeTaken);
                         cmd.Parameters.AddWithValue("creation", wolfpack.CreatedAt);

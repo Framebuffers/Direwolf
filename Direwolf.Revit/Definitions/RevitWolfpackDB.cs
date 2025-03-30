@@ -1,18 +1,8 @@
 ﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 using Direwolf.Contracts;
 using Direwolf.Definitions;
 using Npgsql;
-using NpgsqlTypes;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Xml;
 
 namespace Direwolf.Revit.Definitions
 {

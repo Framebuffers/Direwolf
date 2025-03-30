@@ -4,23 +4,23 @@ namespace Direwolf.Revit.UI
 {
     public static class Buttons
     {
-        public static PushButton? AddGetModelHealthButton(RibbonPanel? rp)
+        public static PushButton? AddTrackThisElementButton(RibbonPanel? rp)
         {
-            PushButtonData b = new("modelHealth", "Get Model Health", References.AssemblyLocation, "Direwolf.Revit.UI.Commands.GetModelHealth");
+            PushButtonData b = new("track", "Track this Element", References.AssemblyLocation, "Direwolf.Revit.UI.Commands.TrackThisElement");
             return rp?.AddItem(b) as PushButton;
         }
 
-        //public static PushButton? AddPushToDBButton(RibbonPanel? rp)
-        //{
-        //    PushButtonData b = new("pushToDB", "Push Wolfpack to Database", References.DirewolfRevitLocation, "Direwolf.Revit.UI.Commands.PushToDB");
-        //    return rp?.AddItem(b) as PushButton;
-        //}
+        public static PushButton? AddTrackThisDocumentButton(RibbonPanel? rp)
+        {
+            PushButtonData b = new("pushToDB", "Track this Document's Information", References.AssemblyLocation, "Direwolf.Revit.UI.Commands.TrackThisDocument");
+            return rp?.AddItem(b) as PushButton;
+        }
 
 
         //public static PushButton? AddGetAnnotativeElementsButton(RibbonPanel? rp)
         //{
         // PushButtonData b = new("modelHealth", "Get Annotative Elements", References.DirewolfRevitLocation, "Direwolf.Revit.Benchmarking.DocumentExtensions");
-    
+
         //}
 
 

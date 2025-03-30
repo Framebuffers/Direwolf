@@ -5,7 +5,6 @@ using System.Diagnostics;
 using Direwolf.Revit.Howlers;
 using Revit.Async;
 using Direwolf.Definitions;
-using Direwolf.Revit.Howls;
 using Direwolf.Extensions;
 using Direwolf.Revit.Introspection;
 
@@ -13,11 +12,10 @@ namespace Direwolf.Revit.UI.Commands
 {
 
     /// <summary>
-    /// Benchmark code.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
 
-    public partial class GetModelHealth : DirewolfRevitCommand
+    public partial class TrackThisElement : DirewolfRevitCommand
     {
         public override Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {

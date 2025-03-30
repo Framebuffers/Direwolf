@@ -2,10 +2,8 @@
 using Direwolf.Contracts;
 using Direwolf.Definitions;
 using Direwolf.EventHandlers;
-using Revit.Async;
 using System.Diagnostics;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Direwolf
 {
@@ -96,6 +94,9 @@ namespace Direwolf
             Debug.Print("HuntSuccessful?: " + e.IsSuccessful.ToString());
         }
 
+        public class Revit
+        {
+        }
     }
 
 }

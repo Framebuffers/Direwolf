@@ -1,13 +1,6 @@
 ﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.Exceptions;
 using Direwolf.Contracts;
 using Direwolf.Definitions;
-using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Direwolf.Revit.Definitions
 {

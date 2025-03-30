@@ -2,9 +2,6 @@
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
-using Microsoft.EntityFrameworkCore.Query;
-using System.Linq;
-using System.Xml;
 
 namespace Direwolf.Revit.Extensions
 {

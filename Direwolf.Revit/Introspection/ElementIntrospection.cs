@@ -1,12 +1,9 @@
-﻿using Autodesk.Revit.ApplicationServices;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Direwolf.Definitions;
 using Direwolf.Extensions;
 using Direwolf.Revit.Extensions;
 using Direwolf.Revit.Howls;
-using System.Text.Json;
-using System.Linq;
 using Direwolf.Revit.Definitions;
 
 namespace Direwolf.Revit.Introspection
@@ -72,14 +69,10 @@ namespace Direwolf.Revit.Introspection
                                 ProjectInformationIntrospection pi = new(GetRevitDocument());
                                 ProjectSiteIntrospection ps = new(GetRevitDocument());
                                 ProjectUnitsIntrospection ui = new(GetRevitDocument());
-                                
+
 
                                 // Success!
                                 SendCatchToCallback(new Prey(result));
-                                SendCatchToCallback(new Prey(d));
-                                SendCatchToCallback(new Prey(pi));
-                                SendCatchToCallback(new Prey(ui));
-                                SendCatchToCallback(new Prey(ps));
 
                             }
                         }

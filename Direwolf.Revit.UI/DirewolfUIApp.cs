@@ -13,8 +13,8 @@ namespace Direwolf.Revit.UI
         public Result OnStartup(UIControlledApplication application)
         {
             RibbonPanel rp = application.CreateRibbonPanel("Direwolf");
-            Buttons.AddGetModelHealthButton(rp);
-            //Buttons.AddPushToDBButton(rp);
+            Buttons.AddTrackThisElementButton(rp);
+            Buttons.AddTrackThisDocumentButton(rp);
             
             return Result.Succeeded;
         }

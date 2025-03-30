@@ -1,6 +1,4 @@
-﻿using Autodesk.Revit.DB;
-
-namespace Direwolf.Revit.Definitions
+﻿namespace Direwolf.Revit.Definitions
 {
     public readonly record struct ElementIntrospection
     {
