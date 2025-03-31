@@ -25,10 +25,10 @@ namespace Direwolf.Revit.UI.Commands
             {
                 RevitTask.Initialize(commandData.Application);
                 RevitHowler rh = new();
-                rh.CreateWolf(new Wolf(), new ElementIntrospection(doc, commandData.Application));
+                rh.CreateWolf(new Wolf(), new ElementSnapshot(doc, commandData.Application));
                 Direwolf dw = new(commandData.Application);
                 dw.QueueHowler(rh);
-                dw.HuntAsync("ElementInformation");
+                dw.HuntAsync("ElementInfo");
                 var s = StopTime();
                 Debug.Print($"Time taken: {s}");
                 dw.SendAllToDB();

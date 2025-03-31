@@ -14,10 +14,8 @@ namespace Direwolf.Revit.UI
         {
             RibbonPanel rp = application.CreateRibbonPanel("Direwolf");
             Buttons.AddModelSnapshotDBButton(rp);
-            Buttons.AddModelSnapshotJsonButton(rp);
-            Buttons.AddElementInformationButton(rp);
-            //Buttons.AddPushToDBButton(rp);
-            
+            Buttons.AddGetSelectedElementInfoButton(rp);
+            Buttons.AddGetInfoButton(rp);
             return Result.Succeeded;
         }
 

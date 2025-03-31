@@ -10,6 +10,7 @@
     <PackageReference Include="Autodesk.Revit.SDK" Version="2025.0.2.419" />
     <PackageReference Include="MiniExcel" Version="1.39.0" />
     <PackageReference Include="Npgsql" Version="9.0.3" />
+    <PackageReference Include="System.Windows.Extensions" Version="9.0.3" />
   </ItemGroup>
 
   <ItemGroup>

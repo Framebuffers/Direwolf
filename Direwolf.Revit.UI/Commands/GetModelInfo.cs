@@ -15,7 +15,7 @@ namespace Direwolf.Revit.UI.Commands
     /// </summary>
     [Transaction(TransactionMode.Manual)]
 
-    public partial class GetModelSnapshotToDB : IExternalCommand
+    public partial class GetModelInfo : IExternalCommand
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
@@ -29,7 +29,7 @@ namespace Direwolf.Revit.UI.Commands
                 rh.CreateWolf(new Wolf(), new GetModelSnapshot(doc));
                 Direwolf dw = new(commandData.Application);
                 dw.QueueHowler(rh);
-                dw.HuntAsync("ModelSnapshot");
+                dw.HuntAsync("ModelInfo");
                 dw.SendAllToDB();
             }
             catch
