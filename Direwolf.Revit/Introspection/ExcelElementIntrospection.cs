@@ -5,6 +5,7 @@ using Direwolf.Extensions;
 using Direwolf.Revit.Extensions;
 using Direwolf.Revit.Howls;
 using Direwolf.Revit.Definitions;
+using MiniExcelLibs;
 
 namespace Direwolf.Revit.Introspection
 {
@@ -12,9 +13,9 @@ namespace Direwolf.Revit.Introspection
     /// Given an <see cref="Element"/>, get the family it belongs to, and return all the parameters for each instance.
     /// Check for overridden parameters.
     /// </summary>
-    public record class ElementIntrospection : RevitHowl
+    public record class ExcelElementIntrospection : RevitHowl
     {
-        public ElementIntrospection(Document doc, UIApplication app)
+        public ExcelElementIntrospection(Document doc, UIApplication app)
         {
             SetRevitDocument(doc);
             _app = app;
@@ -65,10 +66,10 @@ namespace Direwolf.Revit.Introspection
                                     new Dictionary<string, object>() { ["materials"] = selected.GetMaterialIds(true)},
                                 ];
 
-
-                                // Success!
                                 SendCatchToCallback(new Prey(result));
-
+                                var path = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.xlsx");
+                                MiniExcel.SaveAs($"{path}.xlsx", result);
+                                // Success!
                             }
                         }
                     }

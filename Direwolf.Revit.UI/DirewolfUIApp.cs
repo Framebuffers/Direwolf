@@ -15,7 +15,8 @@ namespace Direwolf.Revit.UI
             RibbonPanel rp = application.CreateRibbonPanel("Direwolf");
             Buttons.AddTrackThisElementButton(rp);
             Buttons.AddTrackThisDocumentButton(rp);
-            
+            Buttons.AddDocumentSnapshotButton(rp);
+            Buttons.AddDocumentToJsonButton(rp);
             return Result.Succeeded;
         }
 
