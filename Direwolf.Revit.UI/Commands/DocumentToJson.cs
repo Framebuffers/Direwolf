@@ -30,7 +30,7 @@ namespace Direwolf.Revit.UI.Commands
                 $"elementsSelected = {elements.Size}".ToConsole();
                 Direwolf dw = new(commandData.Application);
                 dw.QueueHowler(rh);
-                dw.HuntAsync("");
+                dw.HuntAsync("DocumentSnapshot");
                 var s = StopTime();
                 Debug.Print($"Time taken: {s}");
                 dw.WriteQueriesToJson();

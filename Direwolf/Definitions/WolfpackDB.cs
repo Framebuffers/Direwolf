@@ -36,6 +36,7 @@ namespace Direwolf.Definitions
                 {
 
                     Wolfpack wolfpack = Pop();
+                    
                     Console.WriteLine(c.ConnectionString);
                     c.Open();
                     await using var cmd = new NpgsqlCommand(sqlQuery, c);
@@ -44,7 +45,6 @@ namespace Direwolf.Definitions
                         resultJson.ParameterName = "result";
                         resultJson.NpgsqlDbType = NpgsqlDbType.Json;
                         resultJson.Value = wolfpack.Results;
-
                         cmd.Parameters.AddWithValue("docName", wolfpack.DocumentName);
                         cmd.Parameters.AddWithValue("origin", wolfpack.FileOrigin);
                         cmd.Parameters.AddWithValue("docVersion", wolfpack.DocumentVersion);
