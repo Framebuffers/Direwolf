@@ -4,25 +4,21 @@ namespace Direwolf.Revit.UI
 {
     public static class Buttons
     {
-        public static PushButton? AddGetModelHealthButton(RibbonPanel? rp)
+        public static PushButton? AddModelSnapshotDBButton(RibbonPanel? rp)
         {
-            PushButtonData b = new("modelHealth", "Get Model Health", Libraries.References.AssemblyLocation, "Direwolf.Revit.UI.Commands.GetModelHealth");
+            PushButtonData b = new("modelToDB", "Send Model to DB", Libraries.References.AssemblyLocation, "Direwolf.Revit.UI.Commands.GetModelSnapshotToDB");
             return rp?.AddItem(b) as PushButton;
         }
-
-        //public static PushButton? AddPushToDBButton(RibbonPanel? rp)
-        //{
-        //    PushButtonData b = new("pushToDB", "Push Wolfpack to Database", References.DirewolfRevitLocation, "Direwolf.Revit.UI.Commands.PushToDB");
-        //    return rp?.AddItem(b) as PushButton;
-        //}
-
-
-        //public static PushButton? AddGetAnnotativeElementsButton(RibbonPanel? rp)
-        //{
-        // PushButtonData b = new("modelHealth", "Get Annotative Elements", References.DirewolfRevitLocation, "Direwolf.Revit.Benchmarking.DocumentExtensions");
-    
-        //}
-
-
+        public static PushButton? AddModelSnapshotJsonButton(RibbonPanel? rp)
+        {
+            PushButtonData b = new("modelHealth", "Send info to JSON", Libraries.References.AssemblyLocation, "Direwolf.Revit.UI.Commands.GetModelSnapshotToJson");
+            return rp?.AddItem(b) as PushButton;
+        }
+        public static PushButton? AddElementInformationButton(RibbonPanel? rp)
+        {
+            PushButtonData b = new("elementInfo", "Send Parameters to DB", Libraries.References.AssemblyLocation, "Direwolf.Revit.UI.Commands.GetSelectedElementInfo");
+            return rp?.AddItem(b) as PushButton;
+        }
     }
+
 }

@@ -1,6 +1,7 @@
 ﻿using Npgsql;
 using NpgsqlTypes;
 using System.Diagnostics;
+using System.Text.Json;
 
 namespace Direwolf.Definitions
 {
@@ -22,6 +23,10 @@ namespace Direwolf.Definitions
             Debug.Print("Database Connected");
         }
 
+        private readonly string Desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+
+
+
         public async Task Send()
         {
             DatabaseConnectedEventHandler?.Invoke(this, new EventArgs());
@@ -39,14 +44,17 @@ namespace Direwolf.Definitions
                 {
 
                     Wolfpack wolfpack = Pop();
+                    string fileName = Path.Combine(Desktop, $"Queries.json");
+                    File.WriteAllText(fileName, wolfpack.Results);
+
                     Console.WriteLine(c.ConnectionString);
                     c.Open();
                     await using var cmd = new NpgsqlCommand(sqlQuery, c);
                     {
-                        var resultJson = cmd.CreateParameter();
-                        resultJson.ParameterName = "result";
-                        resultJson.NpgsqlDbType = NpgsqlDbType.Json;
-                        resultJson.Value = wolfpack.Results;
+                        var resultBson = cmd.CreateParameter();
+                        resultBson.ParameterName = "result";
+                        resultBson.NpgsqlDbType = NpgsqlDbType.Jsonb;
+                        resultBson.Value = wolfpack.Results;
 
                         cmd.Parameters.AddWithValue("docName", wolfpack.DocumentName);
                         cmd.Parameters.AddWithValue("origin", wolfpack.FileOrigin);
@@ -57,7 +65,7 @@ namespace Direwolf.Definitions
                         cmd.Parameters.AddWithValue("id", wolfpack.GUID);
                         cmd.Parameters.AddWithValue("resCount", wolfpack.ResultCount);
                         cmd.Parameters.AddWithValue("name", wolfpack.TestName);
-                        cmd.Parameters.Add(resultJson);
+                        cmd.Parameters.Add(resultBson);
 
                         int rowsAffected = await cmd.ExecuteNonQueryAsync();
                         Debug.Print($"Executed query. Added {rowsAffected} rows");

@@ -13,7 +13,9 @@ namespace Direwolf.Revit.UI
         public Result OnStartup(UIControlledApplication application)
         {
             RibbonPanel rp = application.CreateRibbonPanel("Direwolf");
-            Buttons.AddGetModelHealthButton(rp);
+            Buttons.AddModelSnapshotDBButton(rp);
+            Buttons.AddModelSnapshotJsonButton(rp);
+            Buttons.AddElementInformationButton(rp);
             //Buttons.AddPushToDBButton(rp);
             
             return Result.Succeeded;

@@ -3,12 +3,17 @@ using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
 using Direwolf.Definitions;
+using Direwolf.Revit.Commands.NativeCommands;
 using Direwolf.Revit.Definitions;
+using Direwolf.Revit.Extensions;
+using Direwolf.Revit.Utilities;
+using ElementType = Autodesk.Revit.DB.ElementType;
 
 namespace Direwolf.Revit.Howls
 {
     public record class GetModelSnapshot : RevitHowl
     {
+        public GetModelSnapshot(Document doc) => SetRevitDocument(doc);
         // These are all categories for which information has to be extracted.
         private List<View> viewsInsideDocument = [];
         private List<View> notInSheets = [];
@@ -28,16 +33,17 @@ namespace Direwolf.Revit.Howls
         private List<GraphicsStyle> nonNativeStyles = [];
         private List<Element> isFlipped = [];
         private Dictionary<string, int> worksetElementCount = [];
-        private Stack<_ElementInformation> individualElementInfo = [];
+        private Stack<Dictionary<string, object>> individualElementInfo = [];
 
-        private Prey ProcessInfo()
+        private void ProcessInfo()
         {
             var doc = GetRevitDocument();
             warns.AddRange(GetRevitDocument().GetWarnings());
             ICollection<Element> collector = [.. new FilteredElementCollector(GetRevitDocument()).WhereElementIsNotElementType()];
 
-            foreach (Element e in collector)
+            foreach (Element element in collector)
             {
+                var e = doc.GetElement(element.Id);
                 if (e is not null && e.IsValidObject && e.Category is not null && e.Category.CategoryType is not CategoryType.Invalid || e?.Category?.CategoryType is not CategoryType.Internal)
                 {
                     Parameter? worksetParam = e?.get_Parameter(BuiltInParameter.ELEM_PARTITION_PARAM);
@@ -303,35 +309,25 @@ namespace Direwolf.Revit.Howls
                             break;
                     }
 
-                    individualElementInfo.Push(new _ElementInformation
+                    // Create a dictionary with the Element's metadata, and then add its parameters.
+                    Dictionary<string, object>? elementInfo = new()
                     {
-                        idValue = e.Id.Value,
-                        uniqueElementId = e.UniqueId,
-                        elementVersionId = e.VersionGuid.ToString(),
-                        familyName = familyName,
-                        category = builtInCategory,
-                        builtInCategory = builtInCategory,
-                        workset = workset,
-                        views = views,
-                        designOption = designOption,
-                        documentOwner = docOwner,
-                        ownerViewId = ownerViewId,
-                        worksetId = worksetId,
-                        levelId = levelId,
-                        createdPhaseId = createdPhaseId,
-                        demolishedPhaseId = demolishedPhaseId,
-                        groupId = groupId,
-                        workshareId = workshareId,
-                        isGrouped = isGrouped,
-                        isModifiable = isModifiable,
-                        isViewSpecific = isViewSpecific,
-                        isBuiltInCategory = isBuiltInCategory,
-                        isAnnotative = isAnnotative,
-                        isModel = isModel,
-                        isPinned = isPinned,
-                        isWorkshared = isWorkshared,
-                        Parameters = null
-                    });
+                        ["id"] = e.Id.Value,
+                        ["uniqueId"] = e.UniqueId,
+                        ["familyName"] = GetElementType(e)?.FamilyName ?? string.Empty,
+                        ["elementName"] = e?.Name ?? string.Empty,
+                    };
+
+                    List<Dictionary<string, object>> result =
+                    [
+                        elementInfo,
+                                new Dictionary<string, object>() { ["parameters"] = GetParameters(e) },
+                                GetCategory(e),
+                                new Dictionary<string, object>() { ["materials"] = e.GetMaterialIds(true)},
+                            ];
+
+                    SendCatchToCallback(new Prey(result));
+                    // Success!
                 }
             }
             // view not in sheet. needs to be done after all are done.
@@ -371,12 +367,57 @@ namespace Direwolf.Revit.Howls
                 { "isFlipped", isFlipped.Count },
                 { "worksetElementCount", worksetElementCount.Count }
             };
-            return new Prey(results);
+
+            SendCatchToCallback(new Prey(results));
+        }
+        private static Dictionary<string, object>? GetCategory(Element e)
+        {
+            Dictionary<string, object> categoryInfo = [];
+
+            if (e is not null && e.Category is not null)
+            {
+                categoryInfo.TryAdd("categoryId", e.Category.Id.Value);
+                categoryInfo.TryAdd("categoryUniqueId", e.UniqueId ?? Guid.Empty.ToString());
+                categoryInfo.TryAdd("categoryName", e.Category.Name ?? string.Empty);
+                categoryInfo.TryAdd("builtInCategory", e.Category.BuiltInCategory.ToString() ?? string.Empty);
+                categoryInfo.TryAdd("categoryType", e.Category.CategoryType.ToString() ?? string.Empty);
+                categoryInfo.TryAdd("hasMaterialQuantities", e.Category.HasMaterialQuantities);
+            }
+            return categoryInfo;
+        }
+
+        private static List<Dictionary<string, object>>? GetParameters(Element e)
+        {
+            List<Dictionary<string, object>>? results = [];
+            if (e is not null && e.GetOrderedParameters() is not null)
+            {
+                IList<Parameter>? b = e.GetOrderedParameters();
+                if (e?.Category is not null)
+                {
+                    results.AddRange(from p in b
+                                     select p.GetParameterValue());
+                }
+                return results;
+            }
+            else
+            {
+                return [];
+            }
+        }
+
+        private static ElementType? GetElementType(Element e)
+        {
+            var type = e?.GetTypeId();
+            if (type is not null)
+            {
+                return e?.Document?.GetElement(type) as ElementType;
+            }
+            return null;
         }
 
         public override bool Execute()
         {
-            SendCatchToCallback(ProcessInfo());
+            ProcessInfo();
             return true;
         }
     }

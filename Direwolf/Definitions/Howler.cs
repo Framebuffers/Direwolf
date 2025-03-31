@@ -1,5 +1,7 @@
 ﻿using Direwolf.Contracts;
 using Direwolf.EventHandlers;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Bson;
 using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -16,7 +18,7 @@ namespace Direwolf.Definitions
         public event EventHandler<HuntCompletedEventArgs>? HuntCompleted;
 
         [JsonPropertyName("response")] public Stack<Prey> Den { get; set; } = [];
-        [JsonIgnore] public Queue<IWolf> Wolfpack { get; set; } = [];
+        [System.Text.Json.Serialization.JsonIgnore] public Queue<IWolf> Wolfpack { get; set; } = [];
 
         public virtual void CreateWolf(IWolf runner, IHowl instruction) // wolf factory
         {
@@ -52,7 +54,19 @@ namespace Direwolf.Definitions
 
         public override string ToString()
         {
-            return JsonSerializer.Serialize(Den);
+            return System.Text.Json.JsonSerializer.Serialize(Den);
+        }
+
+        public string AsBson
+        {
+            get
+            {
+                MemoryStream ms = new();
+                using BsonDataWriter b = new(ms);
+                Newtonsoft.Json.JsonSerializer s = new();
+                s.Serialize(b, Den);
+                return Convert.ToBase64String(ms.ToArray());
+            }
         }
     }
 }

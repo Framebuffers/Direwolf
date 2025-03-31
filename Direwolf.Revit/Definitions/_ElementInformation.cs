@@ -3,9 +3,6 @@
 
     public readonly record struct _ElementInformation()
     {
-        public required double idValue { get; init; }
-        public required string uniqueElementId { get; init; }
-        public required string elementVersionId { get; init; }
         public string? familyName { get; init; }
         public string? category { get; init; }
         public string? builtInCategory { get; init; }

@@ -13,11 +13,15 @@ namespace Direwolf
     {
         public event EventHandler? DatabaseConnectionEventHandler;
         public event EventHandler? AsyncHuntCompletedEventHandler;
+
+
         /// <summary>
         /// This is a proof of concept, not a production-ready solution. Please **CHANGE THIS** if you plan to deploy.
         /// </summary>
         private static readonly DbConnectionString _default = new("localhost", 5432, "wolf", "awoo", "direwolf");
 
+        
+        
         private readonly UIApplication? _app;
         private List<HowlId> PreviousHowls = [];
 

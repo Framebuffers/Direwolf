@@ -15,7 +15,7 @@ namespace Direwolf.Revit.UI.Commands
     /// </summary>
     [Transaction(TransactionMode.Manual)]
 
-    public partial class GetModelHealth : IExternalCommand
+    public partial class GetModelSnapshotToDB : IExternalCommand
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
@@ -26,10 +26,10 @@ namespace Direwolf.Revit.UI.Commands
             {
                 RevitTask.Initialize(commandData.Application);
                 RevitHowler rh = new();
-                rh.CreateWolf(new Wolf(), new GetExtensionTest(doc));
+                rh.CreateWolf(new Wolf(), new GetModelSnapshot(doc));
                 Direwolf dw = new(commandData.Application);
                 dw.QueueHowler(rh);
-                dw.HuntAsync("Extension Test");
+                dw.HuntAsync("ModelSnapshot");
                 dw.SendAllToDB();
             }
             catch
