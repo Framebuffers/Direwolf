@@ -25,7 +25,7 @@ namespace Direwolf.Revit.UI.Commands
             {
                 RevitTask.Initialize(commandData.Application);
                 RevitHowler rh = new();
-                rh.CreateWolf(new Wolf(), new GetModelSnapshot(doc));
+                rh.CreateWolf(new Wolf(), new Howls.ModelSnapshot(doc));
                 $"elementsSelected = {elements.Size}".ToConsole();
                 Direwolf dw = new(commandData.Application);
                 dw.QueueHowler(rh);

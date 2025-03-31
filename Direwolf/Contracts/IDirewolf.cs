@@ -16,11 +16,6 @@ namespace Direwolf.Contracts
         void HuntAsync(IHowler howler, string queryName = "query");
         void QueueHowler(IHowler howler);
         void SendAllToDB();
-        void SendAllToExcel();
-        void SendAllToJson();
-        void SendAllToScreen();
-        void SendToDynamo();
-        void GetFromDynamo(IWolfpack wolfpack);
         void WriteQueriesToJson();
     }
 }

@@ -4,22 +4,6 @@ using System.Text.Json.Serialization;
 
 namespace Direwolf
 {
-    public enum Target
-    {
-        Invalid,
-        JSON,
-        DB,
-        Excel,
-        Screen
-    }
-
-    public enum DatabaseChoice
-    {
-        Invalid,
-        Postgres
-    }
-
-
 
     public partial class Direwolf
     {

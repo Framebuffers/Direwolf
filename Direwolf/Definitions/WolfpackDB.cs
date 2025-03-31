@@ -2,13 +2,15 @@
 using Npgsql;
 using NpgsqlTypes;
 using System.Diagnostics;
+using System.Text.Json;
 
 namespace Direwolf.Definitions
 {
-    public readonly record struct DbConnectionString(string Host, int Port, string Username, string Password, string Database) { }
-
+    public readonly record struct DbConnectionString(string Host, int Port, string Username, string Password, string Database);
     public class WolfpackDB : Stack<Wolfpack>, IWolfpackDB
     {
+
+        private readonly string Desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         public event EventHandler DatabaseConnectedEventHandler;
         private readonly DbConnectionString _str;
 
@@ -34,9 +36,10 @@ namespace Direwolf.Definitions
                 c.Notice += C_Notice;
                 while (Count > 0)
                 {
-
+                    string fileName = Path.Combine(Desktop, $"Queries.json");
                     Wolfpack wolfpack = Pop();
-                    
+                    File.WriteAllText(fileName, wolfpack.Results);
+
                     Console.WriteLine(c.ConnectionString);
                     c.Open();
                     await using var cmd = new NpgsqlCommand(sqlQuery, c);
