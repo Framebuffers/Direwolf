@@ -1,10 +1,11 @@
 ﻿using Direwolf.Contracts;
 using Direwolf.EventHandlers;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Bson;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Direwolf.Definitions
 {
@@ -57,16 +58,5 @@ namespace Direwolf.Definitions
             return System.Text.Json.JsonSerializer.Serialize(Den);
         }
 
-        public string AsBson
-        {
-            get
-            {
-                MemoryStream ms = new();
-                using BsonDataWriter b = new(ms);
-                Newtonsoft.Json.JsonSerializer s = new();
-                s.Serialize(b, Den);
-                return Convert.ToBase64String(ms.ToArray());
-            }
-        }
-    }
+         }
 }

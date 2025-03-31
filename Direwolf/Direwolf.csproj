@@ -36,6 +36,7 @@
 
   <ItemGroup>
     <PackageReference Include="Autodesk.Revit.SDK" Version="2025.0.2.419" />
+    <PackageReference Include="MongoDB.Bson" Version="3.3.0" />
     <PackageReference Include="Newtonsoft.Json.Bson" Version="1.0.3" />
     <PackageReference Include="Npgsql" Version="9.0.3">
     </PackageReference>

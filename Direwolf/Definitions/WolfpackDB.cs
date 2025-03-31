@@ -45,17 +45,18 @@ namespace Direwolf.Definitions
 
                     Wolfpack wolfpack = Pop();
                     string fileName = Path.Combine(Desktop, $"Queries.json");
-                    File.WriteAllText(fileName, wolfpack.Results);
+                    File.WriteAllText(fileName, wolfpack.Results.ToString());
 
-                    Console.WriteLine(c.ConnectionString);
                     c.Open();
                     await using var cmd = new NpgsqlCommand(sqlQuery, c);
                     {
                         var resultBson = cmd.CreateParameter();
                         resultBson.ParameterName = "result";
-                        resultBson.NpgsqlDbType = NpgsqlDbType.Jsonb;
-                        resultBson.Value = wolfpack.Results;
-
+                        resultBson.NpgsqlDbType = NpgsqlDbType.Json;
+                        resultBson.Value = wolfpack.Results.ToString();
+                        Debug.Print(wolfpack.Results.ToString());
+                        Debug.Print(wolfpack.Results.ToString());
+    
                         cmd.Parameters.AddWithValue("docName", wolfpack.DocumentName);
                         cmd.Parameters.AddWithValue("origin", wolfpack.FileOrigin);
                         cmd.Parameters.AddWithValue("version", wolfpack.DocumentVersion);

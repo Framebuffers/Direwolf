@@ -10,6 +10,5 @@ namespace Direwolf.Contracts
         public void CreateWolf(IWolf runner, IHowl instruction);
         public Wolfpack Howl(string testName);
         public event EventHandler<HuntCompletedEventArgs> HuntCompleted;
-        public string? AsBson { get; }
     }
 }

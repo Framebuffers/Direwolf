@@ -11,7 +11,6 @@ namespace Direwolf.Definitions
         public Guid GUID { get; init; } = Guid.NewGuid();
         public int ResultCount { get => Howler.Den.Count; }
         public string? Results => Howler?.ToString();
-        public string? ResultsBson => Howler?.AsBson;
         public override string ToString()
         {
             return JsonSerializer.Serialize(new Dictionary<string, object>()
