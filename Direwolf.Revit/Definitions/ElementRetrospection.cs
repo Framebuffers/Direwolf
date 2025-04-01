@@ -2,6 +2,10 @@
 
 namespace Direwolf.Revit.Definitions
 {
+    /// <summary>
+    /// Retrieves parameters from a Revit <see cref="Element"/>
+    /// </summary>
+    /// <param name="Element">Revit Element</param>
     public readonly record struct ElementRetrospection(Element Element)
     {
         public double id => Element.Id.Value;

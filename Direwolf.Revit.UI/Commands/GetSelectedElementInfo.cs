@@ -11,9 +11,9 @@ namespace Direwolf.Revit.UI.Commands
 {
 
     /// <summary>
+    /// Gets all the parameters and instance data from the selected elements.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
-
     public partial class GetSelectedElementInfo : DirewolfRevitCommand
     {
         public override Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)

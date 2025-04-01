@@ -2,6 +2,10 @@
 
 namespace Direwolf.Revit.Definitions
 {
+    /// <summary>
+    /// Retrieves the Units set on a given Revit Document.
+    /// </summary>
+    /// <param name="Document">Revit Document</param>
     public readonly record struct UnitIntrospection(Document Document)
     {
         public string lengthUnits => Document.GetUnits().GetFormatOptions(SpecTypeId.Length).GetUnitTypeId().TypeId;

@@ -11,10 +11,9 @@ namespace Direwolf.Revit.UI.Commands
 {
 
     /// <summary>
-    /// Benchmark code.
+    /// Takes a model, iterates through the entire model in search of a given set of indicators, and returns the amount of elements that fall into each category.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
-
     public partial class GetModelInfo : DirewolfRevitCommand
     {
         public override Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)

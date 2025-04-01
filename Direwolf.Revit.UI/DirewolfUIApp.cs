@@ -4,15 +4,13 @@ namespace Direwolf.Revit.UI
 {
     /// <summary>
     /// UI instance of Direwolf.
-    /// 
     /// All commands are still routed through Direwolf.Revit.dll (and Direwolf.dll), therefore it is independent of the Revit file itself.
-    /// 
     /// </summary>
     public class DirewolfUIApp : IExternalApplication
     {
         public Result OnStartup(UIControlledApplication application)
         {
-             RibbonPanel rp = application.CreateRibbonPanel("Database");
+            RibbonPanel rp = application.CreateRibbonPanel("Database");
 
             PushButtonData elementInfo = new("elementToDB", "Send Element to DB", Libraries.References.AssemblyLocation, "Direwolf.Revit.UI.Commands.GetSelectedElementInfo");
 
@@ -20,11 +18,8 @@ namespace Direwolf.Revit.UI
 
             PushButtonData aboutInfo = new("direwolfInfo", "About", Libraries.References.AssemblyLocation, "Direwolf.Revit.UI.Commands.GetInfo");
 
-            //PushButtonData documentInfo = new("documentInfo", "Get Document Info", Libraries.References.AssemblyLocation, "Direwolf.Revit.UI.Commands.GetDocumentInfo");
-
             rp.AddStackedItems(modelInfo, elementInfo);
             rp.AddItem(aboutInfo);
-            
 
             return Result.Succeeded;
         }

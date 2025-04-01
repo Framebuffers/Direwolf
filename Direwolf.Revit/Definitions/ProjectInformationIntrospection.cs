@@ -2,6 +2,10 @@
 
 namespace Direwolf.Revit.Definitions
 {
+    /// <summary>
+    /// Information about the current Project held inside a Revit Document.
+    /// </summary>
+    /// <param name="Document">Revit Document</param>
     public readonly record struct ProjectInformationIntrospection(Document Document)
     {
         public string projectName => Document.ProjectInformation.Name;

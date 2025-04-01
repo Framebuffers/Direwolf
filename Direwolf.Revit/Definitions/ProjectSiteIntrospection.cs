@@ -2,6 +2,10 @@
 
 namespace Direwolf.Revit.Definitions
 {
+    /// <summary>
+    /// Retrieves information about the Site of a Revit Document.
+    /// </summary>
+    /// <param name="Document">Revit Document</param>
     public readonly record struct ProjectSiteIntrospection(Document Document)
     {
         public string placeName => Document.SiteLocation.PlaceName;

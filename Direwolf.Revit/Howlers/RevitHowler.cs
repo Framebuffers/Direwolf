@@ -10,13 +10,19 @@ namespace Direwolf.Revit.Howlers
 {
     /// <summary>
     /// Exactly the same as a regular Howler, except that it checks if the Howl implements IDynamicRevitHowl.
-    /// A bit of a hack but works.
     /// </summary>
     public record class RevitHowler : Howler
     {
         public new event EventHandler<HuntCompletedEventArgs>? HuntCompleted;
         private Document? _doc;
         private readonly Stopwatch _timeTaken = new();
+
+        /// <summary>
+        /// Create a runner that holds a Revit Document.
+        /// </summary>
+        /// <param name="runner">Runner</param>
+        /// <param name="instruction">Query to be executed</param>
+        /// <exception cref="ArgumentException">Thrown when a given Instruction is not a valid Revit Instruction</exception>
         public override void CreateWolf(IWolf runner, IHowl instruction) // wolf factory
         {
             if (instruction is IRevitHowl)
@@ -32,7 +38,13 @@ namespace Direwolf.Revit.Howlers
                 throw new ArgumentException("Howl is not a valid Revit Howl.");
             }
         }
-        
+       
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="testName"><inheritdoc/></param>
+        /// <returns><inheritdoc/></returns>
+        /// <exception cref="ApplicationException"><inheritdoc/></exception>
         public override Wolfpack Howl(string testName)
         {
             _timeTaken.Start();

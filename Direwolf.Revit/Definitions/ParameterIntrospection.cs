@@ -2,6 +2,10 @@
 
 namespace Direwolf.Revit.Definitions
 {
+    /// <summary>
+    /// Retrieves the name and value of a given Revit Parameter.
+    /// </summary>
+    /// <param name="Parameter">The Parameter of a Revit Element</param>
     public readonly record struct ParameterIntrospection(Parameter Parameter)
     {
         public string name

@@ -3,7 +3,6 @@ using Direwolf.Definitions;
 
 namespace Direwolf.Revit.Howls
 {
-
     public record class GetAnnotativeElements : RevitHowl
     {
         public GetAnnotativeElements(Document doc) => SetRevitDocument(doc);

@@ -38,6 +38,10 @@ namespace Direwolf.Revit.Definitions
      * 
      */
 
+    /// <summary>
+    /// Retrieves document metadata from a Revit document.
+    /// </summary>
+    /// <param name="Document">Revit document</param>
     public readonly record struct DocumentIntrospection(Document Document)
     {
         public string documentName => Document.Title;

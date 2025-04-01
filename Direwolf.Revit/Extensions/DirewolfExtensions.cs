@@ -1,6 +1,10 @@
 ﻿using Autodesk.Revit.DB;
 
 namespace Direwolf.Revit.Utilities;
+
+/// <summary>
+/// Helper extensions to obtain information from a Revit Document, Element or Parameter.
+/// </summary>
 public static class DirewolfExtensions
 {
     public static SortedDictionary<long, string> _GetFamilyFileNamesSortedByFileSize(this Document doc)

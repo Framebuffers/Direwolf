@@ -6,7 +6,7 @@ namespace Direwolf.Revit.UI.Commands
 {
 
     /// <summary>
-    /// Benchmark code.
+    /// About button.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
 
