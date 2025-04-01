@@ -351,26 +351,27 @@ namespace Direwolf.Revit.Howls
 
             Dictionary<string, object> results = new()
             {
-                { "viewsInsideDocument", viewsInsideDocument.Select(x => x.UniqueId) },
-                { "notInSheets", notInSheets.Select(x => x.UniqueId)},
-                { "annotativeElements", annotativeElements.Select(x => x.UniqueId) },
+                { "viewsInsideDocument", viewsInsideDocument.Count },
+                { "notInSheets", notInSheets.Count },
+                { "annotativeElements", annotativeElements.Count },
                 { "externalRefs", externalRefs.Count },
-                { "modelGroups", modelGroups.Select(x => x.UniqueId) },
-                { "detailGroups", detailGroups.Select(x => x.UniqueId) },
-                { "designOptions", designOptions.Select(x => x.UniqueId) },
-                { "levels", levels.Select(x => x.UniqueId) },
-                { "grids", grids.Select(x => x.UniqueId) },
+                { "modelGroups", modelGroups.Count },
+                { "detailGroups", detailGroups.Count },
+                { "designOptions", designOptions.Count },
+                { "levels", levels.Count },
+                { "grids", grids.Count },
                 { "warns", warns.Count },
-                { "unenclosedRoom", unenclosedRoom.Select(x => x.UniqueId) },
-                { "viewports", viewports.Select(x => x.UniqueId) },
-                { "unconnectedDucts", unconnectedDucts.Select(x => x.UniqueId) },
-                { "unconnectedPipes", unconnectedPipes.Select(x => x.UniqueId) },
+                { "unenclosedRoom", unenclosedRoom.Count },
+                { "viewports", viewports.Count },
+                { "unconnectedDucts", unconnectedDucts.Count },
+                { "unconnectedPipes", unconnectedPipes.Count },
                 { "unconnectedElectrical", unconnectedElectrical.Count },
-                { "nonNativeStyles", nonNativeStyles.Select(x => x.UniqueId) },
-                { "isFlipped", isFlipped.Select(x => x.UniqueId) },
+                { "nonNativeStyles", nonNativeStyles.Count },
+                { "isFlipped", isFlipped.Count },
                 { "worksetElementCount", worksetElementCount.Count }
             };
 
+            //SendCatchToCallback(new Prey(doc._GetInstancesPerFamily()));
             SendCatchToCallback(new Prey(results));
         }
         private static Dictionary<string, object>? GetCategory(Element e)

@@ -3,6 +3,91 @@
 namespace Direwolf.Revit.Utilities;
 public static class DirewolfExtensions
 {
+    public static SortedDictionary<long, string> _GetFamilyFileNamesSortedByFileSize(this Document doc)
+    {
+        try
+        {
+            string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            string folderName = $"dw_test_{DateTime.UtcNow.ToFileTimeUtc()}";
+            string fullPath = Path.Combine(appdata, folderName);
+
+            Directory.CreateDirectory(fullPath);
+            SortedDictionary<long, string> sorted = [];
+            foreach (var (f, rfa) in from Family f in doc._GetFamilies()
+                                     let rfa = Path.Combine(fullPath, $"{f.Name}.rfa")
+                                     select (f, rfa))
+            {
+                try
+                {
+                    doc.EditFamily(f).SaveAs(rfa);
+                    sorted.TryAdd(new FileInfo(rfa).Length, f.Name);
+                }
+                catch
+                {
+                    continue;
+                }
+            }
+            return sorted;
+        }
+        catch { throw new Exception("Error while creating folder"); } // because, else, it could file in the middle
+        throw new Exception($"The routine could not be initialized. Reason: Could not get into the try/catch clause.");
+    }
+    public static IEnumerable<Family> _GetFamilies(this Document doc)
+    {
+        foreach (var e in from x in doc.GetAllValidElements()
+                          where x is FamilyInstance
+                          let fi = (FamilyInstance)x
+                          where !x.ViewSpecific
+                          select fi.Symbol.Family)
+        {
+            yield return e;
+        }
+    }
+
+    public static string GetFamilyName(this Element element)
+    {
+        ElementType? elementType = element as ElementType;
+        if (elementType is not null)
+        {
+            return elementType.FamilyName;
+        }
+        else
+        {
+            return string.Empty;
+        }
+    }
+
+    public static IEnumerable<Element?> GetAllValidElements(this Document doc)
+    {
+        var collector = new FilteredElementCollector(doc).WhereElementIsNotElementType().ToElementIds();
+        foreach (var e in from x in collector
+                          let y = doc.GetElement(x)
+                          select y)
+        {
+            if (e is not null && e.IsValidObject && e.Category is not null && e?.Category?.CategoryType is not CategoryType.Invalid || e?.Category?.CategoryType is not CategoryType.Internal)
+                yield return e;
+        }
+    }
+
+    public static Dictionary<string, int> _GetInstancesPerFamily(this Document doc)
+    {
+        Dictionary<string, int> counter = [];
+        foreach (var (e, c) in from e in doc.GetAllValidElements()
+                               let c = e.GetFamilyName()
+                               select (e, c))
+        {
+            if (counter.ContainsKey(c))
+            {
+                counter[c]++;
+            }
+            else
+            {
+                counter[c] = 1;
+            }
+        }
+        return counter;
+    }
+
     public static ICollection<Element>? _GetAllValidElements(this Document doc)
     {
         return new FilteredElementCollector(doc)
@@ -60,6 +145,4 @@ public static class DirewolfExtensions
         }
         return parameters;
     }
-
-
 }
