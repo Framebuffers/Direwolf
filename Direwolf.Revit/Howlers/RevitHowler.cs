@@ -25,7 +25,7 @@ namespace Direwolf.Revit.Howlers
                 IRevitHowl? i = instruction as IRevitHowl;
                 _doc = i.GetRevitDocument();
                 runner.Callback = this;
-                Wolfpack.Enqueue(runner);
+                WolfQueue.Enqueue(runner);
             }
             else
             {
@@ -43,7 +43,7 @@ namespace Direwolf.Revit.Howlers
                 string path = _doc?.PathName ?? string.Empty;
                 string version = _doc?.ProjectInformation.VersionGuid.ToString() ?? Guid.NewGuid().ToString();
 
-                foreach (var wolf in Wolfpack)
+                foreach (var wolf in WolfQueue)
                 {
                     wolf.Run();
                 }

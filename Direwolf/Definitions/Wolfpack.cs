@@ -4,6 +4,15 @@ using System.Text.Json.Serialization;
 
 namespace Direwolf.Definitions
 {
+    /// <summary>
+    /// Wrapper for result data. Includes metadata for identification and performance statistics. This is the format that direwolf-db uses to store test results.
+    /// </summary>
+    /// <param name="Howler">Dispatcher containing the results</param>
+    /// <param name="DocumentName">Source name</param>
+    /// <param name="FileOrigin">Source path</param>
+    /// <param name="DocumentVersion">UUID of the current document revision</param>
+    /// <param name="WasCompleted">True if the result within is a successful test, false if otherwise</param>
+    /// <param name="TimeTaken">Time, in seconds, taken to generate the results being stored on this WolfQueue</param>
     public readonly record struct Wolfpack([property: JsonIgnore]IHowler Howler, string DocumentName = "", string FileOrigin = "", string DocumentVersion = "", bool WasCompleted = false, double TimeTaken = 0)
     {
         public string TestName { get; init; } = string.Empty;

@@ -9,11 +9,13 @@ using System.Text.Json.Serialization;
 
 namespace Direwolf
 {
+    /// <summary>
+    /// Data analysis core. Handles the queue of <see cref="IHowler"/>, the <see cref="WolfpackDB"/> and the serializaion of results.
+    /// </summary>
     public class Direwolf
     {
         public event EventHandler? DatabaseConnectionEventHandler;
         public event EventHandler? AsyncHuntCompletedEventHandler;
-
 
         /// <summary>
         /// This is a proof of concept, not a production-ready solution. Please **CHANGE THIS** if you plan to deploy.
@@ -22,13 +24,24 @@ namespace Direwolf
 
         private readonly UIApplication? _app;
         private List<HowlId> PreviousHowls = [];
+        private Queue<IHowler> Howlers { get; set; } = [];
+        [JsonExtensionData] private WolfpackDB Queries { get; set; } = new(_default);
 
+        /// <summary>
+        /// Instance of a Direwolf analyzer.
+        /// </summary>
+        /// <param name="app">A valid Revit UIApplication context</param>
         public Direwolf(UIApplication app)
         {
             Queries.DatabaseConnectedEventHandler += Queries_DatabaseConnectedEventHandler;
             _app = app;
         }
 
+        /// <summary>
+        /// Instance of a Direwolf analyzer.
+        /// </summary>
+        /// <param name="howler">Dispatcher</param>
+        /// <param name="app">A valid Revit UIApplication context</param>
         public Direwolf(IHowler howler, UIApplication app)
         {
             Howlers.Enqueue(howler);
@@ -37,11 +50,12 @@ namespace Direwolf
             _app = app;
         }
 
-        private void Queries_DatabaseConnectedEventHandler(object? sender, EventArgs e)
-        {
-            Debug.Print("Database connected!");
-        }
-
+        /// <summary>
+        /// Instance of a Direwolf analyzer.
+        /// </summary>
+        /// <param name="howler">Dispatcher</param>
+        /// <param name="instructions">Instructions</param>
+        /// <param name="app">A valid Revit UIApplication context</param>
         public Direwolf(IHowler howler, IHowl instructions, UIApplication app)
         {
             howler.CreateWolf(new Wolf(), instructions);
@@ -51,23 +65,19 @@ namespace Direwolf
             _app = app;
         }
 
-        private void Direwolf_AsyncHuntCompletedEventHandler(object? sender, EventArgs e)
-        {
-            SendAllToDB();
-        }
-
         public Direwolf(IHowler howler, IHowl instructions, IWolf wolf, UIApplication app)
         {
             howler.CreateWolf(wolf, instructions);
             Howlers.Enqueue(howler);
             howler.HuntCompleted += OnHuntCompleted;
             Queries.DatabaseConnectedEventHandler += Queries_DatabaseConnectedEventHandler;
-
             _app = app;
-
         }
 
-
+        /// <summary>
+        /// Add a dispatch to the queue.
+        /// </summary>
+        /// <param name="howler">Dispatch</param>
         public void QueueHowler(IHowler howler)
         {
             ArgumentNullException.ThrowIfNull(howler);
@@ -75,45 +85,9 @@ namespace Direwolf
             howler.HuntCompleted += OnHuntCompleted;
         }
 
-        private Queue<IHowler> Howlers { get; set; } = [];
-
-        public string GetQueueInfo()
-        {
-            try
-            {
-                var howlers = new Dictionary<string, object>
-                {
-                    ["count"] = Howlers.Count.ToString() ?? ""
-                };
-
-                foreach (IHowler h in Howlers)
-                {
-                    var howler = new Dictionary<string, object>();
-                    var hw = new Dictionary<string, object>
-                    {
-                        ["wolves"] = h.Wolfpack.Count,
-                        ["catchCount"] = h.Den.Count
-                    };
-
-                    howler["name"] = h.GetType().Name;
-                    howler["metadata"] = hw;
-                    howlers["howler"] = howler;
-                }
-
-                var total = new Dictionary<string, object>
-                {
-                    ["totalHowlers"] = howlers
-                };
-                return JsonSerializer.Serialize(new Prey(total));
-            }
-            catch
-            {
-                return "";
-            }
-        }
-
-        [JsonExtensionData]
-        private WolfpackDB Queries { get; set; } = new(_default);
+        /// <summary>
+        /// Takes all the contents held inside <see cref="Queries"/>, serializes the results to a JSON file in the Desktop folder, and sends each <see cref="Wolfpack"/> to the connected database.
+        /// </summary>
         public async void SendAllToDB()
         {
             try
@@ -130,6 +104,11 @@ namespace Direwolf
             catch (Exception e) { Debug.Print(e.Message); }
         }
 
+        /// <summary>
+        /// Performs a synchronous query.
+        /// </summary>
+        /// <param name="testName">Name of the query</param>
+        /// <exception cref="Exception">Thrown whenever the hunt process encounteres a failure</exception>
         public void Hunt(string testName)
         {
             try
@@ -143,7 +122,6 @@ namespace Direwolf
                         Name = howler.GetType().Name
                     };
                     PreviousHowls.Add(h);
-                    Debug.Print("Added to queue");
                 }
             }
             catch
@@ -152,6 +130,13 @@ namespace Direwolf
             }
         }
 
+        /// <summary>
+        /// Performs a synchronous query.
+        /// </summary>
+        /// <param name="dispatch">Dispatch</param>
+        /// <param name="result">The resulting Wolfpack from the given Dispatch</param>
+        /// <param name="testName">Name of the query</param>
+        /// <exception cref="Exception">Thrown whenever the hunt process encounteres a failure</exception>
         public void Hunt(IHowler dispatch, out Wolfpack result, string testName)
         {
             try
@@ -171,9 +156,13 @@ namespace Direwolf
             }
         }
 
+        /// <summary>
+        /// Performs an asynchronous query.
+        /// </summary>
+        /// <param name="queryName">Name of the query.</param>
         public async void HuntAsync(string queryName = "query")
         {
-            AsyncHuntCompletedEventHandler += Direwolf_AsyncHuntCompletedEventHandler1;
+            AsyncHuntCompletedEventHandler += Direwolf_AsyncHuntCompletedEventHandler;
             Revit.Async.RevitTask.Initialize(_app);
             foreach (var howler in Howlers)
             {
@@ -181,17 +170,12 @@ namespace Direwolf
             }
         }
 
-        private void Direwolf_AsyncHuntCompletedEventHandler1(object? sender, EventArgs e)
-        {
-            SendAllToDB();
-        }
-
-        public async void HuntAsync(IHowler howler, string queryName = "query")
-        {
-            Revit.Async.RevitTask.Initialize(_app);
-            await HuntTask(howler, queryName);
-        }
-
+        /// <summary>
+        /// Creates a valid Revit context, takes a dispatcher from the queue, and dispatches its workers. Resulting <see cref="Wolfpack"/> are pushed to the <see cref="WolfpackDB"/> stack.
+        /// </summary>
+        /// <param name="howler">Dispatch</param>
+        /// <param name="queryName">Name of the query</param>
+        /// <returns>The execution of a query, resulting in a Wolfpack being pushed to the Query stack.</returns>
         private async Task HuntTask(IHowler howler, string queryName = "query")
         {
             try
@@ -237,6 +221,17 @@ namespace Direwolf
         {
             Debug.Print("HuntSuccessful?: " + e.IsSuccessful.ToString());
         }
+
+        private void Queries_DatabaseConnectedEventHandler(object? sender, EventArgs e)
+        {
+            Debug.Print("Database connected!");
+        }
+        private void Direwolf_AsyncHuntCompletedEventHandler(object? sender, EventArgs e)
+        {
+            SendAllToDB();
+        }
+ 
+
     }
 
 }

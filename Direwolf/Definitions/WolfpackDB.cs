@@ -4,28 +4,28 @@ using System.Diagnostics;
 
 namespace Direwolf.Definitions
 {
+    /// <summary>
+    /// PostgreSQL connection string.
+    /// </summary>
+    /// <param name="Host">Database host address</param>
+    /// <param name="Port">PostgreSQL database port</param>
+    /// <param name="Username">Database username</param>
+    /// <param name="Password">User password</param>
+    /// <param name="Database">Database name</param>
     public readonly record struct DbConnectionString(string Host, int Port, string Username, string Password, string Database) { }
 
-    public class WolfpackDB : Stack<Wolfpack>
+    /// <summary>
+    /// Stack of <see cref="Wolfpack"/> queries, ready to be sent to a database.
+    /// </summary>
+    public class WolfpackDB(DbConnectionString db) : Stack<Wolfpack>
     {
-        public event EventHandler DatabaseConnectedEventHandler;
-        private readonly DbConnectionString _str;
-
-        public WolfpackDB(DbConnectionString db)
-        {
-            _str = db;
-            DatabaseConnectedEventHandler += WolfpackDB_DatabaseConnectedEventHandler;
-        }
-
-        private void WolfpackDB_DatabaseConnectedEventHandler(object? sender, EventArgs e)
-        {
-            Debug.Print("Database Connected");
-        }
-
-        private readonly string Desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-
-
-
+        public event EventHandler? DatabaseConnectedEventHandler;
+        private readonly DbConnectionString _str = db;
+        
+        /// <summary>
+        /// Connects to a database with a schema following the <see cref="Wolfpack"/> structure, and pushes the results held inside up to the target DB.
+        /// </summary>
+        /// <returns></returns>
         public async Task Send()
         {
             DatabaseConnectedEventHandler?.Invoke(this, new EventArgs());
@@ -34,8 +34,6 @@ namespace Direwolf.Definitions
             try
             {
                 using NpgsqlConnection c = new($"Host={_str.Host};Port={_str.Port};Username={_str.Username};Password={_str.Password};Database={_str.Database}");
-
-                if (c is not null) Debug.Print("connection is not null");
 
                 DatabaseConnectedEventHandler?.Invoke(this, new EventArgs());
                 c.StateChange += C_StateChange;
@@ -47,10 +45,15 @@ namespace Direwolf.Definitions
                     c.Open();
                     await using var cmd = new NpgsqlCommand(sqlQuery, c);
                     {
-                        var resultBson = cmd.CreateParameter();
-                        resultBson.ParameterName = "result";
-                        resultBson.NpgsqlDbType = NpgsqlDbType.Json;
-                        resultBson.Value = wolfpack.Results.ToString();
+                        if (wolfpack.Results is not null)
+                        {
+                            var resultBson = cmd.CreateParameter();
+                            resultBson.ParameterName = "result";
+                            resultBson.NpgsqlDbType = NpgsqlDbType.Json;
+                            resultBson.Value = wolfpack.Results.ToString();
+                            cmd.Parameters.Add(resultBson);
+                        }
+
 
                         cmd.Parameters.AddWithValue("docName", wolfpack.DocumentName);
                         cmd.Parameters.AddWithValue("origin", wolfpack.FileOrigin);
@@ -61,10 +64,8 @@ namespace Direwolf.Definitions
                         cmd.Parameters.AddWithValue("id", wolfpack.GUID);
                         cmd.Parameters.AddWithValue("resCount", wolfpack.ResultCount);
                         cmd.Parameters.AddWithValue("name", wolfpack.TestName);
-                        cmd.Parameters.Add(resultBson);
 
                         int rowsAffected = await cmd.ExecuteNonQueryAsync();
-                        Debug.Print($"Executed query. Added {rowsAffected} rows");
                     }
                     c.Dispose();
                 }

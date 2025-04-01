@@ -10,9 +10,25 @@ namespace Direwolf.Definitions
     /// </summary>
     public record struct Wolf() : IWolf
     {
+        /// <summary>
+        /// Link to the summoner of this worker.
+        /// </summary>
         [JsonIgnore] public IHowler? Callback { get; set; }
+
+        /// <summary>
+        /// Query to be executed.
+        /// </summary>
         [JsonIgnore] public IHowl? Instruction { get; set; }
+
+        /// <summary>
+        /// Data obtained from a query.
+        /// </summary>
         [JsonPropertyName("results")] public Stack<Prey> Catches { get; set; } = []; // this is a cache for results *for a particular Wolf*
+        
+        /// <summary>
+        /// Perform the task held inside <see cref="IHowl.Execute"/>.
+        /// </summary>
+        /// <returns>True if task has been performed successfully, false if otherwise.</returns>
         public bool Run()
         {
             if (Instruction is not null)
@@ -20,7 +36,6 @@ namespace Direwolf.Definitions
                 try
                 {
                     Instruction.Callback = this; // attach to load contents back the chain.
-                    //if (Callback is null) Console.WriteLine($"Callback is null");
                     Instruction.Execute();
                     foreach (var c in Catches)
                     {
