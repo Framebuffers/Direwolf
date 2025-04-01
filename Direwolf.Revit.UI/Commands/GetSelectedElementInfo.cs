@@ -32,9 +32,25 @@ namespace Direwolf.Revit.UI.Commands
                 var s = StopTime();
                 Debug.Print($"Time taken: {s}");
                 dw.SendAllToDB();
+                TaskDialog t = new("Query Information")
+                {
+                    MainInstruction = "Query executed successfully!",
+                    MainContent = "The query has been executed. It is being processed by your database, or it has been saved as a file in your Desktop.",
+                    DefaultButton = TaskDialogResult.Ok
+                };
+                t.Show();
+
             }
-            catch
+            catch(Exception e)
             {
+                TaskDialog t = new("Query Information")
+                {
+                    MainInstruction = "Query has failed.",
+                    MainContent = $"The query has raised the following Exception: {e.Message}",
+                    DefaultButton = TaskDialogResult.Ok
+                };
+                t.Show();
+
                 return Result.Failed;
             }
 

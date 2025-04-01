@@ -309,7 +309,11 @@ namespace Direwolf.Revit.Howls
                             break;
                     }
 
-                    // Create a dictionary with the Element's metadata, and then add its parameters.
+                    /**
+                     * This code can serialize the entire model to a JSON file. However, it will export a several-hundred MB JSON file. It *will* crash the database.
+                     * 
+                     * In case you *need* to track every single Element, you'd need to implement a different database solution.
+                     * 
                     Dictionary<string, object>? elementInfo = new()
                     {
                         ["id"] = e.Id.Value,
@@ -327,7 +331,9 @@ namespace Direwolf.Revit.Howls
                             ];
 
                     SendCatchToCallback(new Prey(result));
-                    // Success!
+                    */
+
+
                 }
             }
             // view not in sheet. needs to be done after all are done.
@@ -348,23 +354,23 @@ namespace Direwolf.Revit.Howls
 
             Dictionary<string, object> results = new()
             {
-                { "viewsInsideDocument", viewsInsideDocument.Count },
-                { "notInSheets", notInSheets.Count },
-                { "annotativeElements", annotativeElements.Count },
+                { "viewsInsideDocument", viewsInsideDocument.Select(x => x.UniqueId) },
+                { "notInSheets", notInSheets.Select(x => x.UniqueId)},
+                { "annotativeElements", annotativeElements.Select(x => x.UniqueId) },
                 { "externalRefs", externalRefs.Count },
-                { "modelGroups", modelGroups.Count },
-                { "detailGroups", detailGroups.Count },
-                { "designOptions", designOptions.Count },
-                { "levels", levels.Count },
-                { "grids", grids.Count },
+                { "modelGroups", modelGroups.Select(x => x.UniqueId) },
+                { "detailGroups", detailGroups.Select(x => x.UniqueId) },
+                { "designOptions", designOptions.Select(x => x.UniqueId) },
+                { "levels", levels.Select(x => x.UniqueId) },
+                { "grids", grids.Select(x => x.UniqueId) },
                 { "warns", warns.Count },
-                { "unenclosedRoom", unenclosedRoom.Count },
-                { "viewports", viewports.Count },
-                { "unconnectedDucts", unconnectedDucts.Count },
-                { "unconnectedPipes", unconnectedPipes.Count },
+                { "unenclosedRoom", unenclosedRoom.Select(x => x.UniqueId) },
+                { "viewports", viewports.Select(x => x.UniqueId) },
+                { "unconnectedDucts", unconnectedDucts.Select(x => x.UniqueId) },
+                { "unconnectedPipes", unconnectedPipes.Select(x => x.UniqueId) },
                 { "unconnectedElectrical", unconnectedElectrical.Count },
-                { "nonNativeStyles", nonNativeStyles.Count },
-                { "isFlipped", isFlipped.Count },
+                { "nonNativeStyles", nonNativeStyles.Select(x => x.UniqueId) },
+                { "isFlipped", isFlipped.Select(x => x.UniqueId) },
                 { "worksetElementCount", worksetElementCount.Count }
             };
 

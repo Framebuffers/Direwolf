@@ -32,17 +32,18 @@ namespace Direwolf.Definitions
             DatabaseConnectedEventHandler?.Invoke(this, new EventArgs());
             string sqlQuery =
                 """INSERT INTO "Wolfpack" ("documentName", "fileOrigin", "documentVersion", "wasCompleted", "timeTaken", "createdAt", "guid", "resultCount", "testName", "results") VALUES (@docName, @origin, @version, @completed, @time, @creation, @id, @resCount, @name, @result)""";
-
             try
             {
                 using NpgsqlConnection c = new($"Host={_str.Host};Port={_str.Port};Username={_str.Username};Password={_str.Password};Database={_str.Database}");
+
                 if (c is not null) Debug.Print("connection is not null");
+                
                 DatabaseConnectedEventHandler?.Invoke(this, new EventArgs());
                 c.StateChange += C_StateChange;
                 c.Notice += C_Notice;
+                
                 while (Count > 0)
                 {
-
                     Wolfpack wolfpack = Pop();
                     string fileName = Path.Combine(Desktop, $"Queries.json");
                     File.WriteAllText(fileName, wolfpack.Results.ToString());
@@ -54,8 +55,6 @@ namespace Direwolf.Definitions
                         resultBson.ParameterName = "result";
                         resultBson.NpgsqlDbType = NpgsqlDbType.Json;
                         resultBson.Value = wolfpack.Results.ToString();
-                        Debug.Print(wolfpack.Results.ToString());
-                        Debug.Print(wolfpack.Results.ToString());
     
                         cmd.Parameters.AddWithValue("docName", wolfpack.DocumentName);
                         cmd.Parameters.AddWithValue("origin", wolfpack.FileOrigin);

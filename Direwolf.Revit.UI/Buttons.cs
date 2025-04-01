@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.UI;
+using System.Windows.Media.Imaging;
 
 namespace Direwolf.Revit.UI
 {
@@ -17,6 +18,7 @@ namespace Direwolf.Revit.UI
         public static PushButton? AddGetInfoButton(RibbonPanel? rp)
         {
             PushButtonData b = new("direwolfInfo", "About", Libraries.References.AssemblyLocation, "Direwolf.Revit.UI.Commands.GetInfo");
+            b.Image = new BitmapImage(new Uri("/about.png", UriKind.Relative));
             return rp?.AddItem(b) as PushButton;
         }
     }
