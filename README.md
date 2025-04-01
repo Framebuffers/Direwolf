@@ -1,3 +1,5 @@
+<img width="256" alt="dwolf-r2-512" class="center" src="https://github.com/user-attachments/assets/24707a0a-4212-4442-b4a3-33b61aade71e" />
+
 # 🐺 Direwolf
 
 A data analysis framework for Autodesk Revit. Extracts, serialises and stores parameters from BIM models in fractions of a second.
@@ -7,6 +9,21 @@ This project requires [the direwolf-db container](https://github.com/Framebuffer
 
 ⚠️ **This is not a finalised product!** ⚠️
 This is a proof-of-concept. It may be subject to change and implementation details may change in the future.
+
+## ⚙️ Installation
+- Uncompress the file on `C:\ProgramData\Autodesk\Revit\Addins\2025`.
+- Make sure `Direwolf.addin` is alongside the other `*.addin` files.
+
+A message with the follow message will appear:
+
+![image](https://github.com/user-attachments/assets/9792ba64-a3bd-4b13-849b-c111baca18ba)
+
+Press `Always Load` (or `Load Once`), and it will load.
+
+- Click on the `Add-In` tab.
+- The buttons for each test will be on the Database tray.
+
+![image](https://github.com/user-attachments/assets/cd049d3b-f029-4a70-adfb-73ab5ad667ae)
 
 ## ℹ️ What is in this repository?
 
