@@ -15,7 +15,7 @@ namespace Direwolf.Revit.UI.Commands
     /// </summary>
     [Transaction(TransactionMode.Manual)]
 
-    public partial class GetModelInfo : DirewolfRevitCommand
+    public partial class GetDocumentInfo : DirewolfRevitCommand
     {
         public override Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
@@ -26,10 +26,10 @@ namespace Direwolf.Revit.UI.Commands
             {
                 RevitTask.Initialize(commandData.Application);
                 RevitHowler rh = new();
-                rh.CreateWolf(new Wolf(), new GetModelSnapshot(doc));
+                rh.CreateWolf(new Wolf(), new GetDocumentIntrospection(doc));
                 Direwolf dw = new(commandData.Application);
                 dw.QueueHowler(rh);
-                dw.HuntAsync("ModelInfo");
+                dw.HuntAsync("DocumentInfo");
                 dw.SendAllToDB();
 
                 TaskDialog t = new("Query Information")

@@ -1,9 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Direwolf.Definitions;
-using Direwolf.Revit.Extensions;
 using Direwolf.Revit.Howls;
-using Direwolf.Revit.Definitions;
 using Direwolf.Revit.Utilities;
 
 namespace Direwolf.Revit.Introspection

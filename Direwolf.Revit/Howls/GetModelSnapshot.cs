@@ -3,9 +3,6 @@ using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
 using Direwolf.Definitions;
-using Direwolf.Revit.Commands.NativeCommands;
-using Direwolf.Revit.Definitions;
-using Direwolf.Revit.Extensions;
 using Direwolf.Revit.Utilities;
 using ElementType = Autodesk.Revit.DB.ElementType;
 

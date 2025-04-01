@@ -1,11 +1,5 @@
 ﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Architecture;
-using Autodesk.Revit.DB.Mechanical;
-using Autodesk.Revit.DB.Plumbing;
 using Direwolf.Revit.Definitions;
-using Direwolf.Revit.Utilities;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace Direwolf.Revit.Extensions
 {

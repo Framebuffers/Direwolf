@@ -6,7 +6,6 @@ using Direwolf.Revit.Howlers;
 using Revit.Async;
 using Direwolf.Definitions;
 using Direwolf.Revit.Introspection;
-using Direwolf.Revit.Definitions;
 
 namespace Direwolf.Revit.UI.Commands
 {

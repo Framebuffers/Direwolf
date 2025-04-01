@@ -1,5 +1,4 @@
 ﻿using Autodesk.Revit.UI;
-using System.Windows.Media.Imaging;
 
 namespace Direwolf.Revit.UI
 {
@@ -20,7 +19,11 @@ namespace Direwolf.Revit.UI
             PushButtonData modelInfo = new("modelToDB", "Send Model to DB", Libraries.References.AssemblyLocation, "Direwolf.Revit.UI.Commands.GetModelInfo");
 
             PushButtonData aboutInfo = new("direwolfInfo", "About", Libraries.References.AssemblyLocation, "Direwolf.Revit.UI.Commands.GetInfo");
-            rp.AddStackedItems(elementInfo, modelInfo, aboutInfo);
+
+            //PushButtonData documentInfo = new("documentInfo", "Get Document Info", Libraries.References.AssemblyLocation, "Direwolf.Revit.UI.Commands.GetDocumentInfo");
+
+            rp.AddStackedItems(modelInfo, elementInfo);
+            rp.AddItem(aboutInfo);
             
 
             return Result.Succeeded;
