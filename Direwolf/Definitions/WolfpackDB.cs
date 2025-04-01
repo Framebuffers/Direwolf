@@ -36,17 +36,14 @@ namespace Direwolf.Definitions
                 using NpgsqlConnection c = new($"Host={_str.Host};Port={_str.Port};Username={_str.Username};Password={_str.Password};Database={_str.Database}");
 
                 if (c is not null) Debug.Print("connection is not null");
-                
+
                 DatabaseConnectedEventHandler?.Invoke(this, new EventArgs());
                 c.StateChange += C_StateChange;
                 c.Notice += C_Notice;
-                
+
                 while (Count > 0)
                 {
                     Wolfpack wolfpack = Pop();
-                    string fileName = Path.Combine(Desktop, $"Queries.json");
-                    File.WriteAllText(fileName, wolfpack.Results.ToString());
-
                     c.Open();
                     await using var cmd = new NpgsqlCommand(sqlQuery, c);
                     {
@@ -54,7 +51,7 @@ namespace Direwolf.Definitions
                         resultBson.ParameterName = "result";
                         resultBson.NpgsqlDbType = NpgsqlDbType.Json;
                         resultBson.Value = wolfpack.Results.ToString();
-    
+
                         cmd.Parameters.AddWithValue("docName", wolfpack.DocumentName);
                         cmd.Parameters.AddWithValue("origin", wolfpack.FileOrigin);
                         cmd.Parameters.AddWithValue("version", wolfpack.DocumentVersion);

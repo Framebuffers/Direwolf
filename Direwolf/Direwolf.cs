@@ -20,8 +20,6 @@ namespace Direwolf
         /// </summary>
         private static readonly DbConnectionString _default = new("localhost", 5432, "wolf", "awoo", "direwolf");
 
-        
-        
         private readonly UIApplication? _app;
         private List<HowlId> PreviousHowls = [];
 
@@ -118,7 +116,18 @@ namespace Direwolf
         private WolfpackDB Queries { get; set; } = new(_default);
         public async void SendAllToDB()
         {
-            try { await Queries.Send(); } catch (Exception e) { Debug.Print(e.Message); }
+            try
+            {
+                foreach (var q in Queries)
+                {
+                    string fileName = Path.Combine(Desktop, $"Queries.json");
+                    File.WriteAllText(fileName, q.Results.ToString());
+                }
+                Debug.Print(Queries.Count.ToString());
+
+                await Queries.Send();
+            }
+            catch (Exception e) { Debug.Print(e.Message); }
         }
 
         public void Hunt(string testName)
