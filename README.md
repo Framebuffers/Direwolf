@@ -193,6 +193,6 @@ This project is entirely made on my own, relying heavily on [Revit.Async](https:
 
 ### 🤝 Thanks
 
-Thanks for all the people that have helped me get this far in this lonely journey. Special thanks to Luis for giving me the greatest privilege in the world of letting me learn to do this.
+Thanks for all the people that have helped me get this far in this lonely journey. Special thanks to Luis for giving me the greatest privilege in the world of letting me learn to do this; and to Rodrigo, without his help I wouldn't be here.
 
 I’m open to any offer for employment— be it as a software engineer or inside BIM. If anyone’s interested, I’d like to get in touch!
