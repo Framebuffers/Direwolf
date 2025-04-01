@@ -13,23 +13,16 @@ namespace Direwolf.Revit.UI
     {
         public Result OnStartup(UIControlledApplication application)
         {
-            RibbonPanel rp = application.CreateRibbonPanel("Direwolf");
+             RibbonPanel rp = application.CreateRibbonPanel("Database");
 
-            PushButtonData modelInfo = new("modelToDB", "Send Model to DB", Libraries.References.AssemblyLocation, "Direwolf.Revit.UI.Commands.GetModelInfo")
-            {
-                Image = new BitmapImage(new Uri("/model.png", UriKind.Relative))
-            };
+            PushButtonData elementInfo = new("elementToDB", "Send Element to DB", Libraries.References.AssemblyLocation, "Direwolf.Revit.UI.Commands.GetSelectedElementInfo");
 
-            PushButtonData elementInfo = new("elementToDB", "Send Element to DB", Libraries.References.AssemblyLocation, "Direwolf.Revit.UI.Commands.GetSelectedElementInfo")
-            {
-                Image = new BitmapImage(new Uri("/element.png", UriKind.Relative))
-            };
+            PushButtonData modelInfo = new("modelToDB", "Send Model to DB", Libraries.References.AssemblyLocation, "Direwolf.Revit.UI.Commands.GetModelInfo");
 
-            PushButtonData aboutInfo = new("direwolfInfo", "About", Libraries.References.AssemblyLocation, "Direwolf.Revit.UI.Commands.GetInfo")
-            {
-                Image = new BitmapImage(new Uri("/about.png", UriKind.Relative))
-            };
-            rp.AddStackedItems(modelInfo, elementInfo, aboutInfo);
+            PushButtonData aboutInfo = new("direwolfInfo", "About", Libraries.References.AssemblyLocation, "Direwolf.Revit.UI.Commands.GetInfo");
+            rp.AddStackedItems(elementInfo, modelInfo, aboutInfo);
+            
+
             return Result.Succeeded;
         }
 

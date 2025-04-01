@@ -37,10 +37,12 @@ public class GetElementInfo : IExternalCommand
         try
         {
             Dictionary<string, List<Dictionary<string, object>>> Catches = [];
-            ICollection<Element> allValidElements = new FilteredElementCollector(RevitDocument)
+            IEnumerable<Element> allValidElements = new FilteredElementCollector(RevitDocument)
                 .WhereElementIsNotElementType()
                 .WhereElementIsViewIndependent()
-                .ToElements();
+                .ToElements()
+                .Select(x => x.Document.GetElement(x.Id));
+
             Dictionary<string, List<Element>> elementsSortedByFamily = [];
 
             foreach ((Element e, string familyName) in from Element e in allValidElements

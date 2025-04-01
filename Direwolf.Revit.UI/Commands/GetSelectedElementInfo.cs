@@ -23,6 +23,20 @@ namespace Direwolf.Revit.UI.Commands
             Document doc = commandData.Application.ActiveUIDocument.Document;
             try
             {
+                if (commandData.Application.ActiveUIDocument.Selection.GetElementIds().Count == 0)
+                {
+                    TaskDialog f = new("Query Information")
+                    {
+                        MainInstruction = "No elements have been selected",
+                        MainContent = $"Select an element and try again.",
+                        CommonButtons = TaskDialogCommonButtons.Close,
+                        DefaultButton = TaskDialogResult.Close
+
+                    };
+                    f.Show();
+                    return Result.Failed;
+                }
+
                 RevitTask.Initialize(commandData.Application);
                 RevitHowler rh = new();
                 rh.CreateWolf(new Wolf(), new ElementSnapshot(doc, commandData.Application));
@@ -38,7 +52,6 @@ namespace Direwolf.Revit.UI.Commands
                     MainContent = "The query has been executed. It is being processed by your database, or it has been saved as a file in your Desktop.",
                     CommonButtons = TaskDialogCommonButtons.Close,
                     DefaultButton = TaskDialogResult.Close
-
                 };
                 t.Show();
 

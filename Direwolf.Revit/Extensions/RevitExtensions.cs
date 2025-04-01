@@ -6,7 +6,5 @@ namespace Direwolf.Revit.Utilities
     internal static class RevitExtensions
     {
         public static Document GetDocument(this ExternalCommandData cmd) => cmd.Application.ActiveUIDocument.Document;
-
-        public static UIApplication GetUIApp(this ExternalCommandData cmd) => cmd.Application;
     }
 }
