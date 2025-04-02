@@ -10,6 +10,10 @@ This project requires [the direwolf-db container](https://github.com/Framebuffer
 ⚠️ **This is not a finalised product!** ⚠️
 This is a proof-of-concept. It may be subject to change and implementation details may change in the future.
 
+## ✅ Changelog
+- **v0.1-alpha: Proof of concept. Users have been experiencing problems setting it up. I am working right now for a patch to make it easier to get up and running, as well as a working binary. If you want it to work right now, **make sure the DLL's from the `Direwolf.Revit.UI\Libraries` folder are in the same place as the rest of Direwolf's DLL's. The solution file + `.csproj` should do this automatically. I am aware of the issues and I'm working to sort them out. Thanks for the feedback!
+
+
 ## ⚙️ Installation
 - Uncompress the file on `C:\ProgramData\Autodesk\Revit\Addins\2025`.
 - Make sure `Direwolf.addin` is alongside the other `*.addin` files.
