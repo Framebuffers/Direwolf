@@ -1,24 +1,24 @@
 ﻿using Autodesk.Revit.DB;
 using Direwolf.Definitions;
 
-namespace Direwolf.Revit.Howls
+namespace Direwolf.Revit.Howls;
+
+public record class GetLevelCount : RevitHowl
 {
-    public record class GetLevelCount : RevitHowl
+    public GetLevelCount(Document doc)
     {
-        public GetLevelCount(Document doc) => SetRevitDocument(doc);
-        public override bool Execute()
+        SetRevitDocument(doc);
+    }
+
+    public override bool Execute()
+    {
+        var d = new Dictionary<string, object>
         {
-            var d = new Dictionary<string, object>()
-            {
-                ["levels"] = new FilteredElementCollector(GetRevitDocument())
+            ["levels"] = new FilteredElementCollector(GetRevitDocument())
                 .OfClass(typeof(Level))
                 .GetElementCount()
-            };
-            SendCatchToCallback(new Prey(d));
-            return true;
-
-
-        }            
- 
+        };
+        SendCatchToCallback(new Prey(d));
+        return true;
     }
 }

@@ -1,9 +1,11 @@
 ﻿using Autodesk.Revit.DB;
 
-namespace Direwolf.Revit.Howls
+namespace Direwolf.Revit.Howls;
+
+public record class GetFamilyIntrospection : RevitHowl
 {
-    public record class GetFamilyIntrospection : RevitHowl
+    public GetFamilyIntrospection(Document doc)
     {
-        public GetFamilyIntrospection(Document doc) => SetRevitDocument(doc);
+        SetRevitDocument(doc);
     }
 }

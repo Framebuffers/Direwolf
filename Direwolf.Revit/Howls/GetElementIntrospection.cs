@@ -1,9 +1,11 @@
 ﻿using Autodesk.Revit.DB;
 
-namespace Direwolf.Revit.Howls
+namespace Direwolf.Revit.Howls;
+
+public record class GetElementIntrospection : RevitHowl
 {
-    public record class GetElementIntrospection : RevitHowl
+    public GetElementIntrospection(Document doc)
     {
-        public GetElementIntrospection(Document doc) => SetRevitDocument(doc);
+        SetRevitDocument(doc);
     }
 }

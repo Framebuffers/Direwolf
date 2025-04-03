@@ -1,43 +1,42 @@
 ﻿using Autodesk.Revit.DB;
 using Direwolf.Definitions;
 
-namespace Direwolf.Revit.Howls
+namespace Direwolf.Revit.Howls;
+
+public record class GetFamilyCount : RevitHowl
 {
-    public record class GetFamilyCount : RevitHowl
+    public GetFamilyCount(Document doc)
     {
-        public GetFamilyCount(Document doc) => SetRevitDocument(doc);
-        public override bool Execute()
+        SetRevitDocument(doc);
+    }
+
+    public override bool Execute()
+    {
+        using FilteredElementCollector familyCollector = new(GetRevitDocument());
+
+        Dictionary<string, int> familyCounts = [];
+
+        foreach (Family family in familyCollector)
         {
-            using FilteredElementCollector familyCollector = new(GetRevitDocument());
+            ICollection<ElementId> familyTypeIds = family.GetFamilySymbolIds();
+            var count = 0;
 
-            Dictionary<string, int> familyCounts = [];
+            foreach (var typeId in familyTypeIds)
+                count += new FilteredElementCollector(GetRevitDocument())
+                    .OfCategoryId(family.FamilyCategory.Id)
+                    .WhereElementIsNotElementType()
+                    .Where(e => e.GetTypeId() == typeId)
+                    .ToList()
+                    .Count;
 
-            foreach (Family family in familyCollector)
-            {
-                ICollection<ElementId> familyTypeIds = family.GetFamilySymbolIds();
-                int count = 0;
-
-                foreach (ElementId typeId in familyTypeIds)
-                {
-                    count += new FilteredElementCollector(GetRevitDocument())
-                        .OfCategoryId(family.FamilyCategory.Id)
-                        .WhereElementIsNotElementType()
-                        .Where(e => e.GetTypeId() == typeId)
-                        .ToList()
-                        .Count;
-                }
-
-                familyCounts[family.Name] = count;
-            }
-
-            var d = new Dictionary<string, object>()
-            {
-                ["familyCount"] = familyCounts
-            };
-            SendCatchToCallback(new Prey(d));
-            return true;
-
-
+            familyCounts[family.Name] = count;
         }
+
+        var d = new Dictionary<string, object>
+        {
+            ["familyCount"] = familyCounts
+        };
+        SendCatchToCallback(new Prey(d));
+        return true;
     }
 }

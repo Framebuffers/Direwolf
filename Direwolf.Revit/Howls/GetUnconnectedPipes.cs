@@ -2,50 +2,44 @@
 using Autodesk.Revit.DB.Plumbing;
 using Direwolf.Definitions;
 
-namespace Direwolf.Revit.Howls
+namespace Direwolf.Revit.Howls;
+
+public record class GetUnconnectedPipes : RevitHowl
 {
-    public record class GetUnconnectedPipes : RevitHowl
+    public GetUnconnectedPipes(Document doc)
     {
-        public GetUnconnectedPipes(Document doc) => SetRevitDocument(doc);
-        public override bool Execute()
-        {
-            using FilteredElementCollector pipeCollector = new FilteredElementCollector(GetRevitDocument())
-                            .OfCategory(BuiltInCategory.OST_PipeCurves)
-                            .WhereElementIsNotElementType();
+        SetRevitDocument(doc);
+    }
 
-            List<string> unconnectedPipes = [];
+    public override bool Execute()
+    {
+        using var pipeCollector = new FilteredElementCollector(GetRevitDocument())
+            .OfCategory(BuiltInCategory.OST_PipeCurves)
+            .WhereElementIsNotElementType();
 
-            foreach (Element pipeElement in pipeCollector)
+        List<string> unconnectedPipes = [];
+
+        foreach (var pipeElement in pipeCollector)
+            if (pipeElement is Pipe pipe)
             {
-                if (pipeElement is Pipe pipe)
-                {
-                    bool isUnconnected = false;
+                var isUnconnected = false;
 
-                    ConnectorSet connectors = pipe.ConnectorManager.Connectors;
-                    foreach (Connector connector in connectors)
+                var connectors = pipe.ConnectorManager.Connectors;
+                foreach (Connector connector in connectors)
+                    if (!connector.IsConnected)
                     {
-                        if (!connector.IsConnected)
-                        {
-                            isUnconnected = true;
-                            break;
-                        }
+                        isUnconnected = true;
+                        break;
                     }
 
-                    if (isUnconnected)
-                    {
-                        unconnectedPipes.Add($"Pipe Name: {pipe.Name}, Pipe ID: {pipe.Id}");
-                    }
-                }
+                if (isUnconnected) unconnectedPipes.Add($"Pipe Name: {pipe.Name}, Pipe ID: {pipe.Id}");
             }
 
-            var d = new Dictionary<string, object>()
-            {
-                ["unconnectedPipes"] = unconnectedPipes
-            };
-            SendCatchToCallback(new Prey(d));
-            return true;
-
-
-        }
+        var d = new Dictionary<string, object>
+        {
+            ["unconnectedPipes"] = unconnectedPipes
+        };
+        SendCatchToCallback(new Prey(d));
+        return true;
     }
 }

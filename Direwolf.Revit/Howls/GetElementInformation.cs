@@ -1,54 +1,59 @@
 ﻿using Autodesk.Revit.DB;
 using Direwolf.Definitions;
 
-namespace Direwolf.Revit.Howls
+namespace Direwolf.Revit.Howls;
+
+public record class GetElementInformation : RevitHowl
 {
-    public record class GetElementInformation : RevitHowl
+    public GetElementInformation(Document doc)
     {
-        public GetElementInformation(Document doc) => SetRevitDocument(doc);
-        
-        private static Prey ProcessParameterMap(Element element)
+        SetRevitDocument(doc);
+    }
+
+    private static Prey ProcessParameterMap(Element element)
+    {
+        try
         {
-            try
+            Dictionary<string, object> results = [];
+            var ps = element.Parameters;
+            foreach (Parameter p in ps)
             {
-                Dictionary<string, object> results = [];
-                ParameterSet ps = element.Parameters;
-                foreach (Parameter p in ps)
+                string GetValue()
                 {
-                    string GetValue()
+                    return p.StorageType switch
                     {
-                        return p.StorageType switch
-                        {
-                            StorageType.None => "None",
-                            StorageType.Integer => p.AsInteger().ToString(),
-                            StorageType.Double => p.AsDouble().ToString(),
-                            StorageType.String => p.AsString(),
-                            StorageType.ElementId => p.AsElementId().ToString(),
-                            _ => "None",
-                        };
-                    }
-
-                    Dictionary<string, string> data = new()
-                    {
-                        ["id"] = p.GUID.ToString(),
-                        ["type"] = p.GetTypeId().TypeId,
-                        ["hasValue"] = p.HasValue.ToString(),
-                        ["value"] = GetValue()
-
+                        StorageType.None => "None",
+                        StorageType.Integer => p.AsInteger().ToString(),
+                        StorageType.Double => p.AsDouble().ToString(),
+                        StorageType.String => p.AsString(),
+                        StorageType.ElementId => p.AsElementId().ToString(),
+                        _ => "None"
                     };
-                    results.Add(p.Definition.Name, results);
                 }
-                return new Prey(results);
-            }
-            catch
-            {
-                return new Prey();
-            }
-        }
 
-        private static Prey ExtractElementData(Element element) => new(new Dictionary<string, object>
+                Dictionary<string, string> data = new()
+                {
+                    ["id"] = p.GUID.ToString(),
+                    ["type"] = p.GetTypeId().TypeId,
+                    ["hasValue"] = p.HasValue.ToString(),
+                    ["value"] = GetValue()
+                };
+                results.Add(p.Definition.Name, results);
+            }
+
+            return new Prey(results);
+        }
+        catch
         {
-            [element.Id.ToString()] = new Dictionary<string, object>()
+            return new Prey();
+        }
+    }
+
+    private static Prey ExtractElementData(Element element)
+    {
+        return new Prey(new Dictionary<string, object>
+        {
+            [element.Id.ToString()] = new Dictionary<string, object>
             {
                 ["uniqueId"] = element.UniqueId ?? 0.ToString(),
                 ["versionGuid"] = element.VersionGuid.ToString(),
@@ -56,57 +61,54 @@ namespace Direwolf.Revit.Howls
                 ["data"] = ProcessParameterMap(element)
             }
         });
+    }
 
-        public override bool Execute()
+    public override bool Execute()
+    {
+        try
         {
-            try
-            {
-                Dictionary<string, List<Prey>> Catches = [];
-                ICollection<Element> allValidElements = new FilteredElementCollector(GetRevitDocument())
-                    .WhereElementIsNotElementType()
-                    .WhereElementIsViewIndependent()
-                    .ToElements();
-                Dictionary<string, List<Element>> elementsSortedByFamily = [];
+            Dictionary<string, List<Prey>> Catches = [];
+            ICollection<Element> allValidElements = new FilteredElementCollector(GetRevitDocument())
+                .WhereElementIsNotElementType()
+                .WhereElementIsViewIndependent()
+                .ToElements();
+            Dictionary<string, List<Element>> elementsSortedByFamily = [];
 
-                foreach ((Element e, string familyName) in from Element e in allValidElements
-                                                           let f = e as FamilyInstance
-                                                           where f is not null
-                                                           let familyName = f.Symbol.Family.Name
-                                                           select (e, familyName))
+            foreach (var (e, familyName) in from Element e in allValidElements
+                     let f = e as FamilyInstance
+                     where f is not null
+                     let familyName = f.Symbol.Family.Name
+                     select (e, familyName))
+            {
+                if (!elementsSortedByFamily.TryGetValue(familyName, out List<Element>? value))
                 {
-                    if (!elementsSortedByFamily.TryGetValue(familyName, out List<Element>? value))
-                    {
-                        value = [];
-                        elementsSortedByFamily[familyName] = value;
-                    }
-                    value.Add(e);
+                    value = [];
+                    elementsSortedByFamily[familyName] = value;
                 }
 
-                foreach (KeyValuePair<string, List<Element>> family in elementsSortedByFamily)
-                {
-                    List<Prey> elementData = [];
-                    elementData.AddRange(family.Value.Select(ExtractElementData));
-
-                    if (Catches.TryGetValue(family.Key, out List<Prey>? existingElementData))
-                    {
-                        existingElementData.AddRange(elementData);
-                    }
-                    else
-                    {
-                        Catches[family.Key] = elementData;
-                    }
-                }
-
-               SendCatchToCallback(new Prey(new Dictionary<string, object>()
-                {
-                    ["elementData"] = Catches
-                }));
-                return true;
+                value.Add(e);
             }
-            catch (Exception e)
+
+            foreach (KeyValuePair<string, List<Element>> family in elementsSortedByFamily)
             {
-                return false;
+                List<Prey> elementData = [];
+                elementData.AddRange(family.Value.Select(ExtractElementData));
+
+                if (Catches.TryGetValue(family.Key, out var existingElementData))
+                    existingElementData.AddRange(elementData);
+                else
+                    Catches[family.Key] = elementData;
             }
+
+            SendCatchToCallback(new Prey(new Dictionary<string, object>
+            {
+                ["elementData"] = Catches
+            }));
+            return true;
+        }
+        catch (Exception e)
+        {
+            return false;
         }
     }
 }

@@ -2,50 +2,44 @@
 using Autodesk.Revit.DB.Mechanical;
 using Direwolf.Definitions;
 
-namespace Direwolf.Revit.Howls
+namespace Direwolf.Revit.Howls;
+
+public record class GetUnconnectedDucts : RevitHowl
 {
-    public record class GetUnconnectedDucts : RevitHowl
+    public GetUnconnectedDucts(Document doc)
     {
-        public GetUnconnectedDucts(Document doc) => SetRevitDocument(doc);
-        public override bool Execute()
-        {
-            using FilteredElementCollector ductCollector = new FilteredElementCollector(GetRevitDocument())
-                           .OfCategory(BuiltInCategory.OST_DuctCurves)
-                           .WhereElementIsNotElementType();
+        SetRevitDocument(doc);
+    }
 
-            List<string> unconnectedDucts = [];
+    public override bool Execute()
+    {
+        using var ductCollector = new FilteredElementCollector(GetRevitDocument())
+            .OfCategory(BuiltInCategory.OST_DuctCurves)
+            .WhereElementIsNotElementType();
 
-            foreach (Element ductElement in ductCollector)
+        List<string> unconnectedDucts = [];
+
+        foreach (var ductElement in ductCollector)
+            if (ductElement is Duct duct)
             {
-                if (ductElement is Duct duct)
-                {
-                    bool isUnconnected = false;
+                var isUnconnected = false;
 
-                    ConnectorSet connectors = duct.ConnectorManager.Connectors;
-                    foreach (Connector connector in connectors)
+                var connectors = duct.ConnectorManager.Connectors;
+                foreach (Connector connector in connectors)
+                    if (!connector.IsConnected)
                     {
-                        if (!connector.IsConnected)
-                        {
-                            isUnconnected = true;
-                            break;
-                        }
+                        isUnconnected = true;
+                        break;
                     }
 
-                    if (isUnconnected)
-                    {
-                        unconnectedDucts.Add($"Duct Name: {duct.Name}, Duct ID: {duct.Id}");
-                    }
-                }
+                if (isUnconnected) unconnectedDucts.Add($"Duct Name: {duct.Name}, Duct ID: {duct.Id}");
             }
 
-            var d = new Dictionary<string, object>()
-            {
-                ["unconnectedDucts"] = unconnectedDucts
-            };
-            SendCatchToCallback(new Prey(d));
-            return true;
-
-
-        }
+        var d = new Dictionary<string, object>
+        {
+            ["unconnectedDucts"] = unconnectedDucts
+        };
+        SendCatchToCallback(new Prey(d));
+        return true;
     }
 }

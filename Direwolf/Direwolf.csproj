@@ -1,53 +1,53 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <PlatformTarget>x64</PlatformTarget>
-	<ProduceReferenceAssembly>true</ProduceReferenceAssembly>
-	<CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <PlatformTarget>x64</PlatformTarget>
+        <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+        <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <NoWarn>1701;1702;MSB3277</NoWarn>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <NoWarn>1701;1702;MSB3277</NoWarn>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <NoWarn>1701;1702;MSB3277</NoWarn>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <NoWarn>1701;1702;MSB3277</NoWarn>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Contracts\Dynamics\**" />
-    <Compile Remove="Definitions\Dynamics\**" />
-    <Compile Remove="ManifestGenerator\**" />
-    <EmbeddedResource Remove="Contracts\Dynamics\**" />
-    <EmbeddedResource Remove="Definitions\Dynamics\**" />
-    <EmbeddedResource Remove="ManifestGenerator\**" />
-    <None Remove="Contracts\Dynamics\**" />
-    <None Remove="Definitions\Dynamics\**" />
-    <None Remove="ManifestGenerator\**" />
-  </ItemGroup>
+    <ItemGroup>
+        <Compile Remove="Contracts\Dynamics\**"/>
+        <Compile Remove="Definitions\Dynamics\**"/>
+        <Compile Remove="ManifestGenerator\**"/>
+        <EmbeddedResource Remove="Contracts\Dynamics\**"/>
+        <EmbeddedResource Remove="Definitions\Dynamics\**"/>
+        <EmbeddedResource Remove="ManifestGenerator\**"/>
+        <None Remove="Contracts\Dynamics\**"/>
+        <None Remove="Definitions\Dynamics\**"/>
+        <None Remove="ManifestGenerator\**"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <Compile Remove="Reaper.cs" />
-  </ItemGroup>
+    <ItemGroup>
+        <Compile Remove="Reaper.cs"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Autodesk.Revit.SDK" Version="2025.0.2.419" />
-    <PackageReference Include="MongoDB.Bson" Version="3.3.0" />
-    <PackageReference Include="Newtonsoft.Json.Bson" Version="1.0.3" />
-    <PackageReference Include="Npgsql" Version="9.0.3">
-    </PackageReference>
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
-    <PackageReference Include="Revit.Async" Version="2.1.1" />
-    <PackageReference Include="System.Xml.XDocument" Version="4.3.0" />
-    <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Autodesk.Revit.SDK" Version="2025.0.2.419"/>
+        <PackageReference Include="MongoDB.Bson" Version="3.3.0"/>
+        <PackageReference Include="Newtonsoft.Json.Bson" Version="1.0.3"/>
+        <PackageReference Include="Npgsql" Version="9.0.3">
+        </PackageReference>
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0"/>
+        <PackageReference Include="Revit.Async" Version="2.1.1"/>
+        <PackageReference Include="System.Xml.XDocument" Version="4.3.0"/>
+        <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0"/>
+    </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy /E /Q /Y  $(TargetDir)*.* %25ProgramData%25\Autodesk\Revit\Addins\2025\Direwolf\*.*" />
-  </Target>
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+        <Exec Command="xcopy /E /Q /Y  $(TargetDir)*.* %25ProgramData%25\Autodesk\Revit\Addins\2025\Direwolf\*.*"/>
+    </Target>
 
 </Project>

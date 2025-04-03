@@ -1,45 +1,40 @@
 ﻿using Autodesk.Revit.DB;
 using Direwolf.Definitions;
 
-namespace Direwolf.Revit.Howls
+namespace Direwolf.Revit.Howls;
+
+public record class GetUnusedFamilies : RevitHowl
 {
-    public record class GetUnusedFamilies : RevitHowl
+    public GetUnusedFamilies(Document doc)
     {
-        public GetUnusedFamilies(Document doc) => SetRevitDocument(doc);
-        public override bool Execute()
-        {
-            using FilteredElementCollector familyCollector = new FilteredElementCollector(GetRevitDocument())
-                            .OfClass(typeof(Family));
+        SetRevitDocument(doc);
+    }
 
-            List<string> unusedFamilies = [];
+    public override bool Execute()
+    {
+        using var familyCollector = new FilteredElementCollector(GetRevitDocument())
+            .OfClass(typeof(Family));
 
-            foreach (Family family in familyCollector.Cast<Family>())
+        List<string> unusedFamilies = [];
+
+        foreach (var family in familyCollector.Cast<Family>())
+            try
             {
-                try
-                {
-                    using FilteredElementCollector instanceCollector = new FilteredElementCollector(GetRevitDocument())
-                        .OfCategory(family.Category.BuiltInCategory)
-                        .WhereElementIsNotElementType();
+                using var instanceCollector = new FilteredElementCollector(GetRevitDocument())
+                    .OfCategory(family.Category.BuiltInCategory)
+                    .WhereElementIsNotElementType();
 
-                    if (!instanceCollector.Any())
-                    {
-                        unusedFamilies.Add(family.Name);
-                    }
-                }
-                catch
-                {
-                    continue;
-                }
+                if (!instanceCollector.Any()) unusedFamilies.Add(family.Name);
+            }
+            catch
+            {
             }
 
-            var d = new Dictionary<string, object>()
-            {
-                ["unusedFamilies"] = unusedFamilies
-            };
-            SendCatchToCallback(new Prey(d));
-            return true;
-
-
-        }
+        var d = new Dictionary<string, object>
+        {
+            ["unusedFamilies"] = unusedFamilies
+        };
+        SendCatchToCallback(new Prey(d));
+        return true;
     }
 }

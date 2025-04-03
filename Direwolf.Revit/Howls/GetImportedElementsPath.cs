@@ -1,35 +1,36 @@
 ﻿using Autodesk.Revit.DB;
 using Direwolf.Definitions;
 
-namespace Direwolf.Revit.Howls
+namespace Direwolf.Revit.Howls;
+
+public record class GetImportedElementsPath : RevitHowl
 {
-    public record class GetImportedElementsPath : RevitHowl
+    public GetImportedElementsPath(Document doc)
     {
-        public GetImportedElementsPath(Document doc) => SetRevitDocument(doc);
-        public override bool Execute()
+        SetRevitDocument(doc);
+    }
+
+    public override bool Execute()
+    {
+        using FilteredElementCollector filteredElementCollector = new(GetRevitDocument());
+        ICollection<Element> importedElements = filteredElementCollector
+            .OfClass(typeof(ImportInstance))
+            .WhereElementIsNotElementType()
+            .ToList();
+
+        var results = new Dictionary<string, string>();
+        foreach (var element in importedElements)
         {
-            using FilteredElementCollector filteredElementCollector = new(GetRevitDocument());
-            ICollection<Element> importedElements = filteredElementCollector
-                .OfClass(typeof(ImportInstance))
-                .WhereElementIsNotElementType()
-                .ToList();
-
-            var results = new Dictionary<string, string>();
-            foreach (Element element in importedElements)
-            {
-                using Parameter pathParam = element.get_Parameter(BuiltInParameter.IMPORT_SYMBOL_NAME);
-                string filePath = pathParam != null ? pathParam.AsString() : "Unknown Path";
-                results[element.UniqueId] = filePath;
-            }
-
-            var d = new Dictionary<string, object>()
-            {
-                ["importedElements"] = results
-            };
-            SendCatchToCallback(new Prey(d));
-            return true;
-
-
+            using var pathParam = element.get_Parameter(BuiltInParameter.IMPORT_SYMBOL_NAME);
+            var filePath = pathParam != null ? pathParam.AsString() : "Unknown Path";
+            results[element.UniqueId] = filePath;
         }
+
+        var d = new Dictionary<string, object>
+        {
+            ["importedElements"] = results
+        };
+        SendCatchToCallback(new Prey(d));
+        return true;
     }
 }

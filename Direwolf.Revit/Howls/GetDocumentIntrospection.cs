@@ -1,27 +1,29 @@
 ﻿using Autodesk.Revit.DB;
-using Direwolf.Revit.Definitions;
 using Direwolf.Definitions;
+using Direwolf.Revit.Definitions;
 
-namespace Direwolf.Revit.Howls
+namespace Direwolf.Revit.Howls;
+
+public record class GetDocumentIntrospection : RevitHowl
 {
-    public record class GetDocumentIntrospection : RevitHowl
+    public GetDocumentIntrospection(Document doc)
     {
-        public GetDocumentIntrospection(Document doc) => SetRevitDocument(doc);
+        SetRevitDocument(doc);
+    }
 
-        public override bool Execute()
+    public override bool Execute()
+    {
+        try
         {
-            try
-            {
-                SendCatchToCallback(new Prey(new DocumentIntrospection(GetRevitDocument())));
-                SendCatchToCallback(new Prey(new ProjectInformationIntrospection(GetRevitDocument())));
-                SendCatchToCallback(new Prey(new ProjectSiteIntrospection(GetRevitDocument())));
-                SendCatchToCallback(new Prey(new UnitIntrospection(GetRevitDocument())));
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            SendCatchToCallback(new Prey(new DocumentIntrospection(GetRevitDocument())));
+            SendCatchToCallback(new Prey(new ProjectInformationIntrospection(GetRevitDocument())));
+            SendCatchToCallback(new Prey(new ProjectSiteIntrospection(GetRevitDocument())));
+            SendCatchToCallback(new Prey(new UnitIntrospection(GetRevitDocument())));
+            return true;
+        }
+        catch
+        {
+            return false;
         }
     }
 }

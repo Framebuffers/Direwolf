@@ -1,7 +1,6 @@
-﻿namespace Direwolf.EventHandlers
+﻿namespace Direwolf.EventHandlers;
+
+public class HuntCompletedEventArgs : EventArgs
 {
-    public class HuntCompletedEventArgs : EventArgs
-    {
-        public bool IsSuccessful { get; set; }
-    }
+    public bool IsSuccessful { get; set; }
 }

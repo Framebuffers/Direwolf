@@ -1,40 +1,40 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-	</PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
 
-	<ItemGroup>
-	  <Compile Remove="Contracts\Dynamics\**" />
-	  <Compile Remove="ElementFilters\**" />
-	  <Compile Remove="Howlers\Dynamics\**" />
-	  <Compile Remove="Howls\Dynamics\**" />
-	  <Compile Remove="Testing\**" />
-	  <Compile Remove="Wolves\**" />
-	  <EmbeddedResource Remove="Contracts\Dynamics\**" />
-	  <EmbeddedResource Remove="ElementFilters\**" />
-	  <EmbeddedResource Remove="Howlers\Dynamics\**" />
-	  <EmbeddedResource Remove="Howls\Dynamics\**" />
-	  <EmbeddedResource Remove="Testing\**" />
-	  <EmbeddedResource Remove="Wolves\**" />
-	  <None Remove="Contracts\Dynamics\**" />
-	  <None Remove="ElementFilters\**" />
-	  <None Remove="Howlers\Dynamics\**" />
-	  <None Remove="Howls\Dynamics\**" />
-	  <None Remove="Testing\**" />
-	  <None Remove="Wolves\**" />
-	</ItemGroup>
+    <ItemGroup>
+        <Compile Remove="Contracts\Dynamics\**"/>
+        <Compile Remove="ElementFilters\**"/>
+        <Compile Remove="Howlers\Dynamics\**"/>
+        <Compile Remove="Howls\Dynamics\**"/>
+        <Compile Remove="Testing\**"/>
+        <Compile Remove="Wolves\**"/>
+        <EmbeddedResource Remove="Contracts\Dynamics\**"/>
+        <EmbeddedResource Remove="ElementFilters\**"/>
+        <EmbeddedResource Remove="Howlers\Dynamics\**"/>
+        <EmbeddedResource Remove="Howls\Dynamics\**"/>
+        <EmbeddedResource Remove="Testing\**"/>
+        <EmbeddedResource Remove="Wolves\**"/>
+        <None Remove="Contracts\Dynamics\**"/>
+        <None Remove="ElementFilters\**"/>
+        <None Remove="Howlers\Dynamics\**"/>
+        <None Remove="Howls\Dynamics\**"/>
+        <None Remove="Testing\**"/>
+        <None Remove="Wolves\**"/>
+    </ItemGroup>
 
-	<ItemGroup>
-	  <PackageReference Include="Autodesk.Revit.SDK" Version="2025.0.2.419" />
-	  <PackageReference Include="Npgsql" Version="9.0.3" />
-	</ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Autodesk.Revit.SDK" Version="2025.0.2.419"/>
+        <PackageReference Include="Npgsql" Version="9.0.3"/>
+    </ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\Direwolf\Direwolf.csproj" />
-	</ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Direwolf\Direwolf.csproj"/>
+    </ItemGroup>
 
 
 </Project>
