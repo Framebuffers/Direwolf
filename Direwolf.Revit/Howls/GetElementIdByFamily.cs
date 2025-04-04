@@ -3,7 +3,7 @@ using Direwolf.Definitions;
 
 namespace Direwolf.Revit.Howls;
 
-public record class GetElementIdByFamily : RevitHowl
+public record GetElementIdByFamily : RevitHowl
 {
     public GetElementIdByFamily(Document rvt)
     {

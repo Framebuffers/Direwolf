@@ -3,7 +3,7 @@ using Direwolf.Definitions;
 
 namespace Direwolf.Revit.Howls;
 
-public record class GetImportedElementsPath : RevitHowl
+public record GetImportedElementsPath : RevitHowl
 {
     public GetImportedElementsPath(Document doc)
     {

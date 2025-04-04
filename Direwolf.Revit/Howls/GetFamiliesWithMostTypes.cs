@@ -3,7 +3,7 @@ using Direwolf.Definitions;
 
 namespace Direwolf.Revit.Howls;
 
-public record class GetFamiliesWithMostTypes : RevitHowl
+public record GetFamiliesWithMostTypes : RevitHowl
 {
     public GetFamiliesWithMostTypes(Document doc)
     {

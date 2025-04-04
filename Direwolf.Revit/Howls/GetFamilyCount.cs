@@ -3,7 +3,7 @@ using Direwolf.Definitions;
 
 namespace Direwolf.Revit.Howls;
 
-public record class GetFamilyCount : RevitHowl
+public record GetFamilyCount : RevitHowl
 {
     public GetFamilyCount(Document doc)
     {

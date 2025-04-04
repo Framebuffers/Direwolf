@@ -3,7 +3,7 @@ using Direwolf.Definitions;
 
 namespace Direwolf.Revit.Howls;
 
-public record class GetDetailGroups : RevitHowl
+public record GetDetailGroups : RevitHowl
 {
     public GetDetailGroups(Document doc)
     {

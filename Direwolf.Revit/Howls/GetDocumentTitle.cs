@@ -3,11 +3,11 @@ using Direwolf.Definitions;
 
 namespace Direwolf.Revit.Howls;
 
-public record class GetDocumentTitle(Document doc) : RevitHowl
+public record GetDocumentTitle(Document Doc) : RevitHowl
 {
     public override bool Execute()
     {
-        var rvtdoc = doc;
+        var rvtdoc = Doc;
         var data = new Dictionary<string, object>
         {
             ["Title"] = rvtdoc.Title

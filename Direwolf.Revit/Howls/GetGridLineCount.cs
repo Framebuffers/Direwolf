@@ -3,7 +3,7 @@ using Direwolf.Definitions;
 
 namespace Direwolf.Revit.Howls;
 
-public record class GetGridLineCount : RevitHowl
+public record GetGridLineCount : RevitHowl
 {
     public GetGridLineCount(Document doc)
     {

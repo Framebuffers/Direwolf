@@ -4,7 +4,7 @@ using Direwolf.Definitions;
 
 namespace Direwolf.Revit.Howls;
 
-public record class GetUnenclosedRooms : RevitHowl
+public record GetUnenclosedRooms : RevitHowl
 {
     public GetUnenclosedRooms(Document doc)
     {

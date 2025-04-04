@@ -8,19 +8,19 @@ namespace Direwolf.Revit.Definitions;
 /// <param name="Document">Revit Document</param>
 public readonly record struct UnitIntrospection(Document Document)
 {
-    public string lengthUnits => Document.GetUnits().GetFormatOptions(SpecTypeId.Length).GetUnitTypeId().TypeId;
-    public string areaUnits => Document.GetUnits().GetFormatOptions(SpecTypeId.Area).GetUnitTypeId().TypeId;
-    public string angle => Document.GetUnits().GetFormatOptions(SpecTypeId.Angle).GetUnitTypeId().TypeId;
-    public string currency => Document.GetUnits().GetFormatOptions(SpecTypeId.Currency).GetUnitTypeId().TypeId;
-    public string number => Document.GetUnits().GetFormatOptions(SpecTypeId.Number).GetUnitTypeId().TypeId;
+    public string LengthUnits => Document.GetUnits().GetFormatOptions(SpecTypeId.Length).GetUnitTypeId().TypeId;
+    public string AreaUnits => Document.GetUnits().GetFormatOptions(SpecTypeId.Area).GetUnitTypeId().TypeId;
+    public string Angle => Document.GetUnits().GetFormatOptions(SpecTypeId.Angle).GetUnitTypeId().TypeId;
+    public string Currency => Document.GetUnits().GetFormatOptions(SpecTypeId.Currency).GetUnitTypeId().TypeId;
+    public string Number => Document.GetUnits().GetFormatOptions(SpecTypeId.Number).GetUnitTypeId().TypeId;
 
-    public string rotationAngle =>
+    public string RotationAngle =>
         Document.GetUnits().GetFormatOptions(SpecTypeId.RotationAngle).GetUnitTypeId().TypeId;
 
-    public string sheetLength => Document.GetUnits().GetFormatOptions(SpecTypeId.SheetLength).GetUnitTypeId().TypeId;
-    public string siteAngle => Document.GetUnits().GetFormatOptions(SpecTypeId.SiteAngle).GetUnitTypeId().TypeId;
-    public string slope => Document.GetUnits().GetFormatOptions(SpecTypeId.Slope).GetUnitTypeId().TypeId;
-    public string speed => Document.GetUnits().GetFormatOptions(SpecTypeId.Speed).GetUnitTypeId().TypeId;
-    public string time => Document.GetUnits().GetFormatOptions(SpecTypeId.Time).GetUnitTypeId().TypeId;
-    public string volume => Document.GetUnits().GetFormatOptions(SpecTypeId.Volume).GetUnitTypeId().TypeId;
+    public string SheetLength => Document.GetUnits().GetFormatOptions(SpecTypeId.SheetLength).GetUnitTypeId().TypeId;
+    public string SiteAngle => Document.GetUnits().GetFormatOptions(SpecTypeId.SiteAngle).GetUnitTypeId().TypeId;
+    public string Slope => Document.GetUnits().GetFormatOptions(SpecTypeId.Slope).GetUnitTypeId().TypeId;
+    public string Speed => Document.GetUnits().GetFormatOptions(SpecTypeId.Speed).GetUnitTypeId().TypeId;
+    public string Time => Document.GetUnits().GetFormatOptions(SpecTypeId.Time).GetUnitTypeId().TypeId;
+    public string Volume => Document.GetUnits().GetFormatOptions(SpecTypeId.Volume).GetUnitTypeId().TypeId;
 }

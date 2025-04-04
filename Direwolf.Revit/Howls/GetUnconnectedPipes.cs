@@ -4,7 +4,7 @@ using Direwolf.Definitions;
 
 namespace Direwolf.Revit.Howls;
 
-public record class GetUnconnectedPipes : RevitHowl
+public record GetUnconnectedPipes : RevitHowl
 {
     public GetUnconnectedPipes(Document doc)
     {

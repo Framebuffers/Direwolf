@@ -2,7 +2,7 @@
 
 namespace Direwolf.Revit.Howls;
 
-public record class GetFamilyIntrospection : RevitHowl
+public record GetFamilyIntrospection : RevitHowl
 {
     public GetFamilyIntrospection(Document doc)
     {

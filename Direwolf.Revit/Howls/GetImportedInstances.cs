@@ -3,7 +3,7 @@ using Direwolf.Definitions;
 
 namespace Direwolf.Revit.Howls;
 
-public record class GetImportedInstances : RevitHowl
+public record GetImportedInstances : RevitHowl
 {
     public GetImportedInstances(Document doc)
     {

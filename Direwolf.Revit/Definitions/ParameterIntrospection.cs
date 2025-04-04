@@ -8,7 +8,7 @@ namespace Direwolf.Revit.Definitions;
 /// <param name="Parameter">The Parameter of a Revit Element</param>
 public readonly record struct ParameterIntrospection(Parameter Parameter)
 {
-    public string name
+    public string Name
     {
         get
         {
@@ -23,7 +23,7 @@ public readonly record struct ParameterIntrospection(Parameter Parameter)
         }
     }
 
-    public string value
+    public string Value
     {
         get
         {

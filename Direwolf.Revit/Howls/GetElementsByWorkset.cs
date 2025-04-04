@@ -3,7 +3,7 @@ using Direwolf.Definitions;
 
 namespace Direwolf.Revit.Howls;
 
-public record class GetElementsByWorkset : RevitHowl
+public record GetElementsByWorkset : RevitHowl
 {
     public GetElementsByWorkset(Document doc)
     {

@@ -43,12 +43,12 @@ namespace Direwolf.Revit.Definitions;
 /// <param name="Document">Revit document</param>
 public readonly record struct DocumentIntrospection(Document Document)
 {
-    public string documentName => Document.Title;
-    public string documentPath => Document.PathName;
-    public string documentUniqueId => Document.CreationGUID.ToString();
-    public string documentVersionId => Document.GetDocumentVersion(Document).VersionGUID.ToString();
-    public int documentSaveCount => Document.GetDocumentVersion(Document).NumberOfSaves;
-    public string[] warnings => [.. Document.GetWarnings().Select(x => x.GetDescriptionText())];
-    public double activeWorkset => Document.GetWorksetTable().GetActiveWorksetId().IntegerValue;
-    public ProjectInformationIntrospection projectInformation => new(Document);
+    public string DocumentName => Document.Title;
+    public string DocumentPath => Document.PathName;
+    public string DocumentUniqueId => Document.CreationGUID.ToString();
+    public string DocumentVersionId => Document.GetDocumentVersion(Document).VersionGUID.ToString();
+    public int DocumentSaveCount => Document.GetDocumentVersion(Document).NumberOfSaves;
+    public string[] Warnings => [.. Document.GetWarnings().Select(x => x.GetDescriptionText())];
+    public double ActiveWorkset => Document.GetWorksetTable().GetActiveWorksetId().IntegerValue;
+    public ProjectInformationIntrospection ProjectInformation => new(Document);
 }

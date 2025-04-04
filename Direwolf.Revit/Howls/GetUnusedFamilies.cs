@@ -3,7 +3,7 @@ using Direwolf.Definitions;
 
 namespace Direwolf.Revit.Howls;
 
-public record class GetUnusedFamilies : RevitHowl
+public record GetUnusedFamilies : RevitHowl
 {
     public GetUnusedFamilies(Document doc)
     {

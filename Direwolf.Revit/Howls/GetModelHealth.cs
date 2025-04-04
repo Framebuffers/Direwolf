@@ -3,7 +3,7 @@ using Direwolf.Definitions;
 
 namespace Direwolf.Revit.Howls;
 
-public record class GetModelHealth : RevitHowl
+public record GetModelHealth : RevitHowl
 {
     public GetModelHealth(Document doc)
     {

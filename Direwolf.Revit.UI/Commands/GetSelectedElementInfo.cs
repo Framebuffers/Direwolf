@@ -35,14 +35,14 @@ public class GetSelectedElementInfo : DirewolfRevitCommand
             }
 
             RevitTask.Initialize(commandData.Application);
-            RevitHowler rh = new();
+            RevitLonewolf rh = new();
             rh.CreateWolf(new Wolf(), new ElementSnapshot(doc, commandData.Application));
             Direwolf dw = new(commandData.Application);
             dw.QueueHowler(rh);
             dw.HuntAsync("ElementInfo");
             var s = StopTime();
             Debug.Print($"Time taken: {s}");
-            dw.SendAllToDB();
+            dw.SendAllToDb();
             TaskDialog t = new("Query Information")
             {
                 MainInstruction = "Query executed successfully!",

@@ -3,7 +3,7 @@ using Direwolf.Definitions;
 
 namespace Direwolf.Revit.Howls;
 
-public record class GetUnconnectedElectrical : RevitHowl
+public record GetUnconnectedElectrical : RevitHowl
 {
     public GetUnconnectedElectrical(Document doc)
     {

@@ -6,7 +6,7 @@ using Direwolf.Revit.Contracts;
 
 namespace Direwolf.Revit.Howls;
 
-public abstract record class RevitHowl : IRevitHowl
+public abstract record RevitHowl : IRevitHowl
 {
     private Document? _rvtDoc; // it should never be null though, unless *directly* done so.
     [JsonIgnore] public IWolf? Callback { get; set; }
@@ -23,7 +23,7 @@ public abstract record class RevitHowl : IRevitHowl
             // A catch won't handle data retrieval on it's own, as it is just meant to be a dumb container.
             // Any data retrieval operation should be done here.
             // If, for example, the result returns a void or a bool itself (without having to get data itself)
-            // Just return true. No need to forge a blank Catch. The Wolf *should* expect this result.
+            // Just return true. No need to forge a blank Catch. The Lonewolf *should* expect this result.
             if (Callback is not null) return true; // hunt successful!
 
             return false; // howled into the air, but no wolf to hear back...

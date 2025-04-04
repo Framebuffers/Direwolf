@@ -3,7 +3,7 @@ using Direwolf.Definitions;
 
 namespace Direwolf.Revit.Howls;
 
-public record class GetViewsNotOnSheets : RevitHowl
+public record GetViewsNotOnSheets : RevitHowl
 {
     public GetViewsNotOnSheets(Document doc)
     {

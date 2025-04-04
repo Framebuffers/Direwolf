@@ -4,7 +4,7 @@ using Direwolf.Definitions;
 
 namespace Direwolf.Revit.Howls;
 
-public record class GetUnconnectedDucts : RevitHowl
+public record GetUnconnectedDucts : RevitHowl
 {
     public GetUnconnectedDucts(Document doc)
     {

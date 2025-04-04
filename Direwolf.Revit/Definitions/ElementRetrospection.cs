@@ -8,10 +8,10 @@ namespace Direwolf.Revit.Definitions;
 /// <param name="Element">Revit Element</param>
 public readonly record struct ElementRetrospection(Element Element)
 {
-    public double id => Element.Id.Value;
-    public string uniqueId => Element.UniqueId;
+    public double Id => Element.Id.Value;
+    public string UniqueId => Element.UniqueId;
 
-    public Category? category
+    public Category? Category
     {
         get
         {
@@ -28,7 +28,7 @@ public readonly record struct ElementRetrospection(Element Element)
         }
     }
 
-    public BuiltInCategory builtInCategory
+    public BuiltInCategory BuiltInCategory
     {
         get
         {
@@ -45,7 +45,7 @@ public readonly record struct ElementRetrospection(Element Element)
         }
     }
 
-    public double assemblyInstanceId
+    public double AssemblyInstanceId
     {
         get
         {
@@ -60,7 +60,7 @@ public readonly record struct ElementRetrospection(Element Element)
         }
     }
 
-    public double createdPhaseId
+    public double CreatedPhaseId
     {
         get
         {
@@ -75,7 +75,7 @@ public readonly record struct ElementRetrospection(Element Element)
         }
     }
 
-    public double demolishedPhaseId
+    public double DemolishedPhaseId
     {
         get
         {
@@ -90,7 +90,7 @@ public readonly record struct ElementRetrospection(Element Element)
         }
     }
 
-    public bool hasDesignOption
+    public bool HasDesignOption
     {
         get
         {
@@ -106,7 +106,7 @@ public readonly record struct ElementRetrospection(Element Element)
         }
     }
 
-    public double groupId
+    public double GroupId
     {
         get
         {
@@ -122,7 +122,7 @@ public readonly record struct ElementRetrospection(Element Element)
         }
     }
 
-    public double levelId
+    public double LevelId
     {
         get
         {
@@ -137,7 +137,7 @@ public readonly record struct ElementRetrospection(Element Element)
         }
     }
 
-    public string location
+    public string Location
     {
         get
         {
@@ -153,7 +153,7 @@ public readonly record struct ElementRetrospection(Element Element)
         }
     }
 
-    public string name
+    public string Name
     {
         get
         {
@@ -168,7 +168,7 @@ public readonly record struct ElementRetrospection(Element Element)
         }
     }
 
-    public double ownerViewId
+    public double OwnerViewId
     {
         get
         {
@@ -183,7 +183,7 @@ public readonly record struct ElementRetrospection(Element Element)
         }
     }
 
-    public bool isPinned
+    public bool IsPinned
     {
         get
         {
@@ -198,7 +198,7 @@ public readonly record struct ElementRetrospection(Element Element)
         }
     }
 
-    public bool isViewSpecific
+    public bool IsViewSpecific
     {
         get
         {
@@ -213,7 +213,7 @@ public readonly record struct ElementRetrospection(Element Element)
         }
     }
 
-    public double worksetId
+    public double WorksetId
     {
         get
         {

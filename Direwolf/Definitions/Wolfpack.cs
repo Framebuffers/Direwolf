@@ -23,16 +23,15 @@ public readonly record struct Wolfpack(
     double TimeTaken = 0)
 {
     public string TestName { get; init; } = string.Empty;
-    public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
-    public Guid GUID { get; init; } = Guid.NewGuid();
+    public DateTime CreatedAt { get; } = DateTime.UtcNow;
+    public Guid Guid { get; } = Guid.NewGuid();
     public int ResultCount => Howler.Den.Count;
     public string? Results => Howler?.ToString();
-
     public override string ToString()
     {
         return JsonSerializer.Serialize(new Dictionary<string, object>
         {
-            ["id"] = GUID,
+            ["id"] = Guid,
             ["createdAt"] = CreatedAt,
             ["timeTaken"] = TimeTaken,
             ["resultCount"] = ResultCount,

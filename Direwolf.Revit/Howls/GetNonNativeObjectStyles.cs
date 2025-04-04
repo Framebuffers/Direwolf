@@ -3,7 +3,7 @@ using Direwolf.Definitions;
 
 namespace Direwolf.Revit.Howls;
 
-public record class GetNonNativeObjectStyles : RevitHowl
+public record GetNonNativeObjectStyles : RevitHowl
 {
     public GetNonNativeObjectStyles(Document doc)
     {

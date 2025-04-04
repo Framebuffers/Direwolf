@@ -10,7 +10,7 @@ using Revit.Async;
 namespace Direwolf;
 
 /// <summary>
-///     Data analysis core. Handles the queue of <see cref="IHowler" />, the <see cref="WolfpackDB" /> and the serializaion
+///     Data analysis core. Handles the queue of <see cref="IHowler" />, the <see cref="WolfpackDb" /> and the serialization
 ///     of results.
 /// </summary>
 public class Direwolf
@@ -18,12 +18,10 @@ public class Direwolf
     /// <summary>
     ///     This is a proof of concept, not a production-ready solution. Please **CHANGE THIS** if you plan to deploy.
     /// </summary>
-    private static readonly DbConnectionString _default = new("localhost", 5432, "wolf", "awoo", "direwolf");
-
+    private static readonly DbConnectionString Default = new("localhost", 5432, "wolf", "awoo", "direwolf");
     private readonly UIApplication? _app;
-
-    private readonly string Desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-    private readonly List<HowlId> PreviousHowls = [];
+    private readonly string _desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+    private readonly List<HowlId> _previousHowls = [];
 
     /// <summary>
     ///     Instance of a Direwolf analyzer.
@@ -73,7 +71,7 @@ public class Direwolf
     }
 
     private Queue<IHowler> Howlers { get; } = [];
-    [JsonExtensionData] private WolfpackDB Queries { get; } = new(_default);
+    [JsonExtensionData] private WolfpackDb Queries { get; } = new(Default);
     public event EventHandler? DatabaseConnectionEventHandler;
     public event EventHandler? AsyncHuntCompletedEventHandler;
 
@@ -92,13 +90,13 @@ public class Direwolf
     ///     Takes all the contents held inside <see cref="Queries" />, serializes the results to a JSON file in the Desktop
     ///     folder, and sends each <see cref="Wolfpack" /> to the connected database.
     /// </summary>
-    public async void SendAllToDB()
+    public async void SendAllToDb()
     {
         try
         {
             foreach (var q in Queries)
             {
-                var fileName = Path.Combine(Desktop, "Queries.json");
+                var fileName = Path.Combine(_desktop, "Queries.json");
                 File.WriteAllText(fileName, q.Results);
             }
 
@@ -129,7 +127,7 @@ public class Direwolf
                     HowlIdentifier = new Guid(),
                     Name = howler.GetType().Name
                 };
-                PreviousHowls.Add(h);
+                _previousHowls.Add(h);
             }
         }
         catch
@@ -155,7 +153,7 @@ public class Direwolf
                 HowlIdentifier = new Guid(),
                 Name = dispatch.GetType().Name
             };
-            PreviousHowls.Add(h);
+            _previousHowls.Add(h);
             Queries.Push(result);
         }
         catch
@@ -177,7 +175,7 @@ public class Direwolf
 
     /// <summary>
     ///     Creates a valid Revit context, takes a dispatcher from the queue, and dispatches its workers. Resulting
-    ///     <see cref="Wolfpack" /> are pushed to the <see cref="WolfpackDB" /> stack.
+    ///     <see cref="Wolfpack" /> are pushed to the <see cref="WolfpackDb" /> stack.
     /// </summary>
     /// <param name="howler">Dispatch</param>
     /// <param name="queryName">Name of the query</param>
@@ -196,7 +194,7 @@ public class Direwolf
                     HowlIdentifier = new Guid(),
                     Name = howler.GetType().Name
                 };
-                PreviousHowls.Add(h);
+                _previousHowls.Add(h);
             });
             AsyncHuntCompletedEventHandler?.Invoke(this, new EventArgs());
         }
@@ -214,7 +212,7 @@ public class Direwolf
 
     public void WriteQueriesToJson()
     {
-        var fileName = Path.Combine(Desktop, "Queries.json");
+        var fileName = Path.Combine(_desktop, "Queries.json");
         File.WriteAllText(fileName, JsonSerializer.Serialize(Queries));
     }
 
@@ -235,6 +233,6 @@ public class Direwolf
 
     private void Direwolf_AsyncHuntCompletedEventHandler(object? sender, EventArgs e)
     {
-        SendAllToDB();
+        SendAllToDb();
     }
 }

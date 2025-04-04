@@ -4,7 +4,7 @@ using Direwolf.Definitions;
 
 namespace Direwolf.Revit.Howls;
 
-public record class GetDuplicateElements : RevitHowl
+public record GetDuplicateElements : RevitHowl
 {
     public GetDuplicateElements(Document doc)
     {

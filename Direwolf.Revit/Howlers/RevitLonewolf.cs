@@ -9,9 +9,9 @@ using Direwolf.Revit.Contracts;
 namespace Direwolf.Revit.Howlers;
 
 /// <summary>
-///     Exactly the same as a regular Howler, except that it checks if the Howl implements IDynamicRevitHowl.
+///     Exactly the same as a regular Lonewolf, except that it checks if the Howl implements IDynamicRevitHowl.
 /// </summary>
-public record class RevitHowler : Howler
+public record RevitLonewolf : Lonewolf
 {
     private readonly Stopwatch _timeTaken = new();
     private Document? _doc;

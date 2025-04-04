@@ -3,7 +3,7 @@ using Direwolf.Definitions;
 
 namespace Direwolf.Revit.Howls;
 
-public record class GetErrorsAndWarnings : RevitHowl
+public record GetErrorsAndWarnings : RevitHowl
 {
     public GetErrorsAndWarnings(Document doc)
     {

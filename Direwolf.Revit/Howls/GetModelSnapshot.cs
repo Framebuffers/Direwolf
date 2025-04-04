@@ -8,29 +8,29 @@ using ElementType = Autodesk.Revit.DB.ElementType;
 
 namespace Direwolf.Revit.Howls;
 
-public record class GetModelSnapshot : RevitHowl
+public record GetModelSnapshot : RevitHowl
 {
-    private readonly List<Element> annotativeElements = [];
-    private readonly List<DesignOption> designOptions = [];
-    private readonly List<Group> detailGroups = [];
-    private readonly List<(ExternalFileReferenceType, ExternalFileReference)> externalRefs = [];
-    private readonly List<Grid> grids = [];
-    private readonly List<Element> isFlipped = [];
-    private readonly List<Level> levels = [];
-    private readonly List<Group> modelGroups = [];
-    private readonly List<GraphicsStyle> nonNativeStyles = [];
-    private readonly List<View> notInSheets = [];
-    private readonly List<Duct> unconnectedDucts = [];
-    private readonly List<Connector> unconnectedElectrical = [];
-    private readonly List<Pipe> unconnectedPipes = [];
-    private readonly List<Room> unenclosedRoom = [];
-    private readonly List<Viewport> viewports = [];
+    private readonly List<Element> _annotativeElements = [];
+    private readonly List<DesignOption> _designOptions = [];
+    private readonly List<Group> _detailGroups = [];
+    private readonly List<(ExternalFileReferenceType, ExternalFileReference)> _externalRefs = [];
+    private readonly List<Grid> _grids = [];
+    private readonly List<Element> _isFlipped = [];
+    private readonly List<Level> _levels = [];
+    private readonly List<Group> _modelGroups = [];
+    private readonly List<GraphicsStyle> _nonNativeStyles = [];
+    private readonly List<View> _notInSheets = [];
+    private readonly List<Duct> _unconnectedDucts = [];
+    private readonly List<Connector> _unconnectedElectrical = [];
+    private readonly List<Pipe> _unconnectedPipes = [];
+    private readonly List<Room> _unenclosedRoom = [];
+    private readonly List<Viewport> _viewports = [];
 
     // These are all categories for which information has to be extracted.
-    private readonly List<View> viewsInsideDocument = [];
-    private readonly List<FailureMessage> warns = [];
-    private readonly Dictionary<string, int> worksetElementCount = [];
-    private Stack<Dictionary<string, object>> individualElementInfo = [];
+    private readonly List<View> _viewsInsideDocument = [];
+    private readonly List<FailureMessage> _warns = [];
+    private readonly Dictionary<string, int> _worksetElementCount = [];
+    private Stack<Dictionary<string, object>> _individualElementInfo = [];
 
     public GetModelSnapshot(Document doc)
     {
@@ -40,7 +40,7 @@ public record class GetModelSnapshot : RevitHowl
     private void ProcessInfo()
     {
         var doc = GetRevitDocument();
-        warns.AddRange(GetRevitDocument().GetWarnings());
+        _warns.AddRange(GetRevitDocument().GetWarnings());
         ICollection<Element> collector =
             [.. new FilteredElementCollector(GetRevitDocument()).WhereElementIsNotElementType()];
 
@@ -130,10 +130,10 @@ public record class GetModelSnapshot : RevitHowl
                 {
                     var worksetName = worksetParam.AsValueString();
 
-                    if (worksetElementCount.TryGetValue(worksetName, out var value))
-                        worksetElementCount[worksetName] = ++value;
+                    if (_worksetElementCount.TryGetValue(worksetName, out var value))
+                        _worksetElementCount[worksetName] = ++value;
                     else
-                        worksetElementCount[worksetName] = 1;
+                        _worksetElementCount[worksetName] = 1;
                 }
 
                 if (e.LevelId is not null) levelId = e.LevelId.ToString();
@@ -143,12 +143,12 @@ public record class GetModelSnapshot : RevitHowl
                     case View:
                         var v = e as View;
 
-                        if (v is not null && !v.IsTemplate) viewsInsideDocument.Add(v);
+                        if (v is not null && !v.IsTemplate) _viewsInsideDocument.Add(v);
                         builtInCategory = e?.Category?.BuiltInCategory.ToString();
                         break;
                     case Viewport:
                         var vp = e as Viewport;
-                        if (vp is not null) viewports.Add(vp);
+                        if (vp is not null) _viewports.Add(vp);
                         builtInCategory = e?.Category?.BuiltInCategory.ToString();
                         break;
                     case Group:
@@ -156,26 +156,26 @@ public record class GetModelSnapshot : RevitHowl
                         if (g is not null)
                         {
                             if (g.Category.Name == "Detail Groups")
-                                detailGroups.Add(g);
+                                _detailGroups.Add(g);
                             else
-                                modelGroups.Add(g);
+                                _modelGroups.Add(g);
                         }
 
                         builtInCategory = e?.Category?.BuiltInCategory.ToString();
                         break;
                     case DesignOption:
                         var option = e as DesignOption;
-                        if (option is not null) designOptions.Add(option);
+                        if (option is not null) _designOptions.Add(option);
                         builtInCategory = e?.Category?.BuiltInCategory.ToString();
                         break;
                     case Level:
                         var l = e as Level;
-                        if (l is not null) levels.Add(l);
+                        if (l is not null) _levels.Add(l);
                         builtInCategory = e?.Category?.BuiltInCategory.ToString();
                         break;
                     case Grid:
                         var gr = e as Grid;
-                        if (gr is not null) grids.Add(gr);
+                        if (gr is not null) _grids.Add(gr);
                         builtInCategory = e?.Category?.BuiltInCategory.ToString();
                         break;
                     case GraphicsStyle:
@@ -186,14 +186,14 @@ public record class GetModelSnapshot : RevitHowl
                             builtInCategory = e?.Category?.BuiltInCategory.ToString();
 
                             if (c is not null && c.IsCuttable is not false && c.CategoryType == CategoryType.Annotation)
-                                nonNativeStyles.Add(graphicsStyle);
+                                _nonNativeStyles.Add(graphicsStyle);
                         }
 
                         break;
                     case FamilyInstance:
                         if (fm is not null)
                         {
-                            if (fm.Mirrored) isFlipped.Add(e);
+                            if (fm.Mirrored) _isFlipped.Add(e);
                             builtInCategory = e?.Category?.BuiltInCategory.ToString();
                         }
 
@@ -209,7 +209,7 @@ public record class GetModelSnapshot : RevitHowl
                                         room.GetBoundarySegments(new SpatialElementBoundaryOptions());
 
                                     if (boundarySegments == null || boundarySegments.Count == 0)
-                                        unenclosedRoom.Add(room);
+                                        _unenclosedRoom.Add(room);
                                 }
 
                                 builtInCategory = e?.Category?.BuiltInCategory.ToString();
@@ -228,7 +228,7 @@ public record class GetModelSnapshot : RevitHowl
                                             break;
                                         }
 
-                                    if (isUnconnected) unconnectedDucts.Add(duct);
+                                    if (isUnconnected) _unconnectedDucts.Add(duct);
                                 }
 
                                 builtInCategory = e?.Category?.BuiltInCategory.ToString();
@@ -246,7 +246,7 @@ public record class GetModelSnapshot : RevitHowl
                                             break;
                                         }
 
-                                    if (isUnconnected) unconnectedPipes.Add(pipe);
+                                    if (isUnconnected) _unconnectedPipes.Add(pipe);
                                 }
 
                                 builtInCategory = e?.Category?.BuiltInCategory.ToString();
@@ -258,7 +258,7 @@ public record class GetModelSnapshot : RevitHowl
                                     var connectors = mepModel.ConnectorManager.Connectors;
                                     foreach (Connector connector in connectors)
                                         if (!connector.IsConnected)
-                                            unconnectedElectrical.Add(connector);
+                                            _unconnectedElectrical.Add(connector);
                                 }
 
                                 builtInCategory = e?.Category?.BuiltInCategory.ToString();
@@ -284,7 +284,7 @@ public record class GetModelSnapshot : RevitHowl
                         isAnnotative = true;
                         isModel = false;
                         builtInCategory = CategoryType.Annotation.ToString();
-                        annotativeElements.Add(e);
+                        _annotativeElements.Add(e);
                         break;
                     case CategoryType.Invalid:
                     case CategoryType.Internal:
@@ -320,38 +320,38 @@ public record class GetModelSnapshot : RevitHowl
         }
 
         // view not in sheet. needs to be done after all are done.
-        HashSet<ElementId> viewsOnSheets = [.. viewports.Select(vp => vp.ViewId)];
-        foreach (Element viewElement in viewsInsideDocument)
+        HashSet<ElementId> viewsOnSheets = [.. _viewports.Select(vp => vp.ViewId)];
+        foreach (Element viewElement in _viewsInsideDocument)
             if (viewElement is View view && !view.IsTemplate && !viewsOnSheets.Contains(view.Id))
-                notInSheets.Add(view);
+                _notInSheets.Add(view);
 
         foreach (var reference in ExternalFileUtils.GetAllExternalFileReferences(doc))
         {
             var ext = doc.GetElement(reference);
-            externalRefs.Add((ext.GetExternalFileReference().ExternalFileReferenceType,
+            _externalRefs.Add((ext.GetExternalFileReference().ExternalFileReferenceType,
                 ext.GetExternalFileReference()));
         }
 
         Dictionary<string, object> results = new()
         {
-            { "viewsInsideDocument", viewsInsideDocument.Count },
-            { "notInSheets", notInSheets.Count },
-            { "annotativeElements", annotativeElements.Count },
-            { "externalRefs", externalRefs.Count },
-            { "modelGroups", modelGroups.Count },
-            { "detailGroups", detailGroups.Count },
-            { "designOptions", designOptions.Count },
-            { "levels", levels.Count },
-            { "grids", grids.Count },
-            { "warns", warns.Count },
-            { "unenclosedRoom", unenclosedRoom.Count },
-            { "viewports", viewports.Count },
-            { "unconnectedDucts", unconnectedDucts.Count },
-            { "unconnectedPipes", unconnectedPipes.Count },
-            { "unconnectedElectrical", unconnectedElectrical.Count },
-            { "nonNativeStyles", nonNativeStyles.Count },
-            { "isFlipped", isFlipped.Count },
-            { "worksetElementCount", worksetElementCount.Count }
+            { "viewsInsideDocument", _viewsInsideDocument.Count },
+            { "notInSheets", _notInSheets.Count },
+            { "annotativeElements", _annotativeElements.Count },
+            { "externalRefs", _externalRefs.Count },
+            { "modelGroups", _modelGroups.Count },
+            { "detailGroups", _detailGroups.Count },
+            { "designOptions", _designOptions.Count },
+            { "levels", _levels.Count },
+            { "grids", _grids.Count },
+            { "warns", _warns.Count },
+            { "unenclosedRoom", _unenclosedRoom.Count },
+            { "viewports", _viewports.Count },
+            { "unconnectedDucts", _unconnectedDucts.Count },
+            { "unconnectedPipes", _unconnectedPipes.Count },
+            { "unconnectedElectrical", _unconnectedElectrical.Count },
+            { "nonNativeStyles", _nonNativeStyles.Count },
+            { "isFlipped", _isFlipped.Count },
+            { "worksetElementCount", _worksetElementCount.Count }
         };
 
         //SendCatchToCallback(new Prey(doc._GetInstancesPerFamily()));

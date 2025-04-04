@@ -4,7 +4,7 @@ using Direwolf.Revit.Definitions;
 
 namespace Direwolf.Revit.Howls;
 
-public record class GetDocumentIntrospection : RevitHowl
+public record GetDocumentIntrospection : RevitHowl
 {
     public GetDocumentIntrospection(Document doc)
     {

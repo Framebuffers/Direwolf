@@ -3,7 +3,7 @@ using Direwolf.Definitions;
 
 namespace Direwolf.Revit.Howls;
 
-public record class GetLevelCount : RevitHowl
+public record GetLevelCount : RevitHowl
 {
     public GetLevelCount(Document doc)
     {

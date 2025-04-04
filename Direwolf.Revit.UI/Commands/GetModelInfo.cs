@@ -24,12 +24,12 @@ public class GetModelInfo : DirewolfRevitCommand
         try
         {
             RevitTask.Initialize(commandData.Application);
-            RevitHowler rh = new();
+            RevitLonewolf rh = new();
             rh.CreateWolf(new Wolf(), new GetModelSnapshot(doc));
             Direwolf dw = new(commandData.Application);
             dw.QueueHowler(rh);
             dw.HuntAsync("ModelInfo");
-            dw.SendAllToDB();
+            dw.SendAllToDb();
 
             TaskDialog t = new("Query Information")
             {

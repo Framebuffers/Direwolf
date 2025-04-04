@@ -3,7 +3,7 @@ using Direwolf.Definitions;
 
 namespace Direwolf.Revit.Howls;
 
-public record class GetModelIntrospection : RevitHowl
+public record GetModelIntrospection : RevitHowl
 {
     public GetModelIntrospection(Document doc)
     {

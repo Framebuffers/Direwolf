@@ -10,7 +10,7 @@ namespace Direwolf.Revit.Introspection;
 ///     Given an <see cref="Element" />, get the family it belongs to, and return all the parameters for each instance.
 ///     Check for overridden parameters.
 /// </summary>
-public record class ElementSnapshot : RevitHowl
+public record ElementSnapshot : RevitHowl
 {
     private readonly UIApplication? _app;
 

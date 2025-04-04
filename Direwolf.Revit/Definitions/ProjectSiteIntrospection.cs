@@ -8,11 +8,11 @@ namespace Direwolf.Revit.Definitions;
 /// <param name="Document">Revit Document</param>
 public readonly record struct ProjectSiteIntrospection(Document Document)
 {
-    public string placeName => Document.SiteLocation.PlaceName;
-    public double elevation => Document.SiteLocation.Elevation;
-    public double latitude => Document.SiteLocation.Latitude;
-    public double longitude => Document.SiteLocation.Longitude;
-    public double timeZone => Document.SiteLocation.TimeZone;
-    public string geoCoordinateSystemId => Document.SiteLocation.GeoCoordinateSystemId;
-    public string geoCoordinateSystemDefinition => Document.SiteLocation.GeoCoordinateSystemDefinition;
+    public string PlaceName => Document.SiteLocation.PlaceName;
+    public double Elevation => Document.SiteLocation.Elevation;
+    public double Latitude => Document.SiteLocation.Latitude;
+    public double Longitude => Document.SiteLocation.Longitude;
+    public double TimeZone => Document.SiteLocation.TimeZone;
+    public string GeoCoordinateSystemId => Document.SiteLocation.GeoCoordinateSystemId;
+    public string GeoCoordinateSystemDefinition => Document.SiteLocation.GeoCoordinateSystemDefinition;
 }

@@ -3,7 +3,7 @@ using Direwolf.Definitions;
 
 namespace Direwolf.Revit.Howls;
 
-public record class GetElementInformation : RevitHowl
+public record GetElementInformation : RevitHowl
 {
     public GetElementInformation(Document doc)
     {
@@ -67,7 +67,7 @@ public record class GetElementInformation : RevitHowl
     {
         try
         {
-            Dictionary<string, List<Prey>> Catches = [];
+            Dictionary<string, List<Prey>> catches = [];
             ICollection<Element> allValidElements = new FilteredElementCollector(GetRevitDocument())
                 .WhereElementIsNotElementType()
                 .WhereElementIsViewIndependent()
@@ -94,15 +94,15 @@ public record class GetElementInformation : RevitHowl
                 List<Prey> elementData = [];
                 elementData.AddRange(family.Value.Select(ExtractElementData));
 
-                if (Catches.TryGetValue(family.Key, out var existingElementData))
+                if (catches.TryGetValue(family.Key, out var existingElementData))
                     existingElementData.AddRange(elementData);
                 else
-                    Catches[family.Key] = elementData;
+                    catches[family.Key] = elementData;
             }
 
             SendCatchToCallback(new Prey(new Dictionary<string, object>
             {
-                ["elementData"] = Catches
+                ["elementData"] = catches
             }));
             return true;
         }

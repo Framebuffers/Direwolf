@@ -3,7 +3,7 @@ using Direwolf.Definitions;
 
 namespace Direwolf.Revit.Howls;
 
-public record class GetMirroredObjects : RevitHowl
+public record GetMirroredObjects : RevitHowl
 {
     public GetMirroredObjects(Document doc)
     {
