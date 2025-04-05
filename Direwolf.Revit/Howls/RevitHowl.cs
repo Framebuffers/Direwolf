@@ -1,6 +1,5 @@
 ﻿using System.Text.Json.Serialization;
 using Autodesk.Revit.DB;
-using Direwolf.Contracts;
 using Direwolf.Definitions;
 using Direwolf.Revit.Contracts;
 
@@ -8,25 +7,24 @@ namespace Direwolf.Revit.Howls;
 
 public abstract record RevitHowl : IRevitHowl
 {
-    private Document? _rvtDoc; // it should never be null though, unless *directly* done so.
-    [JsonIgnore] public IWolf? Callback { get; set; }
+    private Document? _rvtDoc;
+    public string Name { get; set; }
+    [JsonIgnore] public Wolf? Callback { get; set; }
 
     public void SendCatchToCallback(Prey c)
     {
-        Callback?.Catches.Push(c);
+        Callback?.Callback?.Push(c);
     }
 
     public virtual bool Execute()
     {
         try
         {
-            // A catch won't handle data retrieval on it's own, as it is just meant to be a dumb container.
+            // A catch won't handle data retrieval on its own, as it is just meant to be a dumb container.
             // Any data retrieval operation should be done here.
             // If, for example, the result returns a void or a bool itself (without having to get data itself)
-            // Just return true. No need to forge a blank Catch. The Lonewolf *should* expect this result.
-            if (Callback is not null) return true; // hunt successful!
-
-            return false; // howled into the air, but no wolf to hear back...
+            // Just return true. No need to forge a blank Catch. The Direwolf *should* expect this result.
+            return Callback is not null; // hunt successful!
         }
         catch
         {
@@ -46,13 +44,11 @@ public abstract record RevitHowl : IRevitHowl
         _rvtDoc = value;
     }
 
-    public override string
-        ToString() // the default implementation will recursively serialize everything up the tree. that is: not good.
+    public override string ToString()
     {
         var d = new Dictionary<string, object>
         {
-            { "Callback", Callback?.GetType().Name ?? "unknown" },
-            { "CreatedAt", DateTime.Now.ToString() }
+            { "Name", Name }, { "CreatedAt", DateTime.Now.ToString() }
         };
         return new Prey(d).ToString();
     }

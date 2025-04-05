@@ -14,8 +14,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Direwolf.Revit.UI", "Direwo
 		{C9A1B9C1-55DC-4F89-A032-D534B884A05E} = {C9A1B9C1-55DC-4F89-A032-D534B884A05E}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Direwolf.Revit.AI", "Direwolf.Revit.AI\Direwolf.Revit.AI.csproj", "{5B08C53B-5CEE-4FF6-AEDD-2D6BEE3B5D24}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Direwolf.Revit.Client", "Direwolf.Revit.Client\Direwolf.Revit.Client.csproj", "{2DCAB039-2CF1-4236-A391-CB1F2F44038D}"
 EndProject
 Global
@@ -40,10 +38,6 @@ Global
 		{88813FC1-5A4E-4AA7-AC20-3127C1685717}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{88813FC1-5A4E-4AA7-AC20-3127C1685717}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{88813FC1-5A4E-4AA7-AC20-3127C1685717}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5B08C53B-5CEE-4FF6-AEDD-2D6BEE3B5D24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5B08C53B-5CEE-4FF6-AEDD-2D6BEE3B5D24}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5B08C53B-5CEE-4FF6-AEDD-2D6BEE3B5D24}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5B08C53B-5CEE-4FF6-AEDD-2D6BEE3B5D24}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2DCAB039-2CF1-4236-A391-CB1F2F44038D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2DCAB039-2CF1-4236-A391-CB1F2F44038D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2DCAB039-2CF1-4236-A391-CB1F2F44038D}.Release|Any CPU.ActiveCfg = Release|Any CPU

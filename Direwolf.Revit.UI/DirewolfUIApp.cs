@@ -4,8 +4,8 @@ using Direwolf.Revit.UI.Libraries;
 namespace Direwolf.Revit.UI;
 
 /// <summary>
-///     UI instance of Direwolf.
-///     All commands are still routed through Direwolf.Revit.dll (and Direwolf.dll), therefore it is independent of the
+///     UI instance of _Direwolf.
+///     All commands are still routed through _Direwolf.Revit.dll (and _Direwolf.dll), therefore it is independent of the
 ///     Revit file itself.
 /// </summary>
 public class DirewolfUIApp : IExternalApplication

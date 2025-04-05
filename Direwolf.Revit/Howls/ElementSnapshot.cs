@@ -14,55 +14,49 @@ public record ElementSnapshot : RevitHowl
 {
     private readonly UIApplication? _app;
 
-    public ElementSnapshot(Document doc, UIApplication app)
+    public ElementSnapshot(UIApplication application)
     {
-        SetRevitDocument(doc);
-        _app = app;
+        _app = application ?? throw new ArgumentNullException(nameof(application));
     }
 
     public override bool Execute()
     {
         try
         {
-            if (_app is not null)
+            var selection = _app?.ActiveUIDocument.Selection.GetElementIds();
+            if (selection == null) return true;
+            
+            // Out of all the elements elementSelected, get the Element, ElementType and ElementId
+            foreach (var (e, selected, elementId) in from selectionFromApp in selection
+                     let elementSelected = GetRevitDocument().GetElement(selectionFromApp)
+                     let elementType = elementSelected?.GetTypeId()
+                     select (selectionFromApp, elementSelected, elementType))
             {
-                var selection = _app.ActiveUIDocument.Selection.GetElementIds();
+                if (elementId is null) continue;
 
-                if (selection is not null)
-                    // Out of all the elements elementSelected, get the Element, ElementType and ElementId
-                    foreach (var (e, selected, elementId) in from selectionFromApp in selection
-                             let elementSelected = GetRevitDocument().GetElement(selectionFromApp)
-                             let elementType = elementSelected?.GetTypeId()
-                             select (selectionFromApp, elementSelected, elementType))
-                    {
-                        if (elementId is null) continue;
+                // Cast the type
+                var elementType = selected?.Document?.GetElement(elementId) as ElementType;
 
-                        // Cast the type
-                        var elementType = selected?.Document?.GetElement(elementId) as ElementType;
+                if (selected is null) continue;
+                // Create a dictionary with the Element's metadata, and then add its parameters.
+                Dictionary<string, object>? element = new()
+                {
+                    ["id"] = selected.Id.Value,
+                    ["uniqueId"] = selected.UniqueId,
+                    ["familyName"] = elementType?.FamilyName ?? string.Empty,
+                    ["elementName"] = selected?.Name ?? string.Empty
+                };
 
-                        if (selected is not null)
-                        {
-                            // Create a dictionary with the Element's metadata, and then add its parameters.
-                            Dictionary<string, object>? element = new()
-                            {
-                                ["id"] = selected.Id.Value,
-                                ["uniqueId"] = selected.UniqueId,
-                                ["familyName"] = elementType?.FamilyName ?? string.Empty,
-                                ["elementName"] = selected?.Name ?? string.Empty
-                            };
+                List<Dictionary<string, object>> result =
+                [
+                    element,
+                    new() { ["parameters"] = GetParameters(selected) },
+                    GetCategory(selected),
+                    new() { ["materials"] = selected.GetMaterialIds(true) }
+                ];
 
-                            List<Dictionary<string, object>> result =
-                            [
-                                element,
-                                new() { ["parameters"] = GetParameters(selected) },
-                                GetCategory(selected),
-                                new() { ["materials"] = selected.GetMaterialIds(true) }
-                            ];
-
-                            // Success!
-                            SendCatchToCallback(new Prey(result));
-                        }
-                    }
+                // Success!
+                SendCatchToCallback(new Prey(result));
             }
 
             return true;

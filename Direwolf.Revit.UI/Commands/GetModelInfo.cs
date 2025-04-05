@@ -5,6 +5,7 @@ using Autodesk.Revit.UI;
 using Direwolf.Definitions;
 using Direwolf.Revit.Howlers;
 using Direwolf.Revit.Howls;
+using Direwolf.Revit.UI.Definitions;
 using Revit.Async;
 
 namespace Direwolf.Revit.UI.Commands;
@@ -24,13 +25,9 @@ public class GetModelInfo : DirewolfRevitCommand
         try
         {
             RevitTask.Initialize(commandData.Application);
-            RevitLonewolf rh = new();
-            rh.CreateWolf(new Wolf(), new GetModelSnapshot(doc));
-            Direwolf dw = new(commandData.Application);
-            dw.QueueHowler(rh);
-            dw.HuntAsync("ModelInfo");
-            dw.SendAllToDb();
-
+            RevitUIDirewolf dw = new(new GetModelHealth(), new DisplayOnScreenConnector(), commandData);
+            dw.Awoo();
+            
             TaskDialog t = new("Query Information")
             {
                 MainInstruction = "Query executed successfully!",

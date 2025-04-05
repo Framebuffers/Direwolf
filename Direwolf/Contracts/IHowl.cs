@@ -8,7 +8,7 @@ namespace Direwolf.Contracts;
 public interface IHowl
 {
     public string Name { get; set; }
-    public IWolf? Callback { get; set; }
+    public Wolf? Callback { get; set; }
     public bool Execute();
     public void SendCatchToCallback(Prey c);
 }

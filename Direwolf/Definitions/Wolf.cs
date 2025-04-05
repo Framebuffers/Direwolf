@@ -1,14 +1,14 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using Direwolf.Contracts;
 
 namespace Direwolf.Definitions;
 
 /// <summary>
 ///     Inside a wolf there is two things: who summoned you, and what you need to do.
-///     When the Lonewolf calls Howls(), the Lonewolf attaches itself to the howl and executes the instruction inside the Howls.
+///     When the Direwolf calls Howls(), the Direwolf attaches itself to the howl and executes the instruction inside the
+///     Howls.
 /// </summary>
-public readonly record struct Wolf(IHowler? Callback, [property: JsonIgnore]IHowl? Instruction) : IWolf
+public readonly record struct Wolf([property: JsonIgnore] IHowler? Callback, [property: JsonIgnore] IHowl? Instruction)
 {
     /// <summary>
     ///     Perform the task held inside <see cref="IHowl.Execute" />.
@@ -16,7 +16,7 @@ public readonly record struct Wolf(IHowler? Callback, [property: JsonIgnore]IHow
     /// <returns>True if task has been performed successfully, false if otherwise.</returns>
     public bool Run()
     {
-        if (Instruction is null) return true; // nothing ran, so no error.
+        if (Instruction is null) return false; // nothing ran, so no error.
         try
         {
             Instruction.Callback = this; // attach to load contents back the chain.
@@ -28,10 +28,5 @@ public readonly record struct Wolf(IHowler? Callback, [property: JsonIgnore]IHow
             Console.WriteLine(e.Message);
             return false;
         }
-    }
-
-    public override string ToString()
-    {
-        return JsonSerializer.Serialize(Callback.Den);
     }
 }

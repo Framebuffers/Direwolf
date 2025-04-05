@@ -5,6 +5,7 @@ using Autodesk.Revit.UI;
 using Direwolf.Definitions;
 using Direwolf.Revit.Howlers;
 using Direwolf.Revit.Introspection;
+using Direwolf.Revit.UI.Definitions;
 using Revit.Async;
 
 namespace Direwolf.Revit.UI.Commands;
@@ -35,14 +36,10 @@ public class GetSelectedElementInfo : DirewolfRevitCommand
             }
 
             RevitTask.Initialize(commandData.Application);
-            RevitLonewolf rh = new();
-            rh.CreateWolf(new Wolf(), new ElementSnapshot(doc, commandData.Application));
-            Direwolf dw = new(commandData.Application);
-            dw.QueueHowler(rh);
-            dw.HuntAsync("ElementInfo");
-            var s = StopTime();
-            Debug.Print($"Time taken: {s}");
-            dw.SendAllToDb();
+            RevitUIDirewolf dw = new(new ElementSnapshot(commandData.Application), new DisplayOnScreenConnector(), commandData);
+            dw.Awoo(); 
+            
+          
             TaskDialog t = new("Query Information")
             {
                 MainInstruction = "Query executed successfully!",
