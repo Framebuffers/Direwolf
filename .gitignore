@@ -371,4 +371,4 @@ xyz.framebuffer.direwolf/.env.prod
 dwolf.code-workspace
 /Direwolf.Revit.AI
 /LookupEngine
-.idea/
+/.idea

@@ -9,4 +9,4 @@
 	url = https://github.com/Framebuffers/direwolf-db
 [submodule "RevitLookup"]
     path = RevitLookup
-    url = https://github.com/Framebuffers/RevitLookup/tree/direwolf
+    url = https://github.com/Framebuffers/RevitLookup
