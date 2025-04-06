@@ -26,7 +26,8 @@ public readonly record struct DisplayOnScreenConnector : IConnector
 
     public Wolfpack[] Read(Direwolf w)
     {
-        return w.ToArray();
+        // return w.ToArray();
+        throw new NotImplementedException();
     }
 
     public bool Update(Direwolf w)
