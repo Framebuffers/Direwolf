@@ -10,7 +10,7 @@ public record GetErrorsAndWarnings : RevitHowl
         SetRevitDocument(doc);
     }
 
-    public override bool Execute()
+    public override bool Hunt()
     {
         Dictionary<string, string> failures = [];
         foreach (var failureMessage in GetRevitDocument().GetWarnings())

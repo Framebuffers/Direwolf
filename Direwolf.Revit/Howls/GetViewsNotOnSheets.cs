@@ -10,7 +10,7 @@ public record GetViewsNotOnSheets : RevitHowl
         SetRevitDocument(doc);
     }
 
-    public override bool Execute()
+    public override bool Hunt()
     {
         using var viewCollector = new FilteredElementCollector(GetRevitDocument())
             .OfClass(typeof(View))

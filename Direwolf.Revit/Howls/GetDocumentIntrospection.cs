@@ -11,14 +11,14 @@ public record GetDocumentIntrospection : RevitHowl
         SetRevitDocument(doc);
     }
 
-    public override bool Execute()
+    public override bool Hunt()
     {
         try
         {
-            SendCatchToCallback(new Prey(new DocumentIntrospection(GetRevitDocument())));
+            SendCatchToCallback(new Prey(DocumentMetadataWolfpack.CreateInstance(GetRevitDocument())));
             SendCatchToCallback(new Prey(new ProjectInformationIntrospection(GetRevitDocument())));
             SendCatchToCallback(new Prey(new ProjectSiteIntrospection(GetRevitDocument())));
-            SendCatchToCallback(new Prey(new UnitIntrospection(GetRevitDocument())));
+            SendCatchToCallback(new Prey(DocumentUnitWolfpack.CreateInstance(GetRevitDocument())));
             return true;
         }
         catch

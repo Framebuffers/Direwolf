@@ -10,7 +10,7 @@ public record GetGridLineCount : RevitHowl
         SetRevitDocument(doc);
     }
 
-    public override bool Execute()
+    public override bool Hunt()
     {
         var d = new Dictionary<string, object>
         {

@@ -3,7 +3,7 @@ using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
 using Direwolf.Definitions;
-using Direwolf.Revit.Utilities;
+using Direwolf.Revit.Extensions;
 using ElementType = Autodesk.Revit.DB.ElementType;
 
 namespace Direwolf.Revit.Howls;
@@ -314,7 +314,7 @@ public record GetModelSnapshot : RevitHowl
                             new Dictionary<string, object>() { ["materials"] = e.GetMaterialIds(true)},
                         ];
 
-                SendCatchToCallback(new Prey(result));
+                SendWolfpackBack(new Prey(result));
                 */
             }
         }
@@ -354,7 +354,7 @@ public record GetModelSnapshot : RevitHowl
             { "worksetElementCount", _worksetElementCount.Count }
         };
 
-        //SendCatchToCallback(new Prey(doc._GetInstancesPerFamily()));
+        //SendWolfpackBack(new Prey(doc._GetInstancesPerFamily()));
         SendCatchToCallback(new Prey(results));
     }
 
@@ -397,7 +397,7 @@ public record GetModelSnapshot : RevitHowl
         return null;
     }
 
-    public override bool Execute()
+    public override bool Hunt()
     {
         ProcessInfo();
         return true;

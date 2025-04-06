@@ -15,11 +15,11 @@ public class RevitUIDirewolf : RevitDirewolf
     private readonly ExternalCommandData _cmd;
 
     // Unlike an array, there's no need to check types before setting the document.
-    public RevitUIDirewolf(IRevitHowl instruction, IDirewolfConnector destination, ExternalCommandData cmd) : base(
+    public RevitUIDirewolf(IRevitHowl instruction, IConnector destination, ExternalCommandData cmd) : base(
         instruction, destination)
     {
         instruction.SetRevitDocument(cmd.Application.ActiveUIDocument.Document);
-        WolfQueue.Enqueue(new Wolf { Instruction = instruction, Callback = this });
+        WolfQueue.Enqueue(new Wolf { Instruction = instruction, Summoner = this });
         _cmd = cmd;
         _connector = destination;
         HuntCompleted += OnHuntCompleted;
@@ -27,7 +27,7 @@ public class RevitUIDirewolf : RevitDirewolf
     
     // Converting from IHowl[] to IRevitHowl[] can cause runtime exceptions on write ops.
     // To get around this, a type check is done for each member of the array.
-    public RevitUIDirewolf(IHowl[] instructions, IDirewolfConnector destination, ExternalCommandData cmd) : base(
+    public RevitUIDirewolf(IHowl[] instructions, IConnector destination, ExternalCommandData cmd) : base(
         instructions, destination)
     {
         foreach (var i in instructions)
@@ -35,7 +35,7 @@ public class RevitUIDirewolf : RevitDirewolf
             if (i is IRevitHowl howl)
             {
                 howl.SetRevitDocument(cmd.Application.ActiveUIDocument.Document);
-                WolfQueue.Enqueue(new Wolf { Instruction = howl, Callback = this });
+                WolfQueue.Enqueue(new Wolf { Instruction = howl, Summoner = this });
             }
             else
             {
@@ -48,7 +48,7 @@ public class RevitUIDirewolf : RevitDirewolf
         HuntCompleted += OnHuntCompleted;
     }
 
-    public override async Task Awoo()
+    public override async Task Howl()
     {
         try
         {

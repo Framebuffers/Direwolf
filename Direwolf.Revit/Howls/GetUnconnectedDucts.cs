@@ -11,7 +11,7 @@ public record GetUnconnectedDucts : RevitHowl
         SetRevitDocument(doc);
     }
 
-    public override bool Execute()
+    public override bool Hunt()
     {
         using var ductCollector = new FilteredElementCollector(GetRevitDocument())
             .OfCategory(BuiltInCategory.OST_DuctCurves)

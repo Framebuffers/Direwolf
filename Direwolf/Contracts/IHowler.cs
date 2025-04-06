@@ -10,8 +10,8 @@ namespace Direwolf.Contracts;
 /// </summary>
 public interface IHowler
 {
-    public Wolfpack GenerateResults(string resultsName);
-    public Task Awoo();
-    public Prey Pop();
-    public void Push(Prey p);
+    public IWolfpack GenerateResults(string resultsName);
+    public Task Howl();
+    public IWolfpack Pop();
+    public void Push(IWolfpack p);
 }

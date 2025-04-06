@@ -10,7 +10,7 @@ public record GetDesignOptions : RevitHowl
         SetRevitDocument(doc);
     }
 
-    public override bool Execute()
+    public override bool Hunt()
     {
         using FilteredElementCollector collector = new(GetRevitDocument());
         ICollection<DesignOption> elements = collector

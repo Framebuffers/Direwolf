@@ -11,7 +11,7 @@ public record GetUnconnectedPipes : RevitHowl
         SetRevitDocument(doc);
     }
 
-    public override bool Execute()
+    public override bool Hunt()
     {
         using var pipeCollector = new FilteredElementCollector(GetRevitDocument())
             .OfCategory(BuiltInCategory.OST_PipeCurves)

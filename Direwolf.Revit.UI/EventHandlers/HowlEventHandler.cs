@@ -24,7 +24,7 @@ public class HowlEventHandler : SyncGenericExternalEventHandler<IRevitHowl, bool
         try
         {
             parameter.SetRevitDocument(doc);
-            parameter.Execute();
+            parameter.Hunt();
             return true;
         }
         catch

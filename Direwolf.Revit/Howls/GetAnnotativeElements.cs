@@ -10,7 +10,7 @@ public record GetAnnotativeElements : RevitHowl
         SetRevitDocument(doc);
     }
 
-    public override bool Execute()
+    public override bool Hunt()
     {
         using FilteredElementCollector collector = new(GetRevitDocument());
         ICollection<Element> annotativeElements = collector

@@ -1,6 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 
-namespace Direwolf.Revit.Utilities;
+namespace Direwolf.Revit.Extensions;
 
 /// <summary>
 ///     Helper extensions to obtain information from a Revit Document, Element or Parameter.

@@ -10,7 +10,7 @@ public record GetElementsByWorkset : RevitHowl
         SetRevitDocument(doc);
     }
 
-    public override bool Execute()
+    public override bool Hunt()
     {
         using var collector = new FilteredElementCollector(GetRevitDocument())
             .WhereElementIsNotElementType();

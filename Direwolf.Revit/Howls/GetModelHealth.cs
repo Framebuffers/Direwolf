@@ -7,12 +7,12 @@ namespace Direwolf.Revit.Howls;
 
 public record GetModelHealth : RevitHowl
 {
-    public override bool Execute()
+    public override bool Hunt()
     {
         try
         {
             Debug.Print($"Executing RevitHowl on document {GetRevitDocument().Title}");
-            SendCatchToCallback(new Prey(new DocumentIntrospection(GetRevitDocument())));
+            SendCatchToCallback(new Prey(DocumentMetadataWolfpack.CreateInstance(GetRevitDocument())));
             return true;
         }
         catch (Exception e)

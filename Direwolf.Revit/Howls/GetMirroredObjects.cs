@@ -10,7 +10,7 @@ public record GetMirroredObjects : RevitHowl
         SetRevitDocument(doc);
     }
 
-    public override bool Execute()
+    public override bool Hunt()
     {
         List<FamilyInstance> familyInstances = new FilteredElementCollector(GetRevitDocument())
             .OfClass(typeof(FamilyInstance))

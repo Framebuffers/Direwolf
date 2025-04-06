@@ -5,7 +5,7 @@ namespace Direwolf.Revit.Howls;
 
 public record GetDocumentTitle(Document Doc) : RevitHowl
 {
-    public override bool Execute()
+    public override bool Hunt()
     {
         var rvtdoc = Doc;
         var data = new Dictionary<string, object>

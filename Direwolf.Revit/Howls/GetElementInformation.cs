@@ -63,7 +63,7 @@ public record GetElementInformation : RevitHowl
         });
     }
 
-    public override bool Execute()
+    public override bool Hunt()
     {
         try
         {

@@ -1,10 +1,8 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using Direwolf.Definitions;
-using Direwolf.Revit.Howls;
-using Direwolf.Revit.Utilities;
+using Direwolf.Revit.Extensions;
 
-namespace Direwolf.Revit.Introspection;
+namespace Direwolf.Revit.Howls;
 
 /// <summary>
 ///     Given an <see cref="Element" />, get the family it belongs to, and return all the parameters for each instance.
@@ -19,7 +17,7 @@ public record ElementSnapshot : RevitHowl
         _app = application ?? throw new ArgumentNullException(nameof(application));
     }
 
-    public override bool Execute()
+    public override bool Hunt()
     {
         try
         {

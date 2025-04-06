@@ -4,9 +4,9 @@ using Direwolf.Contracts;
 namespace Direwolf.Definitions;
 
 /// <summary>
-///     Generic structure for Howls: a wrapper for an Instruction to be executed by a <see cref="Wolf" />.
+///     Generic structure for Howls: a wrapper for an Instruction to be executed by a <see cref="Definitions.Wolf" />.
 /// </summary>
-public record Howl : IHowl
+public abstract record Howl : IHowl
 {
     public string? Name { get; set; } = string.Empty;
 
@@ -15,45 +15,20 @@ public record Howl : IHowl
     ///     property up the chain, eventually to the dispatch <see cref="Direwolf" />.
     /// </summary>
     [JsonIgnore]
-    public Wolf? Callback { get; set; }
+    public IWolf Wolf { get; set; }
 
     /// <summary>
-    ///     Sends <see cref="Prey" /> packages up the chain to the <see cref="IWolf" />.
+    ///     Sends <see cref="Wolfpack" /> packages up the chain to the <see cref="IWolf" />.
     /// </summary>
-    /// <param name="c"></param>
-    public void SendCatchToCallback(Prey c)
-    {
-        Callback?.Callback?.Push(c);
-    }
+    /// <param name="c">Results obtained from a query.</param>
+    public void SendWolfpackBack(IWolfpack c) => Wolf.Summoner.Push(c);
 
     /// <summary>
-    ///     Virtual method to perform a task. Override this method with the code needed to perform any required tasks.
+    ///     Abstract method to perform a task. Override this method with the code needed to perform any required tasks.
     /// </summary>
     /// <returns>True if task has been performed successfully, false if otherwise.</returns>
-    public virtual bool Execute()
-    {
-        try
-        {
-            // A catch won't handle data retrieval on its own, as it is just meant to be a dumb container.
-            // Any data retrieval operation should be done here.
-            // If, for example, the result returns a void or a bool itself (without having to get data itself)
-            // Just return true. No need to forge a blank Catch. The Direwolf *should* expect this result.
-            return Callback is not null; // hunt successful!
-        }
-        catch
-        {
-            return false; // failed to hunt.
-        }
-    }
+    public abstract bool Hunt();
 
     // the default implementation will recursively serialize everything up the tree. that is: not good.
-    public override string ToString()
-    {
-        var d = new Dictionary<string, object>
-        {
-            { "callback", Name ?? "unknown" },
-            { "createdAt", DateTime.Now.ToString() }
-        };
-        return new Prey(d).ToString();
-    }
+    public override string? ToString() => Name;
 }

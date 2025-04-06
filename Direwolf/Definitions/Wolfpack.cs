@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Direwolf.Contracts;
 
 namespace Direwolf.Definitions;
 
@@ -8,22 +9,65 @@ namespace Direwolf.Definitions;
 /// </summary>
 /// <param name="WasCompleted">True if the result within is a successful test, false if otherwise</param>
 /// <param name="TimeTaken">Time, in seconds, taken to generate the results being stored on this WolfQueue</param>
-public readonly record struct Wolfpack
+public readonly record struct Wolfpack : IWolfpack
 {
-    public string Name { get; init; }
-    public DateTime CreatedAt { get; init; }
+    private Wolfpack(string Name = "wolfpack", 
+        bool wasCompleted = false, 
+        double TimeTaken = 0, 
+        object? Data = null)
+    {
+        this.Name = Name;
+        WasCompleted = wasCompleted;
+        this.TimeTaken = TimeTaken;
+        this.Data = Data;
+        Guid = Guid.Empty;
+    }
+
+    public static Wolfpack CreateInstance(string Name = "wolfpack",
+        bool wasCompleted = false,
+        double TimeTaken = 0,
+        object? Data = null)
+    {
+        return new Wolfpack(Name, wasCompleted, TimeTaken, Data);
+    }
+
+    /// <summary>
+    /// Unique identifier for this query.
+    /// </summary>
     public Guid Guid { get; init; }
+
+    /// <summary>
+    /// Unique identifier for this query.
+    /// </summary>
+    public string Name { get; init; }
+
+    /// <summary>
+    /// Creation date of this query.
+    /// </summary>
+    public DateTime CreatedAt { get; init; }
+
+    /// <summary>
+    /// Indicator to store if a query is valid or has been completed.
+    /// It serves as a quickly-indexable value to check for valid results.
+    /// </summary>
     public bool WasCompleted { get; init; }
+
+    /// <summary>
+    /// Time taken to perform this query and serialize its results.
+    /// </summary>
     public double TimeTaken { get; init; }
-    public object Data { get; init; }
 
-    public override string ToString()
-    {
-        return JsonSerializer.Serialize(Data);
-    }
+    /// <summary>
+    /// Results from a query.
+    /// </summary>   
+    public object? Data { get; init; }
 
-    public bool Equals(Wolfpack? other)
-    {
-        return other.Value.Name == Name && other.Value.Guid == Guid;
-    }
+    /// <summary>
+    /// A RevitWolfpack is designed to be easily serialized to any format: JSON, XLSX, CSV--
+    /// But for that, we need to make the process as easy as possible.
+    /// For this, the metadata is stripped from the serialization string and only the data stored
+    /// is serialized when calling <see cref="ToString"/>.
+    /// </summary>
+    /// <returns>The results held inside Data as string.</returns>
+    public override string ToString() => Data?.ToString() ?? string.Empty;
 }

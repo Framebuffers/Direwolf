@@ -10,7 +10,7 @@ public record GetUnconnectedElectrical : RevitHowl
         SetRevitDocument(doc);
     }
 
-    public override bool Execute()
+    public override bool Hunt()
     {
         using var electricalCollector = new FilteredElementCollector(GetRevitDocument())
             .OfCategory(BuiltInCategory.OST_ElectricalFixtures)

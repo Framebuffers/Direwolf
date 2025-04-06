@@ -1,11 +1,9 @@
 ﻿using System.Diagnostics;
-using System.Text.Json;
-using Direwolf.Definitions;
-using MongoDB.Bson;
+using Direwolf.Contracts;
 
-namespace Direwolf;
+namespace Direwolf.Definitions.Connectors;
 
-public readonly record struct DisplayOnScreenConnector : IDirewolfConnector
+public readonly record struct DisplayOnScreenConnector : IConnector
 {
     public bool Connect()
     {
@@ -26,7 +24,7 @@ public readonly record struct DisplayOnScreenConnector : IDirewolfConnector
         return true;
     }
 
-    public Prey[]? Read(Direwolf w)
+    public Wolfpack[] Read(Direwolf w)
     {
         return w.ToArray();
     }

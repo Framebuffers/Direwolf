@@ -10,7 +10,7 @@ public record GetImportedInstances : RevitHowl
         SetRevitDocument(doc);
     }
 
-    public override bool Execute()
+    public override bool Hunt()
     {
         ICollection<Element> importedImages = new FilteredElementCollector(GetRevitDocument())
             .OfClass(typeof(ImportInstance))

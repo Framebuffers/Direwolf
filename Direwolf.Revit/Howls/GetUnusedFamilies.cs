@@ -10,7 +10,7 @@ public record GetUnusedFamilies : RevitHowl
         SetRevitDocument(doc);
     }
 
-    public override bool Execute()
+    public override bool Hunt()
     {
         using var familyCollector = new FilteredElementCollector(GetRevitDocument())
             .OfClass(typeof(Family));

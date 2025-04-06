@@ -11,7 +11,7 @@ public record GetUnenclosedRooms : RevitHowl
         SetRevitDocument(doc);
     }
 
-    public override bool Execute()
+    public override bool Hunt()
     {
         using var roomCollector = new FilteredElementCollector(GetRevitDocument())
             .OfCategory(BuiltInCategory.OST_Rooms)

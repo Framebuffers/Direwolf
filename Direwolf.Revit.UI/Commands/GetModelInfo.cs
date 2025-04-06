@@ -2,7 +2,9 @@
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Direwolf.Contracts;
 using Direwolf.Definitions;
+using Direwolf.Definitions.Connectors;
 using Direwolf.Revit.Howlers;
 using Direwolf.Revit.Howls;
 using Direwolf.Revit.UI.Definitions;
@@ -26,7 +28,7 @@ public class GetModelInfo : DirewolfRevitCommand
         {
             RevitTask.Initialize(commandData.Application);
             RevitUIDirewolf dw = new(new GetModelHealth(), new DisplayOnScreenConnector(), commandData);
-            dw.Awoo();
+            dw.Howl();
             
             TaskDialog t = new("Query Information")
             {

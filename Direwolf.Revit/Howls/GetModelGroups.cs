@@ -10,7 +10,7 @@ public record GetModelGroups : RevitHowl
         SetRevitDocument(doc);
     }
 
-    public override bool Execute()
+    public override bool Hunt()
     {
         ICollection<Element> modelGroups = new FilteredElementCollector(GetRevitDocument())
             .OfClass(typeof(Group))

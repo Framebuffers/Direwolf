@@ -11,7 +11,7 @@ namespace Direwolf;
 ///     Direwolf creates wolves, taking a prototype Direwolf, attaching a Howls (an instruction) and itself as a callback.
 ///     Then, to dispatch wolves, it executes a function inside each Direwolf.
 /// </summary>
-public class Direwolf : Stack<Prey>, IHowler
+public class Direwolf : Stack<IWolfpack>, IHowler
 {
     #region Hunting
 
@@ -21,10 +21,10 @@ public class Direwolf : Stack<Prey>, IHowler
     ///     Performs the query. Summons all the workers held in <see cref="WolfQueue" />,
     ///     executes the <see cref="Wolf.Run" /> method inside each other, and waits back for them to come back.
     ///     When the process is completed, the <see cref="HuntCompleted" /> event is invoked, signalling the
-    ///     <see cref="Direwolf" /> that the process has been completed and that <see cref="IDirewolfConnector.Create" />
+    ///     <see cref="Direwolf" /> that the process has been completed and that <see cref="IConnector.Create" />
     ///     will be called.
     /// </summary>
-    public virtual async Task Awoo()
+    public virtual async Task Howl()
     {
         try
         {
@@ -46,7 +46,7 @@ public class Direwolf : Stack<Prey>, IHowler
 
     public override string ToString()
     {
-        return JsonSerializer.Serialize(this.Select(x => x.Result));
+        return JsonSerializer.Serialize(this.Select(x => x.Data));
     }
 
     #endregion
@@ -54,39 +54,23 @@ public class Direwolf : Stack<Prey>, IHowler
     #region Constructors
 
     /// <summary>
-    ///     Factory of <see cref="Wolf" /> workers. Takes a <see cref="IHowl" /> instruction, attaches it to the Callback of a
+    ///     Factory of <see cref="Wolf" /> workers. Takes a <see cref="IHowl" /> instruction, attaches it to the Summoner of a
     ///     given <see cref="Wolf" />, and enqueues the resulting Direwolf to the WolfQueue.
     /// </summary>
     /// <param name="runner"></param>
     /// <param name="instruction"></param>
-    protected Direwolf(IHowl instruction, IDirewolfConnector destination) // wolf factory
+    protected Direwolf(IHowl instruction, IConnector destination)
     {
-        Wolf w = new() { Instruction = instruction, Callback = this };
+        Wolf w = new(callback: this, instruction: instruction); 
         _connector = destination;
         WolfQueue.Enqueue(w);
         HuntCompleted += OnHuntCompleted;
     }
 
-    /// <summary>
-    ///     <inheritdoc cref="Direwolf" />
-    /// </summary>
-    /// <param name="instructions">
-    ///     <inheritdoc cref="IHowl" />
-    /// </param>
-    /// <param name="destination"><<inheritdoc cref="IHowler" />
-    /// </param>
-    protected Direwolf(IHowl[] instructions, IDirewolfConnector destination)
+    internal static Direwolf CreateInstance(IHowl instruction, IConnector destination)
     {
-        foreach (var i in instructions)
-        {
-            Wolf w = new() { Instruction = i, Callback = this };
-            WolfQueue.Enqueue(w);
-        }
-
-        HuntCompleted += OnHuntCompleted;
-        _connector = destination;
+        return new Direwolf(instruction, destination);
     }
-
     #endregion
 
     #region Properties
@@ -99,26 +83,28 @@ public class Direwolf : Stack<Prey>, IHowler
     /// <summary>
     ///     Connection to an external source to offload generated data.
     /// </summary>
-    [JsonIgnore] protected IDirewolfConnector? _connector;
+    [JsonIgnore] protected IConnector? _connector;
 
     /// <summary>
     ///     Serialized and processed results from a Hunt. While the class itself holds the ray <see cref="Prey" />
     ///     records in a stack, a <see cref="Wolfpack" /> includes metadata about the hunting process and a
     ///     unique identifier for the query.
     /// </summary>
-    public Wolfpack GenerateResults(string resultsName)
+    public IWolfpack GenerateResults(string resultsName = "wolfpack")
     {
         var g = Guid.NewGuid();
         
-        return new Wolfpack
+        Wolfpack w = new()
         {
             Name = resultsName,
             CreatedAt = DateTime.UtcNow,
             Guid = g,
             WasCompleted = true,
             TimeTaken = TimeTaken.Elapsed.TotalSeconds,
-            Data = JsonSerializer.Serialize(this)
+            Data = ToString()
         };
+        
+        return w;
     }
 
     #endregion
@@ -139,7 +125,7 @@ public class Direwolf : Stack<Prey>, IHowler
         }
     }
 
-    public virtual async Task<Prey[]?> Read()
+    public virtual async Task<Wolfpack[]?> Read()
     {
         if (_connector == null) throw new NullReferenceException();
         try
