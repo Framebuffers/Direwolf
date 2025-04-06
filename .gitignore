@@ -370,3 +370,5 @@ xyz.framebuffer.direwolf/.env.prod
 .web-r2.code-workspace
 dwolf.code-workspace
 /Direwolf.Revit.AI
+/LookupEngine
+.idea/

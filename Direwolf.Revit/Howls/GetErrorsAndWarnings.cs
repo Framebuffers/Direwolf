@@ -21,7 +21,7 @@ public record GetErrorsAndWarnings : RevitHowl
         {
             ["errorsAndWarnings"] = failures
         };
-        SendCatchToCallback(new Prey(d));
+        // SendCatchToCallback(new Prey(d));
         return true;
     }
 }

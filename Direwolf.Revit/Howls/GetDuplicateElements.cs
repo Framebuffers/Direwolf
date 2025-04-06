@@ -67,7 +67,7 @@ public record GetDuplicateElements : RevitHowl
         {
             ["duplicateElements"] = elementGroups
         };
-        SendCatchToCallback(new Prey(d));
+        // SendCatchToCallback(new Prey(d));
         return true;
     }
 }

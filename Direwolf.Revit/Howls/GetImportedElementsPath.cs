@@ -30,7 +30,7 @@ public record GetImportedElementsPath : RevitHowl
         {
             ["importedElements"] = results
         };
-        SendCatchToCallback(new Prey(d));
+        // SendCatchToCallback(new Prey(d));
         return true;
     }
 }

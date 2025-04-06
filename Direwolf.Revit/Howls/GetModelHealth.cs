@@ -12,12 +12,12 @@ public record GetModelHealth : RevitHowl
         try
         {
             Debug.Print($"Executing RevitHowl on document {GetRevitDocument().Title}");
-            SendCatchToCallback(new Prey(DocumentMetadataWolfpack.CreateInstance(GetRevitDocument())));
+            // SendCatchToCallback(new Prey(DocumentMetadataWolfpack.CreateInstance(GetRevitDocument())));
             return true;
         }
         catch (Exception e)
         {
-            SendCatchToCallback(new Prey($"Exception thrown. Message:\n{e.Message}"));
+            // SendCatchToCallback(new Prey($"Exception thrown. Message:\n{e.Message}"));
             return false;
         }
     }

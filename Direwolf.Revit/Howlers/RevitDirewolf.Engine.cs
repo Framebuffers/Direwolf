@@ -47,6 +47,12 @@ public partial class RevitDirewolf
     /// <param name="???"></param>
     /// <returns></returns>
     public static object ReapElement(object? element)
-    {   
+    {
+        void a()
+        {
+            
+        }
+
+        return null;
     }
 }

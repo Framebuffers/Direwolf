@@ -27,7 +27,7 @@ public record GetDetailGroups : RevitHowl
         {
             ["detailGroups"] = results
         };
-        SendCatchToCallback(new Prey(d));
+        // SendCatchToCallback(new Prey(d));
         return true;
     }
 }

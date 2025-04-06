@@ -36,10 +36,10 @@ public record GetElementIdByFamily : RevitHowl
                 value.Add(e.Id.Value);
             }
 
-            SendCatchToCallback(new Prey(new Dictionary<string, object>
-            {
-                ["elementsByFamily"] = elementsSortedByFamily
-            }));
+            // SendCatchToCallback(new Prey(new Dictionary<string, object>
+            // {
+            //     ["elementsByFamily"] = elementsSortedByFamily
+            // }));
             return true;
         }
         catch

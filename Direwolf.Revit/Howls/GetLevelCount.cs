@@ -18,7 +18,7 @@ public record GetLevelCount : RevitHowl
                 .OfClass(typeof(Level))
                 .GetElementCount()
         };
-        SendCatchToCallback(new Prey(d));
+        // SendCatchToCallback(new Prey(d));
         return true;
     }
 }

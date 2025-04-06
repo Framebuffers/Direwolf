@@ -36,5 +36,14 @@
         <ProjectReference Include="..\Direwolf\Direwolf.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="LookupEngine">
+        <HintPath>Libraries\LookupEngine.dll</HintPath>
+      </Reference>
+      <Reference Include="LookupEngine.Abstractions">
+        <HintPath>Libraries\LookupEngine.Abstractions.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 
 </Project>

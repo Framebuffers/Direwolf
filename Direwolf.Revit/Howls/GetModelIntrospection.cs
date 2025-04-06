@@ -18,7 +18,7 @@ public record GetModelIntrospection : RevitHowl
         }
         catch (Exception e)
         {
-            SendCatchToCallback(new Prey($"Exception thrown. Message:\n{e.Message}"));
+            // SendCatchToCallback(new Prey($"Exception thrown. Message:\n{e.Message}"));
             return false;
         }
     }

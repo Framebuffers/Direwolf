@@ -25,28 +25,28 @@ public class RevitUIDirewolf : RevitDirewolf
         HuntCompleted += OnHuntCompleted;
     }
     
-    // Converting from IHowl[] to IRevitHowl[] can cause runtime exceptions on write ops.
-    // To get around this, a type check is done for each member of the array.
-    public RevitUIDirewolf(IHowl[] instructions, IConnector destination, ExternalCommandData cmd) : base(
-        instructions, destination)
-    {
-        foreach (var i in instructions)
-        {
-            if (i is IRevitHowl howl)
-            {
-                howl.SetRevitDocument(cmd.Application.ActiveUIDocument.Document);
-                WolfQueue.Enqueue(new Wolf { Instruction = howl, Summoner = this });
-            }
-            else
-            {
-                throw new ArgumentException("Howl is not a RevitHowl");
-            }
-        }
-
-        _cmd = cmd;
-        _connector = destination;
-        HuntCompleted += OnHuntCompleted;
-    }
+    // // Converting from IHowl[] to IRevitHowl[] can cause runtime exceptions on write ops.
+    // // To get around this, a type check is done for each member of the array.
+    // public RevitUIDirewolf(IHowl[] instructions, IConnector destination, ExternalCommandData cmd) : base(
+    //     instructions, destination)
+    // {
+    //     foreach (var i in instructions)
+    //     {
+    //         if (i is IRevitHowl howl)
+    //         {
+    //             howl.SetRevitDocument(cmd.Application.ActiveUIDocument.Document);
+    //             WolfQueue.Enqueue(new Wolf { Instruction = howl, Summoner = this });
+    //         }
+    //         else
+    //         {
+    //             throw new ArgumentException("Howl is not a RevitHowl");
+    //         }
+    //     }
+    //
+    //     _cmd = cmd;
+    //     _connector = destination;
+    //     HuntCompleted += OnHuntCompleted;
+    // }
 
     public override async Task Howl()
     {

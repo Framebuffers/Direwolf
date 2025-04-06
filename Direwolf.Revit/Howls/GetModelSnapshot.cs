@@ -355,7 +355,7 @@ public record GetModelSnapshot : RevitHowl
         };
 
         //SendWolfpackBack(new Prey(doc._GetInstancesPerFamily()));
-        SendCatchToCallback(new Prey(results));
+        // SendCatchToCallback(new Prey(results));
     }
 
     private static Dictionary<string, object>? GetCategory(Element e)

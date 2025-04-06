@@ -8,4 +8,9 @@ public record GetFamilyIntrospection : RevitHowl
     {
         SetRevitDocument(doc);
     }
+
+    public override bool Hunt()
+    {
+        throw new NotImplementedException();
+    }
 }

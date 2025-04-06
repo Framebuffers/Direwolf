@@ -35,7 +35,7 @@ public record GetUnconnectedElectrical : RevitHowl
         {
             ["unconnectedElectrical"] = unconnectedConnections
         };
-        SendCatchToCallback(new Prey(d));
+        // SendCatchToCallback(new Prey(d));
         return true;
     }
 }

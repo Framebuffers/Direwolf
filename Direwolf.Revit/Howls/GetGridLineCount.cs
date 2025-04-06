@@ -18,7 +18,7 @@ public record GetGridLineCount : RevitHowl
                 .OfClass(typeof(Grid))
                 .GetElementCount()
         };
-        SendCatchToCallback(new Prey(d));
+        // SendCatchToCallback(new Prey(d));
         return true;
     }
 }

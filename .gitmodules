@@ -7,6 +7,6 @@
 [submodule "direwolf-db"]
 	path = direwolf-web/direwolf-db
 	url = https://github.com/Framebuffers/direwolf-db
-[submodule "LookupEngine"]
-    path = LookupEngine
-    url = https://github.com/Framebuffers/LookupEngine
+[submodule "RevitLookup"]
+    path = RevitLookup
+    url = https://github.com/Framebuffers/RevitLookup/tree/direwolf

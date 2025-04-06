@@ -54,7 +54,7 @@ public record ElementSnapshot : RevitHowl
                 ];
 
                 // Success!
-                SendCatchToCallback(new Prey(result));
+                // SendCatchToCallback(new Prey(result));
             }
 
             return true;

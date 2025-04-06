@@ -27,7 +27,7 @@ public record GetAnnotativeElements : RevitHowl
             ["annotativeElements"] = results
         };
 
-        SendCatchToCallback(new Prey(c));
+        // SendCatchToCallback(new Prey(c));
         return true;
     }
 }

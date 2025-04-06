@@ -23,7 +23,7 @@ public record GetImportedInstances : RevitHowl
         {
             ["importedImages"] = results
         };
-        SendCatchToCallback(new Prey(d));
+        // SendCatchToCallback(new Prey(d));
         return true;
     }
 }

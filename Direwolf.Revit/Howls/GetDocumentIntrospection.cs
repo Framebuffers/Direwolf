@@ -15,10 +15,10 @@ public record GetDocumentIntrospection : RevitHowl
     {
         try
         {
-            SendCatchToCallback(new Prey(DocumentMetadataWolfpack.CreateInstance(GetRevitDocument())));
-            SendCatchToCallback(new Prey(new ProjectInformationIntrospection(GetRevitDocument())));
-            SendCatchToCallback(new Prey(new ProjectSiteIntrospection(GetRevitDocument())));
-            SendCatchToCallback(new Prey(DocumentUnitWolfpack.CreateInstance(GetRevitDocument())));
+            // SendCatchToCallback(new Prey(DocumentMetadataWolfpack.CreateInstance(GetRevitDocument())));
+            // SendCatchToCallback(new Prey(new ProjectInformationIntrospection(GetRevitDocument())));
+            // SendCatchToCallback(new Prey(new ProjectSiteIntrospection(GetRevitDocument())));
+            // SendCatchToCallback(new Prey(DocumentUnitWolfpack.CreateInstance(GetRevitDocument())));
             return true;
         }
         catch
