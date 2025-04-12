@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 namespace Direwolf.Revit.UI.Commands;
@@ -9,8 +8,6 @@ namespace Direwolf.Revit.UI.Commands;
 /// </summary>
 public abstract class DirewolfRevitCommand : IExternalCommand
 {
-    protected Stopwatch TimeTaken { get; set; } = new();
-
     /// <summary>
     ///     <inheritdoc />
     /// </summary>
@@ -27,16 +24,4 @@ public abstract class DirewolfRevitCommand : IExternalCommand
     ///     <inheritdoc />
     /// </returns>
     public abstract Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements);
-
-    protected void StartTime()
-    {
-        TimeTaken = new Stopwatch();
-        TimeTaken.Start();
-    }
-
-    protected double StopTime()
-    {
-        TimeTaken.Stop();
-        return TimeTaken.Elapsed.TotalSeconds;
-    }
 }

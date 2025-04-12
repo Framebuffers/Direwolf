@@ -14,18 +14,16 @@ public class DirewolfUIApp : IExternalApplication
     {
         var rp = application.CreateRibbonPanel("Database");
 
-        PushButtonData elementInfo = new("elementToDB", "Send Element to DB", References.AssemblyLocation,
-            "Direwolf.Revit.UI.Commands.GetSelectedElementInfo");
+        // PushButtonData native = new("revitNative", "Revit Native Query", References.AssemblyLocation,
+        //     "Direwolf.Revit.UI.Commands.TestingRig.NativeRevitCommand");
 
-        PushButtonData modelInfo = new("modelToDB", "Send Model to DB", References.AssemblyLocation,
-            "Direwolf.Revit.UI.Commands.GetModelInfo");
+        PushButtonData async = new("direwolfAsync", "Revit Async Query", References.AssemblyLocation,
+            "Direwolf.Revit.UI.Commands.TestingRig.RunAllTestsCommand");
+        //
+        // PushButtonData runAll = new("test", "Test all", References.AssemblyLocation,
+        //     "Direwolf.Revit.UI.Commands.TestingRig.RunAllTestsCommand");
 
-        PushButtonData aboutInfo = new("direwolfInfo", "About", References.AssemblyLocation,
-            "Direwolf.Revit.UI.Commands.GetInfo");
-
-        rp.AddStackedItems(modelInfo, elementInfo);
-        rp.AddItem(aboutInfo);
-
+        rp.AddItem(async);
         return Result.Succeeded;
     }
 

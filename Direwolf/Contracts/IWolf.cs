@@ -4,6 +4,7 @@ public interface IWolf
 {
     public IHowler Summoner { get; init; }
     public IHowl Instruction { get; init; }
-    public bool Run();
-    
+    public IWolfpack? Result { get; set; }
+    public List<IConnector> Destinations { get; init; }
+    public void Hunt();
 }

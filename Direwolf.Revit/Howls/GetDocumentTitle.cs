@@ -1,18 +1,26 @@
-﻿using Autodesk.Revit.DB;
-using Direwolf.Definitions;
+﻿using System.Diagnostics;
+using Direwolf.Revit.Definitions.Primitives;
 
 namespace Direwolf.Revit.Howls;
 
-public record GetDocumentTitle(Document Doc) : RevitHowl
+public record GetDocumentTitle : RevitHowl
 {
-    public override bool Hunt()
+    public override RevitWolfpack? ExecuteHunt()
     {
-        var rvtdoc = Doc;
-        var data = new Dictionary<string, object>
-        {
-            ["Title"] = rvtdoc.Title
-        };
-        // SendCatchToCallback(new Prey(data));
-        return true;
+        // test time check
+        Stopwatch s = new();
+
+        s.Start();
+        var title = Document?.Title;
+        s.Stop();
+
+        // do a null check before returning
+        return Document is not null
+            ? RevitWolfpack.New("docTitle",
+                Document,
+                title,
+                s.ElapsedMilliseconds,
+                true)
+            : null;
     }
 }

@@ -18,8 +18,12 @@
         <ProjectReference Include="..\Direwolf.Revit\Direwolf.Revit.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <Folder Include="Definitions\"/>
+    </ItemGroup>
+
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-      <Exec Command="@echo off&#xA;&#xA;set installpath=%25ProgramData%25\Autodesk\Revit\Addins\2025\Direwolf&#xA;set revitfolder=%25ProgramData%25\Autodesk\Revit\Addins\2025&#xA;&#xA;echo Installing Direwolf&#xA;echo Target is %25installpath%25&#xA;echo $(ProjectDir)&#xA;&#xA;rmdir /S /Q %25installpath%25&#xA;mkdir %25installpath%25&#xA;&#xA;echo Folder exists or has been created. Proceeding...&#xA;&#xA;echo Copying files...&#xA;xcopy /F /Y /D $(TargetDir)*.* %25installpath%25\*.*&#xA;xcopy /F /Y /D $(ProjectDir)*.addin %25revitfolder%25\&#xA;xcopy /F /Y /D $(ProjectDir)Libraries\*.dll %25installpath%25\&#xA;&#xA;echo Build installed! Awoo!&#xA;" />
+        <Exec Command="@echo off&#xA;&#xA;set installpath=%25ProgramData%25\Autodesk\Revit\Addins\2025\Direwolf&#xA;set revitfolder=%25ProgramData%25\Autodesk\Revit\Addins\2025&#xA;&#xA;echo Installing Direwolf&#xA;echo Target is %25installpath%25&#xA;echo $(ProjectDir)&#xA;&#xA;rmdir /S /Q %25installpath%25&#xA;mkdir %25installpath%25&#xA;&#xA;echo Folder exists or has been created. Proceeding...&#xA;&#xA;echo Copying files...&#xA;xcopy /F /Y /D $(TargetDir)*.* %25installpath%25\*.*&#xA;xcopy /F /Y /D $(ProjectDir)*.addin %25revitfolder%25\&#xA;xcopy /F /Y /D $(ProjectDir)Libraries\*.dll %25installpath%25\&#xA;&#xA;echo Build installed! Awoo!&#xA;"/>
     </Target>
 
 </Project>

@@ -4,9 +4,5 @@ public readonly record struct ElementEntity
 {
     public ElementEntity()
     {
-        
     }
-    
-    
-    
 }

@@ -1,6 +1,4 @@
-﻿using Direwolf.Definitions;
-
-namespace Direwolf.Contracts;
+﻿namespace Direwolf.Contracts;
 
 /// <summary>
 ///     Dispatch source from where <see cref="IWolf" /> runners are sent, <see cref="IHowl" /> instructions are set for
@@ -10,8 +8,6 @@ namespace Direwolf.Contracts;
 /// </summary>
 public interface IHowler
 {
-    public IWolfpack GenerateResults(string resultsName);
+    public Dictionary<IConnector, List<IWolfpack>> ProcessedResults { get; set; }
     public Task Howl();
-    public IWolfpack Pop();
-    public void Push(IWolfpack p);
 }

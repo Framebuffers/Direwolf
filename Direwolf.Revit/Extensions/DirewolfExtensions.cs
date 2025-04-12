@@ -35,8 +35,6 @@ public static class DirewolfExtensions
         {
             throw new Exception("Error while creating folder");
         } // because, else, it could file in the middle
-
-        throw new Exception("The routine could not be initialized. Reason: Could not get into the try/catch clause.");
     }
 
     public static IEnumerable<Family> _GetFamilies(this Document doc)
