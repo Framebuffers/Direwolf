@@ -18,15 +18,15 @@ public readonly record struct DocumentMetadataWolfpack : IWolfpack
     {
         Document = document;
         Name = document.Title ?? string.Empty;
-        RevitDocument = new RevitDocumentId(document);
+        RevitDocument = new RevitDocumentEpisode(document);
     }
 
     /// <summary>
-    ///     A <see cref="RevitDocumentId" /> joins both the unique identifiers of a document (its CreationGUID)
+    ///     A <see cref="RevitDocumentEpisode" /> joins both the unique identifiers of a document (its CreationGUID)
     ///     alongside identifiers from a specific "episode" (its VersionGUID and save count number).
-    ///     Two RevitDocumentId are equal when they match in CreationGUID.
+    ///     Two RevitDocumentEpisode are equal when they match in CreationGUID.
     /// </summary>
-    public RevitDocumentId RevitDocument { get; init; }
+    public RevitDocumentEpisode RevitDocument { get; init; }
 
     private Dictionary<string, object> DocumentData =>
         new()

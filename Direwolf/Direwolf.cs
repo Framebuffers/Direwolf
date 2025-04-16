@@ -36,7 +36,7 @@ public abstract class Direwolf : IHowler
     ///     Performs the query. Summons all the workers held in <see cref="WolfQueue" />,
     ///     executes the <see cref="Wolf.Hunt" /> method inside each other, and waits back for them to come back.
     ///     When the process is completed, the <see cref="HuntCompleted" /> event is invoked, signalling the
-    ///     <see cref="Direwolf" /> that the process has been completed and that <see cref="Contracts.IConnector.Create" />
+    ///     <see cref="Direwolf" /> that the process has been completed and that <see cref="IConnector.Write" />
     ///     will be called.
     /// </summary>
     public abstract Task Howl();

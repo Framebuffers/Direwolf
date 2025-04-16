@@ -16,7 +16,7 @@
 //         {
 //             RevitTask.Initialize(commandData.Application);
 //             var dw = RevitDirewolf.CreateInstance(commandData.Application);
-//             dw.CreateWolf(new GetDocumentTitle(),
+//             dw.CreateWolf(new DocumentTitle(),
 //                 new DisplayOnScreenConnector());
 //             dw.Howl();
 //             return Result.Succeeded;

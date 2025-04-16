@@ -5,5 +5,5 @@ namespace Direwolf.Revit.Contracts;
 
 public interface IRevitWolfpack : IWolfpack
 {
-    public RevitDocumentId RevitDocument { get; init; }
+    public RevitDocumentEpisode RevitDocument { get; init; }
 }

@@ -66,7 +66,8 @@ public record RevitWolf : IRevitWolf
         instruction = Instruction;
     }
 
-    public override string ToString() // don't serialize this record: it's just a vessel for the Task being ran.
+    // don't serialize this record: it's just a vessel for the Task being run
+    public override string ToString()
     {
         return GetType().Name;
     }

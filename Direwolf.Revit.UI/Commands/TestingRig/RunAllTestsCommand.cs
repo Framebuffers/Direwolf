@@ -15,11 +15,8 @@ public class RunAllTestsCommand : IExternalCommand
         try
         {
             var async = RevitUIDirewolf.CreateInstance(commandData.Application);
-            async.CreateWolf(new GetDocumentTitle(),
-                new List<IConnector> { new DisplayOnScreenConnector(), new Test2Connector() });
-            async.CreateWolf(new GetDocumentTitle(), new List<IConnector> { new Test2Connector() });
-            async.CreateWolf(new GetDocumentTitle(),
-                new List<IConnector> { new DisplayOnScreenConnector(), new DisplayOnScreenConnector() });
+            async.CreateWolf(new ElementDefinitions(),
+                new List<IConnector> { new DisplayOnScreenConnector(), new JsonFileConnector() });
             async.Howl();
             return Result.Succeeded;
         }

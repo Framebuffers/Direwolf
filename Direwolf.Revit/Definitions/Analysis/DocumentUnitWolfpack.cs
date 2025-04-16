@@ -17,7 +17,7 @@ public readonly record struct DocumentUnitWolfpack : IRevitWolfpack
     {
         Document = document;
         Name = document.Title ?? string.Empty;
-        RevitDocument = new RevitDocumentId(document);
+        RevitDocument = new RevitDocumentEpisode(document);
     }
 
     private Dictionary<string, object> Units =>
@@ -66,11 +66,11 @@ public readonly record struct DocumentUnitWolfpack : IRevitWolfpack
     public double TimeTaken { get; }
 
     /// <summary>
-    ///     A <see cref="RevitDocumentId" /> joins both the unique identifiers of a document (its CreationGUID)
+    ///     A <see cref="RevitDocumentEpisode" /> joins both the unique identifiers of a document (its CreationGUID)
     ///     alongside identifiers from a specific "episode" (its VersionGUID and save count number).
-    ///     Two RevitDocumentId are equal when they match in CreationGUID.
+    ///     Two RevitDocumentEpisode are equal when they match in CreationGUID.
     /// </summary>
-    public RevitDocumentId RevitDocument { get; init; }
+    public RevitDocumentEpisode RevitDocument { get; init; }
 
     /// <summary>
     ///     Implements the <see cref="IWolfpack.Data" /> part of the interface. For a RevitWolfpack, there's a main

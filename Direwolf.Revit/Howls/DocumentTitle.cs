@@ -3,13 +3,13 @@ using Direwolf.Revit.Definitions.Primitives;
 
 namespace Direwolf.Revit.Howls;
 
-public record GetDocumentTitle : RevitHowl
+public record DocumentTitle : RevitHowl
 {
     public override RevitWolfpack? ExecuteHunt()
     {
         // test time check
         Stopwatch s = new();
-
+        
         s.Start();
         var title = Document?.Title;
         s.Stop();

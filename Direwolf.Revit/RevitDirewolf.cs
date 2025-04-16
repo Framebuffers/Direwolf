@@ -28,7 +28,7 @@ public class RevitDirewolf : Direwolf
         foreach (var connector in ProcessedResults)
         {
             Debug.Print("Loading data");
-            connector.Key.Create(connector.Value);
+            connector.Key.Write(connector.Value);
         }
     }
 

@@ -15,18 +15,32 @@ public readonly record struct RevitWolfpack : IRevitWolfpack
     {
         Guid = Guid.NewGuid();
         Name = name ?? string.Empty;
-        RevitDocument = new RevitDocumentId(doc);
+        RevitDocument = new RevitDocumentEpisode(doc);
         CreatedAt = DateTime.UtcNow;
         WasCompleted = wasCompleted;
         TimeTaken = timeTaken;
         Data = data;
     }
+    private RevitWolfpack(string? name,
+        RevitDocumentEpisode episode,
+            bool wasCompleted = false,
+            double timeTaken = 0,
+            object? data = null)
+        {
+            Guid = Guid.NewGuid();
+            Name = name ?? string.Empty;
+            RevitDocument = episode;
+            CreatedAt = DateTime.UtcNow;
+            WasCompleted = wasCompleted;
+            TimeTaken = timeTaken;
+            Data = data;
+        }
 
     private RevitWolfpack(IWolfpack wolfpack, Document doc)
     {
         Guid = wolfpack.Guid;
         Name = wolfpack.Name;
-        RevitDocument = new RevitDocumentId(doc);
+        RevitDocument = new RevitDocumentEpisode(doc);
         CreatedAt = wolfpack.CreatedAt;
         WasCompleted = wolfpack.WasCompleted;
         TimeTaken = wolfpack.TimeTaken;
@@ -59,11 +73,11 @@ public readonly record struct RevitWolfpack : IRevitWolfpack
     public double TimeTaken { get; init; }
 
     /// <summary>
-    ///     A <see cref="RevitDocumentId" /> joins both the unique identifiers of a document (its CreationGUID)
+    ///     A <see cref="RevitDocumentEpisode" /> joins both the unique identifiers of a document (its CreationGUID)
     ///     alongside identifiers from a specific "episode" (its VersionGUID and save count number).
-    ///     Two RevitDocumentId are equal when they match in CreationGUID.
+    ///     Two RevitDocumentEpisode are equal when they match in CreationGUID.
     /// </summary>
-    public RevitDocumentId RevitDocument { get; init; }
+    public RevitDocumentEpisode RevitDocument { get; init; }
 
     /// <summary>
     ///     Implements the <see cref="IWolfpack.Data" /> part of the interface. For a RevitWolfpack, there's a main
@@ -84,5 +98,14 @@ public readonly record struct RevitWolfpack : IRevitWolfpack
     public static RevitWolfpack New(IWolfpack wolfpack, Document doc)
     {
         return new RevitWolfpack(wolfpack, doc);
+    }
+
+    public static RevitWolfpack New(string? name,
+        RevitDocumentEpisode episode,
+        object? data,
+        double timeTaken = 0,
+        bool wasCompleted = false)
+    {
+        return new RevitWolfpack(name, episode, wasCompleted, timeTaken, data);
     }
 }

@@ -10,7 +10,7 @@
 //
 // namespace Direwolf.Revit.Howls;
 //
-// public record GetModelSnapshot : Definitions.Primitives.RevitHowl
+// public record ModelSnapshot : Definitions.Primitives.RevitHowl
 // {
 //     private readonly List<Element> _annotativeElements = [];
 //     private readonly List<DesignOption> _designOptions = [];

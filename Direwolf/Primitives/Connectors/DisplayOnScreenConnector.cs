@@ -17,7 +17,7 @@ public readonly record struct DisplayOnScreenConnector : IConnector
         return true;
     }
 
-    public bool Create(List<IWolfpack>? wolfpack)
+    public bool Write(List<IWolfpack>? wolfpack)
     {
         Debug.Print("test 1 connector");
         foreach (var pack in wolfpack) Debug.Print(pack.Data.ToString());
