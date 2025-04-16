@@ -18,20 +18,23 @@ public record RevitWolf : IRevitWolf
     /// </summary>
     public RevitWolf(IHowler callback, RevitHowl instruction, List<IConnector> destinations, Document doc)
     {
+        
+        _revitHowl = instruction;
+        _revitHowl = instruction;
+        _revitHowl.SetRevitDocument(doc);
         Summoner = callback;
         Instruction = instruction;
         Destinations = destinations;
-        _revitHowl = instruction;
-        _revitHowl.Document = doc;
     }
 
     public RevitWolf(IHowler callback, RevitHowl instruction, IConnector destination, Document doc)
     {
+        _revitHowl = instruction;
+        _revitHowl = instruction;
+        _revitHowl.SetRevitDocument(doc);
         Summoner = callback;
         Instruction = instruction;
         Destinations.Add(destination);
-        _revitHowl = instruction;
-        _revitHowl.Document = doc;
     }
 
     [JsonIgnore] public IHowler Summoner { get; init; }

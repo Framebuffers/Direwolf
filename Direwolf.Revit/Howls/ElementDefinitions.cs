@@ -8,44 +8,32 @@ using Direwolf.Revit.Extensions;
 
 namespace Direwolf.Revit.Howls;
 
-public record ElementDefinitions : IRevitHowl
+public record ElementDefinitions : RevitHowl
 {
-    public string? Name { get; set; } = "ElementDefinitions";
-    public IWolf? Wolf { get; set; }
-
-    public RevitWolfpack? ExecuteHunt()
+    public override RevitWolfpack? ExecuteHunt()
     {
         Stopwatch s = new();
         s.Start();
-        if (Document is null) throw new NullReferenceException("Document is null");
-        var episode = new RevitDocumentEpisode(Document);
+        var doc = GetRevitDocument();
+        if (doc is null) throw new NullReferenceException("Document is null");
+        var episode = new RevitDocumentEpisode(doc);
         Dictionary<string, List<ElementEntity?>> results = [];
-        foreach (var element in new FilteredElementCollector(Document).WhereElementIsNotElementType()
-                     .WhereElementIsElementType().ToElements())
+        foreach (var element in new FilteredElementCollector(Document).WhereElementIsNotElementType().ToElements())
         {
             if (element?.Category is null) continue;
-            var validElement = Document.GetElement(element.UniqueId);
-            if (validElement is null) continue;
-            var builtInCategory = validElement.Category.BuiltInCategory.ToString();
-            validElement.TryGetElementEntity(episode, out var elementEntity);
+            // var validElement = doc.GetElement(element.UniqueId);
+            element.TryGetElementEntity(episode, out var elementEntity);
             if (elementEntity is null) continue;
-            if (!results.TryGetValue(builtInCategory, out var elements))
+            var category = element.Category.BuiltInCategory.ToString();
+            if (!results.TryGetValue(category, out var elements))
             {
                 elements = (List<ElementEntity?>) [];
-                results.Add(element.Category.BuiltInCategory.ToString(), elements);
+                results.Add(category, elements);
             }
-
-            results[builtInCategory].Add(elementEntity);
+            results[category].Add(elementEntity);
         }
 
         s.Stop();
         return RevitWolfpack.New(Name, episode, results, s.ElapsedMilliseconds, true);
-    }
-
-    public Document? Document { get; set; }
-
-    IWolfpack? IHowl.ExecuteHunt()
-    {
-        return ExecuteHunt();
     }
 }

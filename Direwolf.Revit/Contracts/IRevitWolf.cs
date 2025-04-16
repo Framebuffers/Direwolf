@@ -5,6 +5,6 @@ namespace Direwolf.Revit.Contracts;
 
 public interface IRevitWolf : IWolf
 {
-    public RevitWolfpack Result { get; set; }
-    public void Hunt();
+    public new RevitWolfpack Result { get; set; }
+    public new void Hunt();
 }

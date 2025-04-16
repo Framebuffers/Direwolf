@@ -37,13 +37,15 @@ public class RevitUIDirewolf : Direwolf
     public void CreateWolf(RevitHowl instruction, IConnector destination)
     {
         RevitWolf w = new(this, instruction, destination, _app.ActiveUIDocument.Document);
+        instruction.SetRevitDocument(_app.ActiveUIDocument.Document);
         w.Instruction.Wolf = w;
         WolfQueue.Add(w);
     }
 
     public void CreateWolf(RevitHowl instruction, List<IConnector> destinations)
     {
-        foreach (var w in destinations.Select(destination => new RevitWolf(this,
+        instruction.SetRevitDocument(_app.ActiveUIDocument.Document);
+        foreach (RevitWolf w in destinations.Select(destination => new RevitWolf(this,
                      instruction,
                      destination,
                      _app.ActiveUIDocument.Document)))

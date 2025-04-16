@@ -6,6 +6,7 @@ namespace Direwolf.Revit.Contracts;
 
 public interface IRevitHowl : IHowl
 {
-    public Document? Document { get; set; }
+    public void SetRevitDocument(Document doc);
+    public Document? GetRevitDocument();
     public new RevitWolfpack? ExecuteHunt();
 }

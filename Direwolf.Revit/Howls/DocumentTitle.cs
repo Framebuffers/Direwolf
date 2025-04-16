@@ -5,6 +5,7 @@ namespace Direwolf.Revit.Howls;
 
 public record DocumentTitle : RevitHowl
 {
+    
     public override RevitWolfpack? ExecuteHunt()
     {
         // test time check
