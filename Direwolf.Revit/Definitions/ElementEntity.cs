@@ -10,7 +10,6 @@ public readonly record struct ElementEntity
     {
         e.TryGetCategory(out var category, out var builtInCategory);
         
-        DocumentEpisode = episode;
         ElementIdValue = e.Id.Value;
         ElementUniqueIdValue = Guid.TryParse(
             e.UniqueId, out var parentElementId)
@@ -22,7 +21,6 @@ public readonly record struct ElementEntity
         ElementCategoryType = category?.CategoryType.ToString() ?? null;
         Parameters = e.GetAllParameterEntities();
     }
-    public RevitDocumentEpisode DocumentEpisode { get; init; } 
     public double ElementIdValue { get; init; }
     public Guid ElementUniqueIdValue { get; init; }
     public string? ElementBuiltInCategory { get; init; }

@@ -7,14 +7,7 @@ namespace Direwolf.Primitives.Connectors;
 
 public readonly record struct JsonFileConnector(string FileName, string Path) : IConnector
 {
-    private string FullPath
-    {
-        get
-        {
-            if (!FileName.EndsWith(".json")) Join(FileName, ".json");
-            return System.IO.Path.Join(Path, FileName);
-        }
-    }
+    private string FullPath => System.IO.Path.Join(Path, FileName);
 
     public bool Connect()
     {
