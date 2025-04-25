@@ -2,6 +2,7 @@
 
 public readonly record struct RevitPerformance
 {
+    public RevitDocumentEpisode Episode { get; init; }
     public int ApplicationLoadTime { get; init; }
     public int DocumentLoadTime { get; init; }
     public int ResponseTimeAverage { get; init; }
