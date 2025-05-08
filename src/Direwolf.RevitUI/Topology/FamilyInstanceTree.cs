@@ -40,6 +40,7 @@ public class FamilyInstanceTree : IExternalCommand
     
     private static string GetFamilyName(Element element)
     {
+        
         return element is ElementType elementType ? elementType.FamilyName : string.Empty;
     }
    
@@ -50,11 +51,6 @@ public class FamilyInstanceTree : IExternalCommand
         {
             var doc = commandData.Application.ActiveUIDocument.Document;
             var result = doc.GetRevitDatabase();
-            foreach (var e in result)
-            {
-                Debug.Print($"Element: {e.Value}");
-            }
-            
             TaskDialog.Show("FamilyInstances", string.Join("\n", result.Count())); 
             return Result.Succeeded;
         }
