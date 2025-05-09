@@ -40,7 +40,6 @@ public class FamilyInstanceTree : IExternalCommand
     
     private static string GetFamilyName(Element element)
     {
-        
         return element is ElementType elementType ? elementType.FamilyName : string.Empty;
     }
    

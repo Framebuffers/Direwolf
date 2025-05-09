@@ -12,10 +12,15 @@ public static class FamilyExtensions
         var db = new FilteredElementCollector(doc)
             .WhereElementIsNotElementType()
             .ToElementIds();
-        
-        foreach (var e in db)
+
+        var records = db
+            .Select(e => RevitElement.Create(doc, e))
+            .Where(e => e.BuiltInCategory is not null)
+            .ToList();
+
+        foreach (var element in records)
         {
-            sw.Write(RevitElement.Create(doc, e));
+            sw.WriteLine(element.ToString());
         }
         
         Debug.Print(sw.ToString());
