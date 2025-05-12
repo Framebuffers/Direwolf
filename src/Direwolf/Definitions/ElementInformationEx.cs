@@ -3,7 +3,7 @@
 namespace Direwolf.Definitions;
 
 //TODO: Fix code to more reliably get information. It's not capturing all properties of an Element.
-public readonly record struct RevitElementSafe(
+public readonly record struct ElementInformationEx(
     double Id,
     string UniqueId,
     double ElementTypeId,
@@ -22,11 +22,11 @@ public readonly record struct RevitElementSafe(
     bool? IsViewSpecific,
     double? WorksetId)
 {
-    public static RevitElementSafe Create(Document doc, ElementId e)
+    public static ElementInformationEx Create(Document doc, ElementId e)
     {
         // Just to be safe.
         var element = doc.GetElement(e);
-        if (element is null) return new RevitElementSafe();
+        if (element is null) return new ElementInformationEx();
         
         // Early bailouts:
         //      These conditions trigger an internal Exception in Revit:
@@ -41,11 +41,11 @@ public readonly record struct RevitElementSafe(
         var categoryRef = element.Category;
         var elementTypeId = element.GetTypeId();
         
-        if (elementTypeId is null) return new RevitElementSafe();
-        if (categoryRef is null) return new RevitElementSafe();
+        if (elementTypeId is null) return new ElementInformationEx();
+        if (categoryRef is null) return new ElementInformationEx();
         var category = HandleCategory(categoryRef);
         
-        return new RevitElementSafe(
+        return new ElementInformationEx(
             e.Value,
             element.UniqueId,
             elementTypeId.Value, 

@@ -1,5 +1,6 @@
 ﻿using System.Data.SqlTypes;
 using System.Diagnostics;
+using System.Text.Json;
 using Autodesk.Revit.DB;
 using Direwolf.Definitions;
 
@@ -14,7 +15,7 @@ public static class FamilyExtensions
             .ToElementIds();
 
         var records = db
-            .Select(e => RevitElement.Create(doc, e))
+            .Select(e => ElementInformation.Create(doc, e))
             .Where(e => e.BuiltInCategory is not null)
             .ToList();
 

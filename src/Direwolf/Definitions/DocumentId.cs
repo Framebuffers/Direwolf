@@ -2,7 +2,7 @@
 
 namespace Direwolf.Definitions;
 
-public readonly record struct RevitDocument
+public readonly record struct DocumentId
 {
     public string DocumentName { get; init; }
     public string DocumentUniqueId { get; init; }

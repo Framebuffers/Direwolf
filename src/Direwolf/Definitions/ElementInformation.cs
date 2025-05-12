@@ -2,7 +2,7 @@
 
 namespace Direwolf.Definitions;
 
-public readonly record struct RevitElement(
+public readonly record struct ElementInformation(
     string? CategoryType,
     string? CategoryName,
     string? BuiltInCategory,
@@ -11,13 +11,13 @@ public readonly record struct RevitElement(
     double? ElementId,
     string? ElementName)
 {
-    public static RevitElement Create(Document doc, ElementId id)
+    public static ElementInformation Create(Document doc, ElementId id)
     {
         var element = doc.GetElement(id);
         var elementTypeId = doc.GetElement(id).GetTypeId();
         var category = GetCategory(element);
         
-        return new RevitElement(
+        return new ElementInformation(
             category.CategoryType,
             category.CategoryName,
             category.BuiltInCategory,
