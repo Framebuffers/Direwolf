@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Direwolf.RevitUI;
+namespace Direwolf.RevitUI.Hooks;
 
 public partial class EventHooks
 {

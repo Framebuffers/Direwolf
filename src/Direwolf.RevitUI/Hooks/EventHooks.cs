@@ -2,50 +2,7 @@
 using System.Text.Json;
 using Autodesk.Revit.ApplicationServices;
 
-namespace Direwolf.RevitUI;
-
-internal readonly record struct TimeIntervalCheck(
-    OperationType Operation,
-    ConditionType Condition,
-    DateTime CreatedAt,
-    double IntervalMilliseconds
-    );
-
-internal readonly record struct EventTriggerCheck(
-    OperationType Operation,
-    ConditionType Condition,
-    DateTime CreatedAt,
-    bool TriggerResult = true
-    );
-
-internal enum OperationType
-{
-    ElementOperation,
-    FamilyOperation,
-    ViewOperation,
-    LinkOperation,
-    DocumentOperation,
-    FileOperation,
-    WorksharingOperation,
-    FailureOperation,
-    ApplicationOperation
-}
-
-internal enum ConditionType
-{
-    OnProgress,
-    OnExecution,
-    OnOpening,
-    OnClosing,
-    OnModifying,
-    OnDeleting,
-    OnSaving,
-    OnSavingAs,
-    OnExporting,
-    OnCreating,
-    OnSync,
-    OnReload
-}
+namespace Direwolf.RevitUI.Hooks;
 
 public partial class EventHooks(ControlledApplication application)
 {
