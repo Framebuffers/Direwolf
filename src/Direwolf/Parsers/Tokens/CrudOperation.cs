@@ -1,4 +1,4 @@
-﻿namespace Direwolf.Parsers;
+﻿namespace Direwolf.Parsers.Tokens;
 
 /// <summary>
 /// Operation to be performed over any given dataset.

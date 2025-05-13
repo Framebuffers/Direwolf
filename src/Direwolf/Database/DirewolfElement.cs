@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Direwolf.Models;
+namespace Direwolf.Database;
 
 public record DirewolfElement(
     [property: Key] double Id,

@@ -1,4 +1,4 @@
-﻿namespace Direwolf.Parsers;
+﻿namespace Direwolf.Parsers.Tokens;
 
 /// <summary>
 /// Constrains the execution of this query to a given type of Document. This is used to filter out some operations

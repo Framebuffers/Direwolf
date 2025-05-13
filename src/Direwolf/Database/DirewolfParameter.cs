@@ -1,4 +1,4 @@
-﻿namespace Direwolf.Models;
+﻿namespace Direwolf.Database;
 
 public record DirewolfParameter(
     int Id,

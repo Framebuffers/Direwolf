@@ -1,6 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 
-namespace Direwolf.Definitions;
+namespace Direwolf.Database.Tokens;
 public readonly record struct DocumentUnits(
     string Volume,
     string LengthUnits,

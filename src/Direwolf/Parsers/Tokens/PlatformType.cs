@@ -1,4 +1,4 @@
-﻿namespace Direwolf.Parsers;
+﻿namespace Direwolf.Parsers.Tokens;
 
 /// <summary>
 /// Constrains any given Wolfpack to a given platform. Some features cannot run on ACC, therefore they are

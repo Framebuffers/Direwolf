@@ -1,8 +1,6 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 
-namespace Direwolf.Definitions;
+namespace Direwolf.Database.Tokens;
 
 public readonly record struct ParameterData(
     string DataType,

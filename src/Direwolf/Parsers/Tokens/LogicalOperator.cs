@@ -1,4 +1,4 @@
-﻿namespace Direwolf.Parsers;
+﻿namespace Direwolf.Parsers.Tokens;
 
 /// <summary>
 /// Logic operations applied over a given condition. Some require more than one operand.

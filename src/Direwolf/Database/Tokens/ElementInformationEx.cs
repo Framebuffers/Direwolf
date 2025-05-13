@@ -1,6 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 
-namespace Direwolf.Definitions;
+namespace Direwolf.Database.Tokens;
 
 //TODO: Fix code to more reliably get information. It's not capturing all properties of an Element.
 public readonly record struct ElementInformationEx(

@@ -1,6 +1,4 @@
-﻿using Direwolf.Parsers;
-
-namespace Direwolf.Contracts;
+﻿namespace Direwolf.Parsers.Tokens;
 
 public readonly record struct Driver(
     string Name,

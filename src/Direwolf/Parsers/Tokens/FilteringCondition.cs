@@ -1,4 +1,4 @@
-﻿namespace Direwolf.Parsers;
+﻿namespace Direwolf.Parsers.Tokens;
 
 /// <summary>
 /// Mappings to <see cref="FilteredElementCollector"/>

@@ -1,6 +1,6 @@
-﻿using Direwolf.Definitions;
+﻿using Direwolf.Database.Tokens;
 
-namespace Direwolf.Models;
+namespace Direwolf.Database;
 
 public record DirewolfDocument(
     int Id,

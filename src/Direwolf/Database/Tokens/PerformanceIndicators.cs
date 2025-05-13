@@ -1,4 +1,4 @@
-﻿namespace Direwolf.Definitions;
+﻿namespace Direwolf.Database.Tokens;
 
 public readonly record struct PerformanceIndicators(
     int ApplicationLoadTime,
