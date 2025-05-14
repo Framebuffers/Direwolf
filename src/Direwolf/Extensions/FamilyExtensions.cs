@@ -1,10 +1,9 @@
-﻿using System.Data.SqlTypes;
-using System.Diagnostics;
-using System.Text.Json;
+﻿using System.Diagnostics;
 using Autodesk.Revit.DB;
-using Direwolf.Database.Tokens;
+using Direwolf.Dto.RevitApi;
 
 namespace Direwolf.Extensions;
+
 public static class FamilyExtensions
 {
     public static List<ElementId?> GetRevitDatabase(this Document doc)
@@ -15,15 +14,12 @@ public static class FamilyExtensions
             .ToElementIds();
 
         var records = db
-            .Select(e => ElementInformation.Create(doc, e))
+            .Select(e => RevitElement.Create(doc, e))
             .Where(e => e.BuiltInCategory is not null)
             .ToList();
 
-        foreach (var element in records)
-        {
-            sw.WriteLine(element.ToString());
-        }
-        
+        foreach (var element in records) sw.WriteLine(element.ToString());
+
         Debug.Print(sw.ToString());
         return db.ToList();
     }

@@ -29,7 +29,7 @@
  * This model allows Direwolf to use the API as little as possible, minding its own business in the background,
  * perform tasks asynchronously (bypassing the synchronous nature of Revit's DB), and make the data fetching and
  * exporting invisible to the user.
- * 
+ *
  * The definition specify:
  *      - The type of Document (project/family) target.
  *      - If it's a read or write operation.
@@ -40,7 +40,7 @@
  *      - Scope of the query [Document/Category/Element/Parameter/Type/Family/Instance/Annotative/Model/Schedules]
  *          - Each one is mapped to the definition of a FilteredElementCollector.
  *          - Queries can be united together (using .Union()) or manipulated using any LINQ operator.
- *      - Destination of the data [defined by a Driver, taking the raw data as input]
+ *      - Destination of the data [defined by a DriverCommonDto, taking the raw data as input]
  *
  * In the case of data input queries:
  *      - DataType of the parameters
@@ -48,5 +48,4 @@
 
 public class WolfpackParser
 {
-    
 }

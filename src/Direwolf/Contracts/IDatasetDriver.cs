@@ -1,7 +1,7 @@
 ﻿namespace Direwolf.Contracts;
 
 /// <summary>
-/// Implements any operations needed to manipulate a Dataset, regardless of its type: a file, a database, etc.
+///     Implements any operations needed to manipulate a Dataset, regardless of its type: a file, a database, etc.
 /// </summary>
 public interface IDatasetDriver
 {

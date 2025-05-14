@@ -1,4 +1,8 @@
 ﻿using System.Diagnostics;
+using Direwolf.Dto.InternalDb.Enums;
+using Direwolf.Dto.Mapper;
+using Direwolf.Dto.Parser;
+using Direwolf.RevitUI.Extensions;
 
 namespace Direwolf.RevitUI.Hooks;
 
@@ -13,10 +17,9 @@ public partial class EventHooks
         };
         application.DocumentClosed += (sender, args) =>
         {
-            AddTimeIntervalCheck(OperationType.DocumentOperation, ConditionType.OnClosing);     
-            Debug_PrintContentsOfCheckRegistry();
+            AddTimeIntervalCheck(Realm.Document, EventCondition.OnClosing);
+            this.Debug_PrintContentsOfCheckRegistry();
         };
-        
     }
 
     private void MeasureDocumentOpeningTime()
@@ -28,7 +31,7 @@ public partial class EventHooks
         };
         application.DocumentOpened += (sender, args) =>
         {
-            AddTimeIntervalCheck(OperationType.DocumentOperation, ConditionType.OnOpening); 
+            AddTimeIntervalCheck(Realm.Document, EventCondition.OnOpening);
         };
     }
 
@@ -36,9 +39,9 @@ public partial class EventHooks
     {
         application.DocumentChanged += (sender, args) =>
         {
-            _eventChecks.Add(new EventTriggerCheck(
-                OperationType.DocumentOperation, 
-                ConditionType.OnModifying, 
+            Counters.Add(new TriggerEventData(
+                Realm.Document,
+                EventCondition.OnModifying,
                 DateTime.Now));
         };
     }
@@ -59,12 +62,12 @@ public partial class EventHooks
 
         application.DocumentSaved += (sender, args) =>
         {
-            AddTimeIntervalCheck(OperationType.DocumentOperation, ConditionType.OnSaving);
+            AddTimeIntervalCheck(Realm.Document, EventCondition.OnSaving);
         };
 
         application.DocumentSavedAs += (sender, args) =>
         {
-            AddTimeIntervalCheck(OperationType.DocumentOperation, ConditionType.OnSavingAs);
+            AddTimeIntervalCheck(Realm.Document, EventCondition.OnSavingAs);
         };
     }
 }
