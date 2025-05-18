@@ -1,17 +1,15 @@
 ﻿using Autodesk.Revit.DB;
 using Direwolf.Contracts;
-using Direwolf.Drivers;
-using Direwolf.Dto.Driver;
-using Direwolf.Dto.InternalDb;
 using Direwolf.Dto.InternalDb.Enums;
 using Direwolf.Dto.Parser;
 using Transaction = Direwolf.Dto.InternalDb.Transaction;
+
 #pragma warning disable VISLIB0001
 namespace Direwolf.Dto;
 
 /// <summary>
-/// The base Data Operation Object type inside Direwolf. Implements <see cref="IWolf"/>. Holds any operation
-/// generated from an external source.
+///     The base Data Operation Object type inside Direwolf. Implements <see cref="IWolf" />. Holds any operation
+///     generated from an external source.
 /// </summary>
 /// <param name="Id"></param>
 /// <param name="Name"></param>

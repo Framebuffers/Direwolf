@@ -1,5 +1,4 @@
 using Direwolf.Drivers;
-using Direwolf.Parsers;
 
 namespace Direwolf.Dto.Parser;
 
@@ -15,7 +14,7 @@ public readonly record struct Cuid(int Length = 4)
     public static Cuid Create(int length = 4)
     {
         var cuid = CuidDriver.GenerateDeconstructedCuid(length);
-        return new Cuid()
+        return new Cuid
         {
             Value = cuid.Value,
             TimestampMilliseconds = cuid.TimeGenerated,

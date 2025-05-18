@@ -14,8 +14,8 @@ public static class CuidDriver
     //      - Made the length of the generated value a parameter.
     private static readonly char[] Base36Chars = "0123456789abcdefghijklmnopqrstuvwxyz".ToCharArray();
     private static readonly object LockObject = new();
-    private static long _lastTimeStamp = 0;
-    private static int _counter = 0;
+    private static long _lastTimeStamp;
+    private static int _counter;
 
     public static Cuid GenerateCuid(int length = 4)
     {
@@ -88,10 +88,7 @@ public static class CuidDriver
         var hashBytes = MD5.HashData(Encoding.UTF8.GetBytes(machineName));
 
         var sb = new StringBuilder();
-        foreach (var b in hashBytes)
-        {
-            sb.Append(Base36Chars[b % 36]);
-        }
+        foreach (var b in hashBytes) sb.Append(Base36Chars[b % 36]);
 
         return sb.ToString()[..4];
     }
@@ -100,10 +97,7 @@ public static class CuidDriver
     {
         var data = RandomNumberGenerator.GetBytes(length);
         var sb = new StringBuilder(length);
-        foreach (var b in data)
-        {
-            sb.Append(Base36Chars[b % 36]);
-        }
+        foreach (var b in data) sb.Append(Base36Chars[b % 36]);
 
         return sb.ToString();
     }

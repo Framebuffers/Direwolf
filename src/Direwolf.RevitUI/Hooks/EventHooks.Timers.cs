@@ -1,33 +1,32 @@
 ﻿using System.Diagnostics;
 using Direwolf.Dto.InternalDb.Enums;
 using Direwolf.Dto.Mapper;
-using Direwolf.Dto.Parser;
 
 namespace Direwolf.RevitUI.Hooks;
 
 public partial class EventHooks
 {
-    private readonly Stopwatch _direwolfQueryOperationTimer = new();
-    private readonly Stopwatch _direwolfSetOperationTimer = new();
-    private readonly Stopwatch _direwolfInternalOperationTimer = new();
-    private readonly Stopwatch _parameterOperationTimer = new();
-    private readonly Stopwatch _instancesOperationTimer = new();
-    private readonly Stopwatch _elementOperationTimer = new();
-    private readonly Stopwatch _elementTypeOperationTimer = new();
-    private readonly Stopwatch _groupOperationTimer = new();
-    private readonly Stopwatch _viewOperationTimer = new();
-    private readonly Stopwatch _scheduleOperationTimer = new();
-    private readonly Stopwatch _linkOperationTimer = new();
-    private readonly Stopwatch _familyOperationTimer = new();
     private readonly Stopwatch _categoryOperationTimer = new();
-    private readonly Stopwatch _documentOperationTimer = new();
-    private readonly Stopwatch _revitDatabaseOperationTimer = new();
-    private readonly Stopwatch _fileOperationTimer = new();
-    private readonly Stopwatch _localWorkshareOperationTimer = new();
     private readonly Stopwatch _cloudWorkshareOperationTimer = new();
     private readonly Stopwatch _dataWarehouseOperationTimer = new();
-    private readonly Stopwatch _worksharingOperationTimer = new();
+    private readonly Stopwatch _direwolfInternalOperationTimer = new();
+    private readonly Stopwatch _direwolfQueryOperationTimer = new();
+    private readonly Stopwatch _direwolfSetOperationTimer = new();
+    private readonly Stopwatch _documentOperationTimer = new();
+    private readonly Stopwatch _elementOperationTimer = new();
+    private readonly Stopwatch _elementTypeOperationTimer = new();
+    private readonly Stopwatch _familyOperationTimer = new();
+    private readonly Stopwatch _fileOperationTimer = new();
+    private readonly Stopwatch _groupOperationTimer = new();
+    private readonly Stopwatch _instancesOperationTimer = new();
+    private readonly Stopwatch _linkOperationTimer = new();
+    private readonly Stopwatch _localWorkshareOperationTimer = new();
+    private readonly Stopwatch _parameterOperationTimer = new();
+    private readonly Stopwatch _revitDatabaseOperationTimer = new();
     private readonly Stopwatch _revitUIApplicationOperationTimer = new();
+    private readonly Stopwatch _scheduleOperationTimer = new();
+    private readonly Stopwatch _viewOperationTimer = new();
+    private readonly Stopwatch _worksharingOperationTimer = new();
 
     private void AddTimeIntervalCheck(Realm op, EventCondition eventCondition)
     {

@@ -4,5 +4,8 @@ namespace Direwolf.Extensions;
 
 public static class DirewolfExtensions
 {
-    public static void ToConsole(this string txt) => Debug.Write(txt);
+    public static void ToConsole(this string txt)
+    {
+        Debug.Write(txt);
+    }
 }

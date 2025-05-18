@@ -59,7 +59,7 @@ public class WolfpackParser
         {
             var yaml = new YamlStream();
             yaml.Load(reader);
-            
+
             var deserialize = new DeserializerBuilder()
                 .WithNamingConvention(CamelCaseNamingConvention.Instance)
                 .Build();

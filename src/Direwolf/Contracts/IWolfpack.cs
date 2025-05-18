@@ -1,6 +1,5 @@
 ﻿using Direwolf.Dto.Driver;
 using Direwolf.Dto.InternalDb.Enums;
-using Direwolf.Dto.Parser;
 
 namespace Direwolf.Contracts;
 

@@ -14,7 +14,7 @@ public static class EventHooksExtensions
         foreach (var eventData in e.Timers) sortedList.Add(eventData.CreatedAt, eventData);
         Debug.Print(JsonSerializer.Serialize(sortedList));
     }
-    
+
     public static void Debug_PrintContentsOfTriggerRegistry(this EventHooks e)
     {
         using StringWriter sw = new();

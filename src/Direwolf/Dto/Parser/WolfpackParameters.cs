@@ -8,4 +8,4 @@ public record WolfpackParameters(
     bool Async,
     int RevitVersion,
     ExecutionTrigger Trigger
-    );
+);
