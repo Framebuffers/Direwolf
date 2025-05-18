@@ -1,11 +1,13 @@
-﻿using System.Runtime.InteropServices;
-using Autodesk.Revit.Attributes;
+﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Direwolf.Dto;
 using Direwolf.Dto.InternalDb.Enums;
 using Direwolf.Dto.Parser;
+using Direwolf.Dto.RevitApi;
+using Microsoft.Extensions.Caching.Memory;
 using Transaction = Direwolf.Dto.InternalDb.Transaction;
+
 #pragma warning disable VISLIB0001
 namespace Direwolf.RevitUI.Commands;
 
@@ -22,13 +24,17 @@ public class DumpDatabase : IExternalCommand
      *      instead of using UUID's for everything. CUID's are only used inside
      *      Direwolf. Anything outside Direwolf's scope is parsed using Revit's UUID's.
      */
-    
-    private static WolfDto CreateDto(
-        Transaction t, 
-        string name, 
-        Realm realm, 
-        BuiltInCategory category, 
-        out Cuid id)
+
+    private static MemoryCache _cache = new(new MemoryCacheOptions());
+    private static List<RevitElement> _elements = [];
+
+
+    public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
+    {
+        return Result.Succeeded;
+    }
+
+    private static WolfDto CreateDto(Transaction t, string name, Realm realm, BuiltInCategory category, out Cuid id)
     {
         /*
          * CUID structure:
@@ -43,19 +49,6 @@ public class DumpDatabase : IExternalCommand
 
         var transactionId = Cuid.Create();
         id = transactionId;
-        return new WolfDto(
-            transactionId,
-            name,
-            realm,
-            category)
-        {
-            Data = t
-        };
-    }
-
-    public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
-    {
-         
-        return Result.Succeeded;
+        return new WolfDto(transactionId, name, realm, category) { Data = t };
     }
 }

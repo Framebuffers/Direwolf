@@ -1,8 +1,10 @@
 ﻿using Autodesk.Revit.DB;
+using Direwolf.Dto.Parser;
 
 namespace Direwolf.Dto.RevitApi;
 
 public readonly record struct RevitElement(
+    Cuid Id,
     string? CategoryType,
     string? CategoryName,
     string? BuiltInCategory,
@@ -18,6 +20,7 @@ public readonly record struct RevitElement(
         var category = GetCategory(element);
 
         return new RevitElement(
+            Cuid.Create(),
             category.CategoryType,
             category.CategoryName,
             category.BuiltInCategory,

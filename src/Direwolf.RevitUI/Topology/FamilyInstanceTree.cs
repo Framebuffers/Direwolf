@@ -1,7 +1,7 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using Direwolf.Extensions;
+using Direwolf.Sources.InternalDB;
 
 namespace Direwolf.RevitUI.Topology;
 
@@ -13,8 +13,9 @@ public class FamilyInstanceTree : IExternalCommand
         try
         {
             var doc = commandData.Application.ActiveUIDocument.Document;
-            var result = doc.GetRevitDatabase();
-            TaskDialog.Show("FamilyInstances", string.Join("\n", result.Count()));
+            // var result = doc.GetRevitDatabase();
+            Database db = new(commandData.Application.Application);
+            TaskDialog.Show("Elements in DB", db.GetDatabaseCount().ToString());
             return Result.Succeeded;
         }
         catch (Exception e)

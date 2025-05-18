@@ -1,7 +1,8 @@
 ﻿using System.Diagnostics;
 using Direwolf.Dto.InternalDb.Enums;
 using Direwolf.Dto.Mapper;
-using Direwolf.Dto.Parser;
+using Direwolf.Dto.RevitApi;
+using Direwolf.Extensions;
 using Direwolf.RevitUI.Extensions;
 
 namespace Direwolf.RevitUI.Hooks;
@@ -32,6 +33,19 @@ public partial class EventHooks
         application.DocumentOpened += (sender, args) =>
         {
             AddTimeIntervalCheck(Realm.Document, EventCondition.OnOpening);
+            List<RevitElement> _database = [];
+            var doc = args.Document;
+            if (doc is null) return;
+
+            var result = doc.GetRevitDatabase();
+            foreach (var element in result)
+            {
+                if (element is null) return;
+                _database.Add(RevitElement.Create(doc, element));
+                $"Added element: {element.Value}".ToConsole();
+            }
+
+            $"Final Count: {_database.Count}".ToConsole();
         };
     }
 
