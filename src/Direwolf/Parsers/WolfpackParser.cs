@@ -1,4 +1,9 @@
-﻿namespace Direwolf.Parsers;
+﻿using Direwolf.Dto.Parser;
+using YamlDotNet.RepresentationModel;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
+
+namespace Direwolf.Parsers;
 
 /*
  * YAML parsing structure:
@@ -48,4 +53,17 @@
 
 public class WolfpackParser
 {
+    public static Wolfpack Parse(string yamlStream)
+    {
+        using (var reader = new StreamReader(yamlStream))
+        {
+            var yaml = new YamlStream();
+            yaml.Load(reader);
+            
+            var deserialize = new DeserializerBuilder()
+                .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                .Build();
+            return deserialize.Deserialize<Wolfpack>(yamlStream);
+        }
+    }
 }

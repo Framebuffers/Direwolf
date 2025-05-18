@@ -1,7 +1,9 @@
-﻿namespace Direwolf.Dto.Parser;
+﻿using Direwolf.Dto.InternalDb;
+
+namespace Direwolf.Dto.Parser;
 
 public readonly record struct Query(
     string Name,
     string Target,
-    List<Operation> Operations
+    Dictionary<string, InternalDb.Transaction> Transactions
 );

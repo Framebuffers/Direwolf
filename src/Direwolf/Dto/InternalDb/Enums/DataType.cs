@@ -17,5 +17,9 @@ public enum DataType
     Category,
     Family,
     FamilyInstance,
-    ForgeTypeId
+    ForgeTypeId,
+    RevitException,
+    SystemException,
+    CloudException,
+    Query
 }

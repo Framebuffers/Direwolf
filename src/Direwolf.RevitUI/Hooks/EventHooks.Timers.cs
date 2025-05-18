@@ -33,7 +33,7 @@ public partial class EventHooks
     {
         switch (op)
         {
-            case Realm.DirewolfQuery:
+            case Realm.Query:
                 _direwolfQueryOperationTimer.Stop();
                 Timers.Add(new TimerEventData(op, eventCondition, DateTime.Now,
                     _direwolfQueryOperationTimer.Elapsed.TotalMilliseconds));
@@ -41,7 +41,7 @@ public partial class EventHooks
                     $"\n\nDirewolfQuery operation completed. Result = {Timers.Last().ToString()}\n\n");
                 _direwolfQueryOperationTimer.Restart();
                 break;
-            case Realm.DirewolfSet:
+            case Realm.Set:
                 _direwolfSetOperationTimer.Stop();
                 Timers.Add(new TimerEventData(op, eventCondition, DateTime.Now,
                     _direwolfSetOperationTimer.Elapsed.TotalMilliseconds));
@@ -49,7 +49,7 @@ public partial class EventHooks
                     $"\n\nDirewolfSet operation completed. Result = {Timers.Last().ToString()}\n\n");
                 _direwolfSetOperationTimer.Restart();
                 break;
-            case Realm.DirewolfInternal:
+            case Realm.InternalDatabase:
                 _direwolfInternalOperationTimer.Stop();
                 Timers.Add(new TimerEventData(op, eventCondition, DateTime.Now,
                     _direwolfInternalOperationTimer.Elapsed.TotalMilliseconds));

@@ -5,9 +5,9 @@
 /// </summary>
 public enum Realm
 {
-    DirewolfQuery,
-    DirewolfSet,
-    DirewolfInternal,
+    Query,
+    Set,
+    InternalDatabase,
     Parameter,
     Instances,
     Element,

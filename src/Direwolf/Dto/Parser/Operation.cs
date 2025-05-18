@@ -2,7 +2,7 @@
 
 namespace Direwolf.Dto.Parser;
 
-public readonly struct Operation(
+public readonly record struct Operation(
     Realm Scope,
     string P,
     LogicalOperator OP,

@@ -39,10 +39,7 @@ public partial class EventHooks
     {
         application.DocumentChanged += (sender, args) =>
         {
-            Counters.Add(new TriggerEventData(
-                Realm.Document,
-                EventCondition.OnModifying,
-                DateTime.Now));
+            Counters.Add(new TriggerEventData(Realm.Document, EventCondition.OnModifying, DateTime.Now));
         };
     }
 
@@ -53,18 +50,15 @@ public partial class EventHooks
             Debug.Print("\n\nDocument is saving.\n\n");
             _documentOperationTimer.Restart();
         };
-
         application.DocumentSavingAs += (sender, args) =>
         {
             Debug.Print("\n\nDocument is saving as.\n\n");
             _documentOperationTimer.Restart();
         };
-
         application.DocumentSaved += (sender, args) =>
         {
             AddTimeIntervalCheck(Realm.Document, EventCondition.OnSaving);
         };
-
         application.DocumentSavedAs += (sender, args) =>
         {
             AddTimeIntervalCheck(Realm.Document, EventCondition.OnSavingAs);
