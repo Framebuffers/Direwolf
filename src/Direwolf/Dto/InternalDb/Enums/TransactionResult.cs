@@ -7,8 +7,8 @@
 /// </summary>
 public enum TransactionResult
 {
-    Success, // operation has been carried out as explicitly instructed
-    Failed, // operation failed to return the query as explicitly instructed by the logic operator
+    Success,  // operation has been carried out as explicitly instructed
+    Failed,   // operation failed to return the query as explicitly instructed by the logic operator
     Canceled, // operation has been interrupted at any point by the user
 
     ExceptionThrown // operation has encountered any kind of exception while it was executing.

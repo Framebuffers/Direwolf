@@ -3,7 +3,7 @@
 namespace Direwolf.Dto.Driver;
 
 public abstract record DriverCommonDto(
-    string Name,
+    string                               Name,
     (int MajorVersion, int MinorVersion) Version,
-    Dictionary<string, string> ParameterList,
-    List<CrudOperation> Operations);
+    Dictionary<string, string>           ParameterList,
+    List<CrudOperation>                  Operations);

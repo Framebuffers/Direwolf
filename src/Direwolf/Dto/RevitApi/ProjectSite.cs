@@ -13,14 +13,12 @@ public readonly record struct ProjectSite(
 {
     public static ProjectSite Create(Document doc)
     {
-        return new ProjectSite(
-            doc.SiteLocation.PlaceName,
-            doc.SiteLocation.Elevation,
-            doc.SiteLocation.Latitude,
-            doc.SiteLocation.Longitude,
-            doc.SiteLocation.TimeZone,
-            doc.SiteLocation.GeoCoordinateSystemId,
-            doc.SiteLocation.GeoCoordinateSystemDefinition
-        );
+        return new ProjectSite(doc.SiteLocation.PlaceName,
+                               doc.SiteLocation.Elevation,
+                               doc.SiteLocation.Latitude,
+                               doc.SiteLocation.Longitude,
+                               doc.SiteLocation.TimeZone,
+                               doc.SiteLocation.GeoCoordinateSystemId,
+                               doc.SiteLocation.GeoCoordinateSystemDefinition);
     }
 }

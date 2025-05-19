@@ -1,4 +1,5 @@
 ﻿using Direwolf.Dto.Parser;
+
 using YamlDotNet.RepresentationModel;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
@@ -60,9 +61,9 @@ public class WolfpackParser
             var yaml = new YamlStream();
             yaml.Load(reader);
 
-            var deserialize = new DeserializerBuilder()
-                .WithNamingConvention(CamelCaseNamingConvention.Instance)
-                .Build();
+            var deserialize
+                = new DeserializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).Build();
+
             return deserialize.Deserialize<Wolfpack>(yamlStream);
         }
     }

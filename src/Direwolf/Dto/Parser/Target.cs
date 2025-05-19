@@ -2,9 +2,4 @@
 
 namespace Direwolf.Dto.Parser;
 
-public readonly record struct Target(
-    Realm Realm,
-    TargetType Type,
-    string Name,
-    string[] Arguments
-);
+public readonly record struct Target(Realm Realm, TargetType Type, string Name, string[] Arguments);

@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Text.Json;
+
 using Direwolf.Dto.Mapper;
 using Direwolf.RevitUI.Hooks;
 
@@ -11,7 +12,9 @@ public static class EventHooksExtensions
     {
         using StringWriter sw = new();
         SortedList<DateTime, TimerEventData> sortedList = [];
-        foreach (var eventData in e.Timers) sortedList.Add(eventData.CreatedAt, eventData);
+        foreach (var eventData in e.Timers)
+            sortedList.Add(eventData.CreatedAt,
+                           eventData);
         Debug.Print(JsonSerializer.Serialize(sortedList));
     }
 
@@ -19,7 +22,9 @@ public static class EventHooksExtensions
     {
         using StringWriter sw = new();
         SortedList<DateTime, TriggerEventData> sortedList = [];
-        foreach (var eventData in e.Counters) sortedList.Add(eventData.CreatedAt, eventData);
+        foreach (var eventData in e.Counters)
+            sortedList.Add(eventData.CreatedAt,
+                           eventData);
         Debug.Print(JsonSerializer.Serialize(sortedList));
     }
 }

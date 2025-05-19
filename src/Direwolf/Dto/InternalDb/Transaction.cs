@@ -1,4 +1,7 @@
-﻿using Direwolf.Dto.InternalDb.Enums;
+﻿using Autodesk.Revit.DB;
+
+using Direwolf.Dto.InternalDb.Enums;
+using Direwolf.Dto.Parser;
 
 namespace Direwolf.Dto.InternalDb;
 
@@ -15,10 +18,11 @@ namespace Direwolf.Dto.InternalDb;
 /// <param name="DataType">The expected return type of the value.</param>
 /// <param name="Data">A generic object containing the result.</param>
 public readonly record struct Transaction(
-    CrudOperation Operation,
-    DataType DataType,
-    TransactionResult Result
-)
+    Cuid              Id,
+    ElementId         ElementId,
+    CrudOperation     Operation,
+    DataType          DataType,
+    TransactionResult Result)
 {
-    public object Data { get; init; }
+    public object Data {get; init;}
 }

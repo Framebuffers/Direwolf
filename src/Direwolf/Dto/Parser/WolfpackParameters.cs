@@ -3,9 +3,4 @@ using Direwolf.Dto.Mapper;
 
 namespace Direwolf.Dto.Parser;
 
-public record WolfpackParameters(
-    DocumentType Type,
-    bool Async,
-    int RevitVersion,
-    ExecutionTrigger Trigger
-);
+public record WolfpackParameters(DocumentType Type, bool Async, int RevitVersion, ExecutionTrigger Trigger);

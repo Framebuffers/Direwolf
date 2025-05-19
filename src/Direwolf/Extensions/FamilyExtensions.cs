@@ -1,26 +1,27 @@
 ﻿using System.Diagnostics;
+
 using Autodesk.Revit.DB;
+
 using Direwolf.Dto.RevitApi;
 
 namespace Direwolf.Extensions;
 
 public static class FamilyExtensions
 {
-    public static List<ElementId?> GetRevitDatabase(this Document doc)
+    public static IEnumerable<RevitElement> GetRevitDatabase(this Document doc)
     {
-        using StringWriter sw = new();
-        var db = new FilteredElementCollector(doc)
-            .WhereElementIsNotElementType()
-            .ToElementIds();
+        return
+            from elementId in new FilteredElementCollector(doc).WhereElementIsNotElementType().ToElementIds()
+            let el = RevitElement.Create(doc,
+                                         elementId)
+            where el.BuiltInCategory != null && el.ElementId!.Value > 0
+            select el;
+    }
 
-        var records = db
-            .Select(e => RevitElement.Create(doc, e))
-            .Where(e => e.BuiltInCategory is not null)
-            .ToList();
-
-        foreach (var element in records) sw.WriteLine(element.ToString());
-
-        Debug.Print(sw.ToString());
-        return db.ToList();
+    public static IEnumerable<ElementId> GetElementTypes(this Document doc)
+    {
+        return
+            from elementId in new FilteredElementCollector(doc).WhereElementIsElementType().ToElementIds()
+            select elementId;
     }
 }

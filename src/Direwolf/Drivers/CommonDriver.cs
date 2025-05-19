@@ -17,11 +17,11 @@ namespace Direwolf.Drivers;
 /// </summary>
 public interface IDriver : IDisposable
 {
-    public IDriver Create(string[] args);
-    public WolfDto Read(Wolfpack instructions, out bool result);
-    public void Update(Query instruction, out bool result);
-    public void Delete(Query instruction, out bool result);
-    public void Destroy(out bool result);
+    public IDriver Create(string[]  args);
+    public WolfDto Read(Wolfpack    instructions, out bool result);
+    public void    Update(Query     instruction,  out bool result);
+    public void    Delete(Query     instruction,  out bool result);
+    public void    Destroy(out bool result);
 }
 
 /// <summary>
@@ -31,10 +31,10 @@ public interface IDriver : IDisposable
 /// </summary>
 public abstract class CommonDriver : IDriver
 {
-    public abstract IDriver Create(string[] args);
-    public abstract WolfDto Read(Wolfpack instructions, out bool result);
-    public abstract void Update(Query instruction, out bool result);
-    public abstract void Delete(Query instruction, out bool result);
-    public abstract void Destroy(out bool result);
-    public abstract void Dispose();
+    public abstract IDriver Create(string[]  args);
+    public abstract WolfDto Read(Wolfpack    instructions, out bool result);
+    public abstract void    Update(Query     instruction,  out bool result);
+    public abstract void    Delete(Query     instruction,  out bool result);
+    public abstract void    Destroy(out bool result);
+    public abstract void    Dispose();
 }

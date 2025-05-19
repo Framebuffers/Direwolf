@@ -18,15 +18,15 @@ public readonly record struct ProjectInformation(
     public static ProjectInformation Create(Document doc)
     {
         return new ProjectInformation(doc.ProjectInformation.Name,
-            doc.ProjectInformation.ClientName,
-            doc.ProjectInformation.Address,
-            doc.ProjectInformation.Author,
-            doc.ProjectInformation.BuildingName,
-            doc.ProjectInformation.IssueDate,
-            doc.ProjectInformation.Location.ToString() ?? string.Empty,
-            doc.ProjectInformation.Number,
-            doc.ProjectInformation.OrganizationDescription,
-            doc.ProjectInformation.OrganizationName,
-            doc.ProjectInformation.Status);
+                                      doc.ProjectInformation.ClientName,
+                                      doc.ProjectInformation.Address,
+                                      doc.ProjectInformation.Author,
+                                      doc.ProjectInformation.BuildingName,
+                                      doc.ProjectInformation.IssueDate,
+                                      doc.ProjectInformation.Location.ToString() ?? string.Empty,
+                                      doc.ProjectInformation.Number,
+                                      doc.ProjectInformation.OrganizationDescription,
+                                      doc.ProjectInformation.OrganizationName,
+                                      doc.ProjectInformation.Status);
     }
 }

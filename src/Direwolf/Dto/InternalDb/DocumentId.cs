@@ -4,7 +4,7 @@ namespace Direwolf.Dto.InternalDb;
 
 public readonly record struct DocumentId
 {
-    public string DocumentName { get; init; }
-    public string DocumentUniqueId { get; init; }
-    public DocumentType DocumentType { get; init; }
+    public string       DocumentName     {get; init;}
+    public string       DocumentUniqueId {get; init;}
+    public DocumentType DocumentType     {get; init;}
 }

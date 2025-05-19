@@ -4,9 +4,9 @@ namespace Direwolf.Dto.RevitApi;
 
 //TODO: Fix code to more reliably get information. It's not capturing all properties of an Element.
 public readonly record struct RevitElementEx(
-    double Id,
-    string UniqueId,
-    double ElementTypeId,
+    double  Id,
+    string  UniqueId,
+    double  ElementTypeId,
     string? Category,
     string? BuiltInCategory,
     double? AssemblyInstanceId,
@@ -18,14 +18,15 @@ public readonly record struct RevitElementEx(
     string? Location,
     string? Name,
     double? OwnerViewId,
-    bool? IsPinned,
-    bool? IsViewSpecific,
+    bool?   IsPinned,
+    bool?   IsViewSpecific,
     double? WorksetId)
 {
     public static RevitElementEx Create(Document doc, ElementId e)
     {
         // Just to be safe.
         var element = doc.GetElement(e);
+
         if (element is null) return new RevitElementEx();
 
         // Early bailouts:
@@ -45,24 +46,35 @@ public readonly record struct RevitElementEx(
         if (categoryRef is null) return new RevitElementEx();
         var category = HandleCategory(categoryRef);
 
-        return new RevitElementEx(
-            e.Value,
-            element.UniqueId,
-            elementTypeId.Value,
-            category.CategoryName,
-            category.BuiltInCategory,
-            SafeGet(() => element.AssemblyInstanceId.Value, -1),
-            SafeGet(() => element.CreatedPhaseId.Value, -1),
-            SafeGet(() => element.DemolishedPhaseId.Value, -1),
-            SafeGet(() => element.DesignOption.Id.Value, -1),
-            SafeGet(() => element.GroupId?.Value != -1 ? element.GroupId!.Value : -1, -1),
-            SafeGet(() => element.LevelId.Value, -1),
-            SafeGet(() => element.Location?.ToString(), string.Empty)!,
-            SafeGet(() => element.Name, string.Empty),
-            SafeGet(() => element.OwnerViewId.Value, -1),
-            SafeGet(() => element.Pinned),
-            SafeGet(() => element.ViewSpecific),
-            SafeGet(() => element.WorksetId.IntegerValue, -1));
+        return new RevitElementEx(e.Value,
+                                  element.UniqueId,
+                                  elementTypeId.Value,
+                                  category.CategoryName,
+                                  category.BuiltInCategory,
+                                  SafeGet(() => element.AssemblyInstanceId.Value,
+                                          -1),
+                                  SafeGet(() => element.CreatedPhaseId.Value,
+                                          -1),
+                                  SafeGet(() => element.DemolishedPhaseId.Value,
+                                          -1),
+                                  SafeGet(() => element.DesignOption.Id.Value,
+                                          -1),
+                                  SafeGet(() => element.GroupId?.Value != -1
+                                              ? element.GroupId!.Value
+                                              : -1,
+                                          -1),
+                                  SafeGet(() => element.LevelId.Value,
+                                          -1),
+                                  SafeGet(() => element.Location?.ToString(),
+                                          string.Empty)!,
+                                  SafeGet(() => element.Name,
+                                          string.Empty),
+                                  SafeGet(() => element.OwnerViewId.Value,
+                                          -1),
+                                  SafeGet(() => element.Pinned),
+                                  SafeGet(() => element.ViewSpecific),
+                                  SafeGet(() => element.WorksetId.IntegerValue,
+                                          -1));
     }
 
     // Each property is obtained by try/catching each one. Revit tends to throw an Exception that will paralyze
@@ -70,24 +82,15 @@ public readonly record struct RevitElementEx(
     // It *may* be slower, but it makes sure that the result is valid and no element is left behind.
     private static T SafeGet<T>(Func<T> func, T defaultValue = default!)
     {
-        try
-        {
-            return func();
-        }
-        catch
-        {
-            return defaultValue!;
-        }
+        try { return func(); }
+        catch { return defaultValue!; }
     }
 
     // Categories need some special handling. If a Category is null, and it's 
-    private static (string? CategoryName, string? BuiltInCategory) HandleCategory(Category c)
+    private static(string? CategoryName, string? BuiltInCategory) HandleCategory(Category c)
     {
-        return (
-            c.Name,
-            Enum.Parse(
-                    typeof(BuiltInCategory),
-                    c.BuiltInCategory.ToString())
-                .ToString());
+        return(c.Name, Enum.Parse(typeof(BuiltInCategory),
+                                  c.BuiltInCategory.ToString())
+                           .ToString());
     }
 }

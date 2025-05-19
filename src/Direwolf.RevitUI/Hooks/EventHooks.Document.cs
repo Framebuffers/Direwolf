@@ -1,81 +1,107 @@
 ﻿using System.Diagnostics;
+
+using Autodesk.Revit.ApplicationServices;
+using Autodesk.Revit.Creation;
+using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Events;
+using Autodesk.Revit.UI;
+
 using Direwolf.Dto.InternalDb.Enums;
 using Direwolf.Dto.Mapper;
 using Direwolf.Dto.RevitApi;
 using Direwolf.Extensions;
 using Direwolf.RevitUI.Extensions;
 
+using Document = Autodesk.Revit.DB.Document;
+
 namespace Direwolf.RevitUI.Hooks;
 
 public partial class EventHooks
 {
-    private void MeasureSessionTime()
+    public  Document?     Document         {get; set;}
+    private Queue<Action> OnDocumentOpened {get; set;} = [];
+
+    public void EnqueueOnDocumentOpened(Action action)
     {
-        application.DocumentClosing += (sender, args) =>
+        OnDocumentOpened.Enqueue(action);
+    }
+
+    public Action DequeueOnDocumentOpened()
+    {
+        return OnDocumentOpened.Dequeue();
+    }
+
+    public void QueueOnDocumentOpened(Action action)
+    {
+        if (Document is null) return;
+        OnDocumentOpened.Enqueue(action);
+    }
+
+    private void OnDocumentClosing()
+    {
+        _application.DocumentClosing += (sender, args) =>
         {
             Debug.Print("\n\nDocument is closing.\n\n");
             _documentOperationTimer.Start();
         };
-        application.DocumentClosed += (sender, args) =>
+        _application.DocumentClosed += (sender, args) =>
         {
-            AddTimeIntervalCheck(Realm.Document, EventCondition.OnClosing);
+            AddTimeIntervalCheck(Realm.Document,
+                                 EventCondition.OnClosing);
             this.Debug_PrintContentsOfCheckRegistry();
         };
     }
 
-    private void MeasureDocumentOpeningTime()
+    private void OnDocumentOpening()
     {
-        application.DocumentOpening += (sender, args) =>
+        _application.DocumentOpening += (sender, args) =>
         {
             Debug.Print("\n\nDocument is opening.\n\n");
             _documentOperationTimer.Restart();
         };
-        application.DocumentOpened += (sender, args) =>
+        _application.DocumentOpened += (sender, args) =>
         {
-            AddTimeIntervalCheck(Realm.Document, EventCondition.OnOpening);
-            List<RevitElement> _database = [];
-            var doc = args.Document;
-            if (doc is null) return;
+            Document = args.Document;
+            // Run each action in the queue.
+            foreach (var act in OnDocumentOpened.Select(action => DequeueOnDocumentOpened()))
+                act?.Invoke();
 
-            var result = doc.GetRevitDatabase();
-            foreach (var element in result)
-            {
-                if (element is null) return;
-                _database.Add(RevitElement.Create(doc, element));
-                $"Added element: {element.Value}".ToConsole();
-            }
-
-            $"Final Count: {_database.Count}".ToConsole();
+            AddTimeIntervalCheck(Realm.Document,
+                                 EventCondition.OnOpening);
         };
     }
 
     private void MeasureDocumentChangeCount()
     {
-        application.DocumentChanged += (sender, args) =>
+        _application.DocumentChanged += (sender, args) =>
         {
-            Counters.Add(new TriggerEventData(Realm.Document, EventCondition.OnModifying, DateTime.Now));
+            Counters.Add(new TriggerEventData(Realm.Document,
+                                              EventCondition.OnModifying,
+                                              DateTime.Now));
         };
     }
 
     private void MeasureDocumentSavingTime()
     {
-        application.DocumentSaving += (sender, args) =>
+        _application.DocumentSaving += (sender, args) =>
         {
             Debug.Print("\n\nDocument is saving.\n\n");
             _documentOperationTimer.Restart();
         };
-        application.DocumentSavingAs += (sender, args) =>
+        _application.DocumentSavingAs += (sender, args) =>
         {
             Debug.Print("\n\nDocument is saving as.\n\n");
             _documentOperationTimer.Restart();
         };
-        application.DocumentSaved += (sender, args) =>
+        _application.DocumentSaved += (sender, args) =>
         {
-            AddTimeIntervalCheck(Realm.Document, EventCondition.OnSaving);
+            AddTimeIntervalCheck(Realm.Document,
+                                 EventCondition.OnSaving);
         };
-        application.DocumentSavedAs += (sender, args) =>
+        _application.DocumentSavedAs += (sender, args) =>
         {
-            AddTimeIntervalCheck(Realm.Document, EventCondition.OnSavingAs);
+            AddTimeIntervalCheck(Realm.Document,
+                                 EventCondition.OnSavingAs);
         };
     }
 }

@@ -3,8 +3,7 @@
 namespace Direwolf.Dto.Mapper;
 
 public readonly record struct TriggerEventData(
-    Realm Realm,
+    Realm          Realm,
     EventCondition EventCondition,
-    DateTime CreatedAt,
-    bool TriggerResult = true
-);
+    DateTime       CreatedAt,
+    bool           TriggerResult = true);

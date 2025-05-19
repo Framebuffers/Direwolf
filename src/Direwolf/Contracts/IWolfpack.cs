@@ -5,7 +5,7 @@ namespace Direwolf.Contracts;
 
 public interface IWolfpack
 {
-    public DocumentType DocumentType { get; set; }
-    public Realm Realm { get; set; }
-    public List<DriverCommonDto> Drivers { get; set; }
+    public DocumentType          DocumentType {get; set;}
+    public Realm                 Realm        {get; set;}
+    public List<DriverCommonDto> Drivers      {get; set;}
 }

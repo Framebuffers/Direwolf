@@ -1,7 +1,9 @@
 ﻿using Autodesk.Revit.DB;
+
 using Direwolf.Contracts;
 using Direwolf.Dto.InternalDb.Enums;
 using Direwolf.Dto.Parser;
+
 using Transaction = Direwolf.Dto.InternalDb.Transaction;
 
 #pragma warning disable VISLIB0001
@@ -20,12 +22,7 @@ namespace Direwolf.Dto;
 /// <param name="Driver"></param>
 /// <param name="DataType"></param>
 /// <param name="CreatedDate"></param>
-public record WolfDto(
-    Cuid UniqueId,
-    string Name,
-    Realm Realm,
-    BuiltInCategory Category
-) : IWolf
+public record WolfDto(Cuid UniqueId, string Name, Realm Realm, BuiltInCategory Category) : IWolf
 {
-    public virtual Transaction Data { get; set; }
+    public virtual Transaction Data {get; set;}
 }

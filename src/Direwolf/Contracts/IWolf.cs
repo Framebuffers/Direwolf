@@ -1,6 +1,8 @@
 ﻿using Autodesk.Revit.DB;
+
 using Direwolf.Dto.InternalDb.Enums;
 using Direwolf.Dto.Parser;
+
 using Transaction = Direwolf.Dto.InternalDb.Transaction;
 
 namespace Direwolf.Contracts;
@@ -41,9 +43,9 @@ namespace Direwolf.Contracts;
 /// </summary>
 public interface IWolf
 {
-    public Cuid UniqueId { get; init; }
-    public string Name { get; init; }
-    public Realm Realm { get; init; }
-    public BuiltInCategory Category { get; init; }
-    public Transaction Data { get; set; }
+    public Cuid            UniqueId {get; init;}
+    public string          Name     {get; init;}
+    public Realm           Realm    {get; init;}
+    public BuiltInCategory Category {get; init;}
+    public Transaction     Data     {get; set;}
 }

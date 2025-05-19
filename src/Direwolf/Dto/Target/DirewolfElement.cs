@@ -3,13 +3,12 @@
 namespace Direwolf.Dto.Target;
 
 public record DirewolfElement(
-    [property: Key] double Id,
-    double IdValue,
-    Guid IdUnique,
-    string BuiltInCategory,
-    string Name,
-    [property: Timestamp] DateTime CapturedAt
-)
+    [property: Key] double         Id,
+    double                         IdValue,
+    Guid                           IdUnique,
+    string                         BuiltInCategory,
+    string                         Name,
+    [property: Timestamp] DateTime CapturedAt)
 {
-    public virtual List<object>? Parameters { get; set; }
+    public virtual List<object>? Parameters {get; set;}
 }

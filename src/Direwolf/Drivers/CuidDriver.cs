@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
+
 using Direwolf.Dto.Parser;
 
 namespace Direwolf.Drivers;
@@ -19,13 +20,13 @@ public static class CuidDriver
 
     public static Cuid GenerateCuid(int length = 4)
     {
-        var timestamp = GetCurrentTimeStamp();
-        var counter = GetNextCounter(timestamp);
+        long timestamp = GetCurrentTimeStamp();
+        int counter = GetNextCounter(timestamp);
 
-        var timestampPart = EncodeBase36(timestamp);
-        var counterPart = EncodeBase36(counter);
-        var fingerprintPart = GetMachineFingerprint();
-        var randomPart = GetRandomString(length);
+        string? timestampPart = EncodeBase36(timestamp);
+        string? counterPart = EncodeBase36(counter);
+        string? fingerprintPart = GetMachineFingerprint();
+        string? randomPart = GetRandomString(length);
         var value = $"c{timestampPart}{counterPart}{fingerprintPart}{randomPart}";
 
         return new Cuid(length)
@@ -39,19 +40,19 @@ public static class CuidDriver
         };
     }
 
-    public static ( string Timestamp, string Counter, string Fingerprint, string Random, long TimeGenerated, string
-        Value) GenerateDeconstructedCuid(int length = 4)
+    public static( string Timestamp, string Counter, string Fingerprint, string Random, long TimeGenerated, string Value
+        ) GenerateDeconstructedCuid(int length = 4)
     {
-        var timestamp = GetCurrentTimeStamp();
-        var counter = GetNextCounter(timestamp);
+        long timestamp = GetCurrentTimeStamp();
+        int counter = GetNextCounter(timestamp);
 
-        var timestampPart = EncodeBase36(timestamp);
-        var counterPart = EncodeBase36(counter);
-        var fingerprintPart = GetMachineFingerprint();
-        var randomPart = GetRandomString(length);
+        string? timestampPart = EncodeBase36(timestamp);
+        string? counterPart = EncodeBase36(counter);
+        string? fingerprintPart = GetMachineFingerprint();
+        string? randomPart = GetRandomString(length);
         var value = $"c{timestampPart}{counterPart}{fingerprintPart}{randomPart}";
 
-        return (timestampPart, counterPart, fingerprintPart, randomPart, timestamp, value);
+        return(timestampPart, counterPart, fingerprintPart, randomPart, timestamp, value);
     }
 
     private static long GetCurrentTimeStamp()
@@ -63,9 +64,10 @@ public static class CuidDriver
     {
         lock (LockObject)
         {
-            if (timestamp == _lastTimeStamp) return ++_counter;
+            if (timestamp == _lastTimeStamp) return++_counter;
             _lastTimeStamp = timestamp;
             _counter = 0;
+
             return _counter;
         }
     }
@@ -75,29 +77,32 @@ public static class CuidDriver
         var result = new StringBuilder();
         while (value > 0)
         {
-            result.Insert(0, Base36Chars[value % 36]);
+            result.Insert(0,
+                          Base36Chars[value % 36]);
             value /= 36;
         }
 
-        return result.ToString().PadLeft(8, '0');
+        return result.ToString()
+                     .PadLeft(8,
+                              '0');
     }
 
     private static string GetMachineFingerprint()
     {
-        var machineName = Environment.MachineName;
-        var hashBytes = MD5.HashData(Encoding.UTF8.GetBytes(machineName));
+        string? machineName = Environment.MachineName;
+        byte[]? hashBytes = MD5.HashData(Encoding.UTF8.GetBytes(machineName));
 
         var sb = new StringBuilder();
-        foreach (var b in hashBytes) sb.Append(Base36Chars[b % 36]);
+        foreach (byte b in hashBytes) sb.Append(Base36Chars[b % 36]);
 
         return sb.ToString()[..4];
     }
 
     private static string GetRandomString(int length)
     {
-        var data = RandomNumberGenerator.GetBytes(length);
+        byte[]? data = RandomNumberGenerator.GetBytes(length);
         var sb = new StringBuilder(length);
-        foreach (var b in data) sb.Append(Base36Chars[b % 36]);
+        foreach (byte b in data) sb.Append(Base36Chars[b % 36]);
 
         return sb.ToString();
     }

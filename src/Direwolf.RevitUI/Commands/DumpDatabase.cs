@@ -1,11 +1,14 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+
 using Direwolf.Dto;
 using Direwolf.Dto.InternalDb.Enums;
 using Direwolf.Dto.Parser;
 using Direwolf.Dto.RevitApi;
+
 using Microsoft.Extensions.Caching.Memory;
+
 using Transaction = Direwolf.Dto.InternalDb.Transaction;
 
 #pragma warning disable VISLIB0001
@@ -49,6 +52,10 @@ public class DumpDatabase : IExternalCommand
 
         var transactionId = Cuid.Create();
         id = transactionId;
-        return new WolfDto(transactionId, name, realm, category) { Data = t };
+
+        return new WolfDto(transactionId,
+                           name,
+                           realm,
+                           category) { Data = t };
     }
 }
