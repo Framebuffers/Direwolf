@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.Caching;
+using System.Runtime.CompilerServices;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
@@ -10,6 +11,7 @@ using Direwolf.Dto;
 using Direwolf.Dto.InternalDb.Enums;
 using Direwolf.Dto.Parser;
 using Direwolf.Dto.RevitApi;
+using Direwolf.EventArgs;
 using Direwolf.Extensions;
 
 using Microsoft.Extensions.Caching.Memory;
@@ -20,55 +22,62 @@ using Transaction = Direwolf.Dto.InternalDb.Transaction;
 
 namespace Direwolf.Sources.InternalDB;
 
-public class DatabaseChangedEventArgs : EventArgs
-{
-    public CrudOperation Operation {get; set;}
-}
-
 public sealed class Database
 {
-    public event EventHandler<DatabaseChangedEventArgs> OnDatabaseChanged;
+    public event EventHandler<DatabaseChangedEventArgs> DatabaseChangedEventHandler;
 
-    private static readonly ObjectCache ParameterCache = MemoryCache.Default;
-    private static readonly ObjectCache TransactionCache = MemoryCache.Default;
-    private static readonly ObjectCache ElementCache = MemoryCache.Default;
-    private static readonly ObjectCache RemovedElementsCache = MemoryCache.Default;
+    public delegate Database DatabaseProvider();
+
+    public static event DatabaseProvider? OnRequestingDatabase;
+    internal static readonly ObjectCache ElementCache = MemoryCache.Default;
     private readonly List<Transaction> _exceptions = [];
     private readonly Stack<WolfDto> _results = new();
     private readonly Queue<WolfDto> _queue = new();
     private readonly Driver? _driver;
-    private readonly Document _document;
+    internal readonly Document _document;
+    private Database _instance;
 
     public Database(Document document)
     {
         _document = document;
-        OnDatabaseChanged += OnDatabaseEvent;
+        DatabaseChangedEventHandler += DatabaseEvent;
+        _instance = this;
     }
 
-    private void OnDatabaseEvent(object? sender, DatabaseChangedEventArgs e)
+    public static Database? GetDatabase()
+    {
+        return OnRequestingDatabase?.Invoke();
+    }
+
+    private void DatabaseEvent(object? sender, DatabaseChangedEventArgs e)
     {
         $"Database operation performed: {e.Operation.ToString()}".ToConsole();
     }
 
-    public int GetDatabaseCount()
-    {
-        return ElementCache.Count();
-    }
-
+    /// <summary>
+    /// The Direwolf database schema is a flat, linear structure where <see cref="Autodesk.Revit.DB.ElementId.Value"/>
+    /// as a string is the key, and <see cref="RevitElement"/> is the value.
+    ///
+    /// When the document is fully loaded, Direwolf will populate this database with a record of each valid element.
+    /// The result is stored in <see cref="ElementCache"/>. Each subsequent operation is performed over those caches.
+    ///
+    /// <remarks>
+    /// When the cache has to be built from scratch,
+    /// use this schema to flush and rebuild the in-memory DB.
+    /// </remarks>
+    /// </summary>
     public void PopulateDatabase()
     {
         try
         {
             var db = _document.GetRevitDatabase();
             foreach (var r in db)
-            {
-                ElementCache.Add(new CacheItem(r.Id.ToString(),
+                ElementCache.Add(new CacheItem(r.ElementId.ToString()!,
                                                r),
                                  null!);
-    
-            }
 
-            OnDatabaseChanged.Invoke(this, new DatabaseChangedEventArgs { Operation = CrudOperation.Create });
+            DatabaseChangedEventHandler.Invoke(this,
+                                               new DatabaseChangedEventArgs { Operation = CrudOperation.Create });
         }
         catch (Exception ex) { ex.LogException(_exceptions); }
     }
@@ -81,14 +90,12 @@ public sealed class Database
         {
             var newElement = RevitElement.Create(_document,
                                                  transaction.ElementId);
-            TransactionCache.Add(new CacheItem(transaction.Id.Value!,
-                                               transaction),
-                                 null!);
+
             ElementCache.Add(new CacheItem(newElement.ElementId.ToString()!,
                                            newElement),
                              null!);
-            OnDatabaseChanged.Invoke(this,
-                                     new DatabaseChangedEventArgs { Operation = CrudOperation.Create });
+            DatabaseChangedEventHandler.Invoke(this,
+                                               new DatabaseChangedEventArgs { Operation = CrudOperation.Create });
 
             return true;
         }
@@ -104,13 +111,9 @@ public sealed class Database
     {
         try
         {
-            RemovedElementsCache.Add(new CacheItem(transaction.Id.Value!,
-                                                   transaction),
-                                     null!);
-            TransactionCache.Remove(transaction.Id.Value!);
             ElementCache.Remove(transaction.ElementId.ToString()!);
-            OnDatabaseChanged.Invoke(this,
-                                     new DatabaseChangedEventArgs { Operation = CrudOperation.Delete });
+            DatabaseChangedEventHandler.Invoke(this,
+                                               new DatabaseChangedEventArgs { Operation = CrudOperation.Delete });
 
             return true;
         }
@@ -128,8 +131,8 @@ public sealed class Database
         {
             Delete(transaction);
             Add(transaction);
-            OnDatabaseChanged.Invoke(this,
-                                     new DatabaseChangedEventArgs { Operation = CrudOperation.Update });
+            DatabaseChangedEventHandler.Invoke(this,
+                                               new DatabaseChangedEventArgs { Operation = CrudOperation.Update });
 
             return true;
         }
@@ -141,31 +144,15 @@ public sealed class Database
         }
     }
 
-    public(IEnumerable<Transaction>? Transactions, RevitElement? ElementData) Read(ElementId id)
+    public RevitElement? Read(ElementId id)
     {
         try
         {
-            var transactions
-                = TransactionCache.GetValues(new List<string> { id.ToString() }).Values.Cast<Transaction>();
             var rvtElement = (RevitElement)ElementCache.Get(id.ToString());
-            OnDatabaseChanged.Invoke(this,
-                                     new DatabaseChangedEventArgs { Operation = CrudOperation.Read });
+            DatabaseChangedEventHandler.Invoke(this,
+                                               new DatabaseChangedEventArgs { Operation = CrudOperation.Read });
 
-            return(transactions, rvtElement);
-        }
-        catch (Exception e) { e.LogException(_exceptions); }
-
-        return(null, null);
-    }
-
-    public IEnumerable<Transaction>? ReadTransactionsOfElement(ElementId id)
-    {
-        try
-        {
-            OnDatabaseChanged.Invoke(this,
-                                     new DatabaseChangedEventArgs { Operation = CrudOperation.Read });
-
-            return TransactionCache.GetValues(new List<string> { id.ToString() }).Values.Cast<Transaction>();
+            return rvtElement;
         }
         catch (Exception e) { e.LogException(_exceptions); }
 
