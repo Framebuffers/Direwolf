@@ -1,16 +1,17 @@
-﻿using Autodesk.Revit.UI;
+﻿using System.Diagnostics;
+
+using Autodesk.Revit.UI;
+
+using Direwolf.Database;
 
 namespace Direwolf;
 
-public class Frontend : IExternalApplication
+public class Frontend : Nice3point.Revit.Toolkit.External.ExternalApplication
 {
-    public Result OnStartup(UIControlledApplication application)
+    public override void OnStartup()
     {
-        return Result.Succeeded;
-    }
+        var e = Engine.GetEngine();
+        Debug.Print("\n\n\n\nOnStartup\n\n\n\n");
 
-    public Result OnShutdown(UIControlledApplication application)
-    {
-        return Result.Succeeded;
     }
 }

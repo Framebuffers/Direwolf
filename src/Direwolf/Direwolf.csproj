@@ -1,17 +1,46 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net8.0-windows</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <PlatformTarget>x64</PlatformTarget>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <PlatformTarget>x64</PlatformTarget>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Revit_All_Main_Versions_API_x64" Version="2025.0.0" />
+      <PackageReference Include="Nice3point.Revit.Toolkit" Version="2025.1.0" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Direwolf.Database\Direwolf.Database.csproj" />
+      <ProjectReference Include="..\Direwolf.Definitions\Direwolf.Definitions.csproj" />
+      <ProjectReference Include="..\Direwolf.Parser\Direwolf.Parser.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Commands\" />
+      <Folder Include="EventArgs\" />
+      <Folder Include="Extensions\" />
+      <Folder Include="Interfaces\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="RevitAPI">
+        <HintPath>..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2025\RevitAPI.dll</HintPath>
+        <Private>False</Private>
+      </Reference>
+      <Reference Include="RevitAPIUI">
+        <HintPath>..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2025\RevitAPIUI.dll</HintPath>
+        <Private>False</Private>
+      </Reference>
     </ItemGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
