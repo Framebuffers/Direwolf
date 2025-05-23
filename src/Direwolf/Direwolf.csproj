@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Revit_All_Main_Versions_API_x64" Version="2025.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Direwolf.Database\Direwolf.Database.csproj" />
+    </ItemGroup>
+
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+      <Exec Command="@echo off&#xA;echo Direwolf After Build Script&#xA;echo Rev2 - 202505&#xA;&#xA;set installpath=%ProgramData%\Autodesk\Revit\Addins\2025\Direwolf&#xA;set manifest=$(SolutionDir)Direwolf.addin&#xA;set libraries=$(SolutionDir)lib&#xA;set revitfolder=%ProgramData%\Autodesk\Revit\Addins\2025&#xA;echo ------------------------------------&#xA;echo Installing Direwolf&#xA;echo ------------------------------------&#xA;echo InstallPath=%installpath%&#xA;echo Manifest=%manifest%&#xA;echo Libraries=%libraries%&#xA;echo RevitFolder=%revitfolder%&#xA;echo ------------------------------------&#xA;echo Creating folder...&#xA;rmdir /S /Q %installpath%&#xA;mkdir %installpath%&#xA;echo Created folder.&#xA;echo ------------------------------------&#xA;echo Copying files...&#xA;xcopy /F /Y /D $(TargetDir)*.* %installpath%\*.*&#xA;xcopy /F /Y /D %manifest% %revitfolder%\&#xA;echo ------------------------------------&#xA;echo Build installed! Awoo!&#xA;echo ------------------------------------" />
+    </Target>
+
+</Project>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<RevitAddIn>
+	<AddIn Type="Application">
+		<Name>Direwolf</Name>
+		<Description>Benchmarks Revit and Direwolf's parameter serialization performance.</Description>
+		<Assembly>"C:\ProgramData\Autodesk\Revit\Addins\2025\Direwolf\Direwolf.dll"</Assembly>
+		<FullClassName>Direwolf.Frontend</FullClassName>
+		<ClientId>7812751E-728C-4B6E-B644-9E3D78702E62</ClientId>
+		<VendorId>Framebuffer</VendorId>
+		<VendorDescription>
+			<![CDATA[https://github.com/framebuffers]]>
+		</VendorDescription>
+		<VisibilityMode>AlwaysVisible</VisibilityMode>
+	</AddIn>
+</RevitAddIn>
