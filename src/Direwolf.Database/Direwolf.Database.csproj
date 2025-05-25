@@ -24,10 +24,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Direwolf.Definitions\Direwolf.Definitions.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Reference Include="RevitAPI">
         <HintPath>..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2025\RevitAPI.dll</HintPath>
         <Private>False</Private>
@@ -36,5 +32,9 @@
         <HintPath>..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2025\RevitAPIUI.dll</HintPath>
         <Private>False</Private>
       </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Direwolf.Definitions\Direwolf.Definitions.csproj" />
     </ItemGroup>
 </Project>
