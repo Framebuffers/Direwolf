@@ -1,0 +1,60 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <UseWPF>true</UseWPF>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+        <PlatformTarget>x64</PlatformTarget>
+        <ImplicitUsings>true</ImplicitUsings>
+        <EnableDynamicLoading>true</EnableDynamicLoading>
+        <Configurations>Debug R25;Debug R26</Configurations>
+        <Configurations>$(Configurations);Release R25;Release R26</Configurations>
+    </PropertyGroup>
+
+    <!-- Revit configuration -->
+
+    <PropertyGroup Condition="$(Configuration.Contains('R25'))">
+        <RevitVersion>2025</RevitVersion>
+        <TargetFramework>net8.0-windows</TargetFramework>
+    </PropertyGroup>
+    <PropertyGroup Condition="$(Configuration.Contains('R26'))">
+        <RevitVersion>2026</RevitVersion>
+        <TargetFramework>net8.0-windows</TargetFramework>
+    </PropertyGroup>
+
+    <!-- Launch configuration -->
+    <PropertyGroup>
+        <StartAction>Program</StartAction>
+        <StartProgram>C:\Program Files\Autodesk\Revit $(RevitVersion)\Revit.exe</StartProgram>
+        <StartArguments>/language ENG</StartArguments>
+    </PropertyGroup>
+
+    <!-- Build configuration -->
+    <!-- https://github.com/Nice3point/Revit.Build.Tasks -->
+    <PropertyGroup>
+        <IsRepackable>true</IsRepackable>
+        <DeployRevitAddin>true</DeployRevitAddin>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- Revit References -->
+        <PackageReference Include="ILRepack" Version="2.0.42">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Nice3point.Revit.Build.Tasks" Version="3.0.1"/>
+        <PackageReference Include="Nice3point.Revit.Toolkit" Version="$(RevitVersion).*"/>
+        <PackageReference Include="Nice3point.Revit.Extensions" Version="$(RevitVersion).*"/>
+        <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="$(RevitVersion).*"/>
+        <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="$(RevitVersion).*"/>
+
+        <!-- MVVM -->
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Resource Include="Resources\Icons\RibbonIcon16.png"/>
+        <Resource Include="Resources\Icons\RibbonIcon32.png"/>
+    </ItemGroup>
+
+</Project>

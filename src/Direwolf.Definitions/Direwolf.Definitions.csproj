@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0-windows</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- Revit References -->
+        <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="2025.4.0"/>
+        <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="$(RevitVersion).*"/>
+
+        <!-- Logging -->
+        <PackageReference Include="Serilog" Version="4.2.0"/>
+        <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0"/>
+
+        <!-- Build -->
+        <PackageReference Include="ILRepack" Version="2.0.41"/>
+    </ItemGroup>
+</Project>
