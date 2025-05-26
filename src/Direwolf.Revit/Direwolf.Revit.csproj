@@ -53,6 +53,11 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Direwolf\Direwolf.csproj"/>
+        <ProjectReference Include="..\Direwolf.Definitions\Direwolf.Definitions.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
         <Resource Include="Resources\Icons\RibbonIcon16.png"/>
         <Resource Include="Resources\Icons\RibbonIcon32.png"/>
     </ItemGroup>

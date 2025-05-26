@@ -4,9 +4,9 @@
         <Assembly>Direwolf.Revit\Direwolf.Revit.dll</Assembly>
         <AddInId>A9EDD133-00A2-4A5B-8C35-EB20BB32F9D8</AddInId>
         <FullClassName>Direwolf.Revit.Application</FullClassName>
-        <VendorId>Development</VendorId>
+        <VendorId>Framebuffer</VendorId>
         <VendorDescription></VendorDescription>
-        <VendorEmail></VendorEmail>
+        <VendorEmail>hello@framebuffer.cl</VendorEmail>
     </AddIn>
     <ManifestSettings>
         <UseRevitContext>False</UseRevitContext>

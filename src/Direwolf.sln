@@ -9,6 +9,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Direwolf.Definitions", "Direwolf.Definitions\Direwolf.Definitions.csproj", "{8B67BD0C-FE01-4FE7-8D11-F3E6725FAAF9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Direwolf.Revit", "Direwolf.Revit\Direwolf.Revit.csproj", "{7FDBBC48-6364-4D38-A81A-08D4EE9DCBC0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6A561F67-7BB7-4EF3-841F-A2E6357288FF} = {6A561F67-7BB7-4EF3-841F-A2E6357288FF}
+		{8B67BD0C-FE01-4FE7-8D11-F3E6725FAAF9} = {8B67BD0C-FE01-4FE7-8D11-F3E6725FAAF9}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
