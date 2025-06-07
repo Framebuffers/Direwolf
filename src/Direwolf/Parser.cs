@@ -1,5 +1,4 @@
 ﻿using Direwolf.Definitions.Parser;
-
 using YamlDotNet.RepresentationModel;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
@@ -52,19 +51,24 @@ namespace Direwolf;
  *      - DataType of the parameters
  */
 
+// Unimplemented as of 2025-05-29. 
+// Implementation subject to change.
+
 public class Parser
 {
     public static Wolfpack Parse(string yamlStream)
     {
-        using var reader = new StreamReader(yamlStream);
+        using var reader = new StreamReader
+            (yamlStream);
         var yaml = new YamlStream();
-        yaml.Load(reader);
+        yaml.Load
+            (reader);
 
-        var deserialize = new DeserializerBuilder()
-                          .WithNamingConvention(
-                              CamelCaseNamingConvention.Instance)
-                          .Build();
+        var deserialize = new DeserializerBuilder().WithNamingConvention
+                (CamelCaseNamingConvention.Instance)
+            .Build();
 
-        return deserialize.Deserialize<Wolfpack>(yamlStream);
+        return deserialize.Deserialize<Wolfpack>
+            (yamlStream);
     }
 }

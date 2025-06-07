@@ -1,85 +1,182 @@
-﻿using System.Globalization;
-using System.Text.Json;
-
+﻿using System.Collections.Specialized;
+using System.Runtime.Caching;
+using System.Text.Json.Serialization;
 using Autodesk.Revit.DB;
-
+using Direwolf.Definitions.Drivers;
 using Direwolf.Definitions.Extensions;
 using Direwolf.Definitions.Parser;
 
 namespace Direwolf.Definitions.RevitApi;
 
+/// <summary>
+///     A symbolic representation of a <see cref="Autodesk.Revit.DB.Element" /> inside the context of
+///     <see cref="Direwolf" />.
+///     It identifies, defines and specifies the state of any valid <see cref="Autodesk.Revit.DB.Element" /> inside the
+///     Revit <see cref="Document" /> at any given time.
+///     The purpose of it is to have a lighter data structure that mirrors the state of the currently-loaded Revit
+///     <see cref="Document" />, that can be cached and
+///     retrieved faster than doing a normal Revit API query.
+/// </summary>
+/// <param name="Id">A Collision-Resistant Unique Identifier</param>
+/// <param name="CategoryType">Category Type: Annotative, Model, Internal, AnalyticalModel, Invalid</param>
+/// <param name="BuiltInCategory">BuiltInCategory Enum</param>
+/// <param name="ElementTypeId">ElementId of the type corresponding to the Element being defined.</param>
+/// <param name="ElementUniqueId">The UniqueId of this Element</param>
+/// <param name="ElementId">The ElementId value of this Element</param>
+/// <param name="ElementName">The human-readable name of this Element, if applicable.</param>
+/// <param name="Parameters">A list of all the Parameters held inside this Element.</param>
+[JsonConverter(typeof(ElementJsonParser))]
 public readonly record struct RevitElement(
-    Cuid                 Id,
-    string?              CategoryType,
-    string?              CategoryName,
-    long?                BuiltInCategory,
-    double?              ElementTypeId,
-    string?              ElementUniqueId,
-    double?              ElementId,
-    string?              ElementName,
-    List<RevitParameter> Parameters)
+    Cuid Id,
+    CategoryType CategoryType,
+    BuiltInCategory BuiltInCategory,
+    ElementId? ElementTypeId,
+    string ElementUniqueId,
+    ElementId? ElementId,
+    string? ElementName,
+    IReadOnlyList<RevitParameter?> Parameters)
 {
-    public static RevitElement Create(Document doc, ElementId id)
+    /// <summary>
+    ///     Creates a new record of the given <see cref="ElementId" />, held inside the given <see cref="Document" />
+    /// </summary>
+    /// <param name="doc">Revit Document</param>
+    /// <param name="elementUniqueId"></param>
+    /// <returns>
+    ///     A record containing identification, description and details of a <see cref="Autodesk.Revit.DB.Element" />
+    /// </returns>
+    public static RevitElement? Create(Document doc,
+        string elementUniqueId)
     {
-        var element = doc.GetElement(id);
-        var elementTypeId = doc.GetElement(id).GetTypeId();
-        element.TryGetParameters(out var param);
-
-        (string CategoryType, string CategoryName, long? BuiltInCategory)
-            category = GetCategory(element)!;
-
-        return new RevitElement(Cuid.Create(),
-                                category.CategoryType,
-                                category.CategoryName,
-                                category.BuiltInCategory,
-                                elementTypeId.Value,
-                                element?.UniqueId,
-                                element?.Id.Value,
-                                element?.Name ?? string.Empty,
-                                param);
+        var members = elementUniqueId.DeconstructElementUniqueId(doc);
+        if (members.Element is null)
+            return null;
+        members.Element.TryGetParameters(out var param);
+        var category = GetElementCategory(members.Element);
+        return new RevitElement(Cuid.CreateRevitId(doc, out var _),
+            category.CategoryType,
+            category.BuiltInCategory,
+            members.ElementTypeId,
+            elementUniqueId,
+            members.ElementId,
+            members.Element.Name ?? string.Empty,
+            param);
     }
 
-    private static(string? CategoryType, string? Name, long? BuiltInCategory)
-        GetCategory(Element e)
+    /// <summary>
+    /// Create a <see cref="RevitElement"/> with only certain <see cref="BuiltInParameter"/> loaded inside <see cref="RevitElement.Parameters"/>
+    /// </summary>
+    /// <param name="doc">Revit Document</param>
+    /// <param name="elementUniqueId">The Element's Unique Identifier found on <see cref="Autodesk.Revit.DB.Element.UniqueId"/></param>
+    /// <param name="parameters">The <see cref="BuiltInParameter"/> to check the values for.</param>
+    /// <returns>A <see cref="RevitElement"/> where the <see cref="RevitElement.Parameters"/> property only contains <see cref="RevitParameter"/> for the specified <see cref="BuiltInParameter"/></returns>
+    public static RevitElement? CreateWithSpecificParameters(Document doc,
+        string elementUniqueId,
+        BuiltInParameter[] parameters)
     {
-        var category = e?.Category;
-
-        return category is null
-            ? (null, null, null)
-            : (category.CategoryType.ToString(), category.Name,
-               (long)category.BuiltInCategory);
+        var members = elementUniqueId.DeconstructElementUniqueId(doc);
+        if (members.Element is null)
+            return null;
+        members.Element.TryGetParameters(out var param);
+        var category = GetElementCategory(members.Element);
+        return new RevitElement(Cuid.CreateRevitId(doc, out var _),
+            category.CategoryType,
+            category.BuiltInCategory,
+            members.ElementTypeId,
+            members.Element.UniqueId,
+            members.ElementId,
+            members.Element.Name ?? string.Empty,
+            param);
     }
 
-    public override string ToString()
+    /// <summary>
+    ///     Creates a record of the given <see cref="Autodesk.Revit.DB.Element" />, held inside the given <see cref="Document" />, as a
+    ///     <see cref="CacheItem" /> to be used inside the <see cref="ObjectCache" /> inside <see cref="Direwolf"/>.
+    /// </summary>
+    /// <remarks>
+    ///     Inside <see cref="Direwolf"/>, the key for all <see cref="CacheItem"/> held inside the <see cref="ObjectCache"/> is <see cref="Autodesk.Revit.DB.Element.UniqueId"/>
+    /// </remarks>
+    /// <param name="doc">Revit Document</param>
+    /// <param name="elementUniqueId">The Element's Unique Identifier found on <see cref="Autodesk.Revit.DB.Element.UniqueId"/></param>
+    /// <param name="rvt">The <see cref="RevitElement" /> generated.</param>
+    /// <returns></returns>
+    public static CacheItem? CreateAsCacheItem(Document doc,
+        string elementUniqueId,
+        out RevitElement? rvt)
     {
-        return JsonSerializer.Serialize(new Dictionary<string, object>()
+        var members = elementUniqueId.DeconstructElementUniqueId(doc);
+        if (members.Element is null)
         {
-            [ElementId!.Value.ToString(
-                 CultureInfo
-                     .InvariantCulture)]
-                = new
-                    Dictionary<string, object>()
-                    {
-                        ["Id"] = Id.Value!,
-                        ["CategoryType"]
-                            = CategoryType
-                            ?? string.Empty,
-                        ["CategoryName"]
-                            = CategoryName
-                            ?? string.Empty,
-                        ["BuiltInCategory"]
-                            = BuiltInCategory
-                            ?? -1,
-                        ["typeId"]
-                            = ElementTypeId
-                            ?? -1,
-                        ["elementName"]
-                            = ElementName
-                            ?? string.Empty,
-                        ["parameters"]
-                            = Parameters
-                            ?? null!
-                    }
-        });
+            rvt = null;
+            return null;
+        }
+
+        members.Element.TryGetParameters(out var param);
+        var category = GetElementCategory(members.Element);
+        var newElement = new RevitElement(Cuid.CreateRevitId(doc, out var _),
+            category.CategoryType,
+            category.BuiltInCategory,
+            members.ElementTypeId,
+            members.Element.UniqueId,
+            members.ElementId,
+            members.Element.Name ?? string.Empty,
+            param);
+        rvt = newElement;
+        return new CacheItem(newElement.ElementUniqueId,
+            newElement);
+    }
+
+    public CacheItem? AsCacheItem() => new(ElementUniqueId, this);
+
+    /// <summary>
+    ///     Concatenates the <see cref="Cuid.CounterSubstring"/> and <see cref="Cuid.FingerprintSubstring"/> portions of
+    ///     a Direwolf-generated CUID. These IDs are based on a truncated Base36 hash of both the <see cref="Document.CreationGUID"/>
+    ///     and Document.GetDocumentVersion(doc).NumberOfSaves of the given <see cref="Document"/>
+    /// </summary>
+    /// <remarks>
+    ///     Each <see cref="RevitElement.Id"/> is created using <see cref="CuidDriver.NewDirewolfId"/> method.
+    ///     This method uses the <see cref="Cuid.CounterSubstring"/> and <see cref="Cuid.FingerprintSubstring"/> to
+    ///     store the number of saves and the <see cref="Document.CreationGUID"/> respectively, deviating a bit
+    ///     from a standard CUID.
+    ///
+    ///     The way <see cref="Direwolf"/> indexes <see cref="RevitElement"/> inside the <see cref="ObjectCache"/> is through
+    ///     this concatenated hash, identifying each "Episode" (a given Document at a given save state), at a given time
+    ///     (using <see cref="Cuid.TimestampMilliseconds"/>)
+    ///
+    ///     Therefore, it is safe to use these properties as a way to separate two <see cref="Autodesk.Revit.DB.Element.UniqueId"/>
+    ///     when more than one snapshot is cached.
+    ///
+    ///     This allows <see cref="Direwolf"/> to track the history of a single element's changes over time.
+    /// </remarks>
+    /// <param name="r">RevitElement to extract the Document ID from.</param>
+    /// <returns>A string with the concatenated Base46 hash of the CreationGUID and SaveCount of the <see cref="Document"/></returns>
+    private static string GetEmbeddedDocumentId(RevitElement r) =>
+        string.Concat(r.Id.CounterSubstring,
+            r.Id.FingerprintSubstring);
+
+    /// <summary>
+    ///     Checks if a given <see cref="RevitElement.Id"/> has the same <see cref="Cuid.CounterSubstring"/> and <see cref="Cuid.FingerprintSubstring"/>
+    ///     as one generated by hashing the <see cref="Document"/>'s <see cref="Document.CreationGUID"/> and its SaveCount.
+    /// </summary>
+    /// <param name="r">A <see cref="RevitElement"/>.</param>
+    /// <param name="doc">The Revit <see cref="Document"/> to check against.</param>
+    /// <returns>True if the <see cref="RevitElement"/> corresponds to the given <see cref="Document"/>, False otherwise.</returns>
+    public static bool BelongsToDocument(RevitElement r,
+        Document doc) =>
+        doc.GetDocumentUuidHash()
+            .Equals(GetEmbeddedDocumentId(r));
+
+    /// <summary>
+    ///     Checks if an <see cref="Autodesk.Revit.DB.Element"/> has a valid <see cref="Autodesk.Revit.DB.Category"/>,
+    ///     and returns its corresponding values.
+    /// </summary>
+    /// <param name="e">An <see cref="Autodesk.Revit.DB.Element"/> to check its category for.</param>
+    /// <returns>A tuple with the <see cref="CategoryType"/> and <see cref="BuiltInCategory"/> held inside the
+    /// <see cref="Autodesk.Revit.DB.Category"/> property.</returns>
+    private static (CategoryType CategoryType, BuiltInCategory BuiltInCategory) GetElementCategory(Element e)
+    {
+        var category = e.Category;
+        return category is null
+            ? (CategoryType.Invalid, BuiltInCategory.INVALID)
+            : (category.CategoryType, category.BuiltInCategory);
     }
 }

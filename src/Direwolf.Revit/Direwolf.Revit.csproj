@@ -9,6 +9,20 @@
         <EnableDynamicLoading>true</EnableDynamicLoading>
         <Configurations>Debug R25;Debug R26</Configurations>
         <Configurations>$(Configurations);Release R25;Release R26</Configurations>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Version>0.0.4</Version>
+        <Title>Direwolf</Title>
+        <Authors>Framebuffer</Authors>
+        <Description>Data Hunting Framework for Autodesk Revit 2025+</Description>
+        <Copyright>(C) 2025 Framebuffer/Sebastian Torres Sagredo</Copyright>
+        <PackageProjectUrl>https://github.com/framebuffers/direwolf</PackageProjectUrl>
+        <PackageIcon>dwolf-1080.png</PackageIcon>
+        <RepositoryUrl>https://github.com/framebuffers/direwolf</RepositoryUrl>
+        <PackageTags>revit api data-science data-analysis</PackageTags>
+        <Company>Framebuffer</Company>
+        <Product>Direwolf</Product>
+        <AssemblyVersion>0.0.4</AssemblyVersion>
+        <FileVersion>0.0.4</FileVersion>
     </PropertyGroup>
 
     <!-- Revit configuration -->
@@ -35,6 +49,9 @@
         <IsRepackable>true</IsRepackable>
         <DeployRevitAddin>true</DeployRevitAddin>
     </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release R25' ">
+        <DebugType>embedded</DebugType>
+    </PropertyGroup>
 
     <ItemGroup>
         <!-- Revit References -->
@@ -60,6 +77,25 @@
     <ItemGroup>
         <Resource Include="Resources\Icons\RibbonIcon16.png"/>
         <Resource Include="Resources\Icons\RibbonIcon32.png"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Reference Include="System.Windows.Forms">
+            <HintPath>..\..\..\..\..\..\..\Program Files\dotnet\shared\Microsoft.WindowsDesktop.App\8.0.13\System.Windows.Forms.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="dwolf-1080.png">
+            <Pack>True</Pack>
+            <PackagePath></PackagePath>
+        </None>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Commands\Exporting\"/>
+        <Folder Include="Commands\Importing\"/>
     </ItemGroup>
 
 </Project>

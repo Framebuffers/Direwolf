@@ -1,23 +1,17 @@
 ﻿using Autodesk.Revit.ApplicationServices;
-
 using Direwolf.Definitions.Telemetry;
 
 namespace Direwolf.Events;
 
-public partial class EventManager
+// Unimplemented feature as of 2025-05-29
+public partial class EventManager(ControlledApplication application)
 {
-    public readonly List<TriggerEventData> Counters = [];
-    public readonly List<TimerEventData> Timers = [];
-    private readonly ControlledApplication _application;
+    private readonly List<TriggerEventData> Counters = [];
 
-    public EventManager(ControlledApplication application)
-    {
-        _application = application;
-    }
+    private readonly List<TimerEventData> Timers = [];
 
     public void LoadTimers()
     {
-        // Document Hooks
         OnDocumentOpening();
         OnDocumentClosing();
         MeasureDocumentChangeCount();

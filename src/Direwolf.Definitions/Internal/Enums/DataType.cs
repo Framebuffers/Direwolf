@@ -21,5 +21,7 @@ public enum DataType
     RevitException,
     SystemException,
     CloudException,
-    Query
+    Query,
+    Invalid,
+    Empty
 }

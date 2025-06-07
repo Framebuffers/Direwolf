@@ -2,6 +2,7 @@
 
 namespace Direwolf.Definitions.RevitApi;
 
+// Unimplemented feature as of 2025-05-29
 public readonly record struct DocumentWarnings(
     List<string> NoSeverityWarningMessages,
     List<string> WarningMessages,
@@ -15,7 +16,7 @@ public readonly record struct DocumentWarnings(
         List<string> errors = [];
         List<string> corruptions = [];
 
-        foreach ((var severity, string? message) in
+        foreach (var (severity, message) in
                  from w in doc.GetWarnings()
                  let s = w.GetSeverity()
                  let m = w.GetDescriptionText()
@@ -23,26 +24,30 @@ public readonly record struct DocumentWarnings(
             switch (severity)
             {
                 case FailureSeverity.None:
-                    none.Add(message);
+                    none.Add
+                        (message);
 
                     break;
                 case FailureSeverity.Warning:
-                    warnings.Add(message);
+                    warnings.Add
+                        (message);
 
                     break;
                 case FailureSeverity.Error:
-                    errors.Add(message);
+                    errors.Add
+                        (message);
 
                     break;
                 case FailureSeverity.DocumentCorruption:
-                    corruptions.Add(message);
+                    corruptions.Add
+                        (message);
 
                     break;
             }
 
         return new DocumentWarnings(none,
-                                    warnings,
-                                    errors,
-                                    corruptions);
+            warnings,
+            errors,
+            corruptions);
     }
 }

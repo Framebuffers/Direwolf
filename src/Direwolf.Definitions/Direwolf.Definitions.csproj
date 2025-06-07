@@ -8,8 +8,9 @@
 
     <ItemGroup>
         <!-- Revit References -->
+        <PackageReference Include="cuid.net" Version="6.0.1"/>
         <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="2025.4.0"/>
-        <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="2025.4.0" />
+        <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="2025.4.0"/>
 
         <!-- Logging -->
         <PackageReference Include="Serilog" Version="4.2.0"/>
@@ -17,5 +18,10 @@
 
         <!-- Build -->
         <PackageReference Include="ILRepack" Version="2.0.41"/>
+        <PackageReference Include="System.Runtime.Caching" Version="9.0.5"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Export\"/>
     </ItemGroup>
 </Project>

@@ -3,8 +3,5 @@ using Direwolf.Definitions.Telemetry;
 
 namespace Direwolf.Definitions.Parser;
 
-public record WolfpackParameters(
-    DocumentType     Type,
-    bool             Async,
-    int              RevitVersion,
-    ExecutionTrigger Trigger);
+// Unimplemented feature as of 2025-05-29
+public record WolfpackParameters(DocumentType Type, bool Async, int RevitVersion, ExecutionTrigger Trigger);

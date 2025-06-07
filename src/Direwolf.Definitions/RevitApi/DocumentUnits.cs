@@ -2,6 +2,7 @@
 
 namespace Direwolf.Definitions.RevitApi;
 
+// Unimplemented feature as of 2025-05-29
 public readonly record struct DocumentUnits(
     string Volume,
     string LengthUnits,
@@ -18,54 +19,65 @@ public readonly record struct DocumentUnits(
 {
     public static DocumentUnits Create(Document document)
     {
-        return new DocumentUnits(
+        return new DocumentUnits(document.GetUnits()
+                .GetFormatOptions
+                    (SpecTypeId.Volume)
+                .GetUnitTypeId()
+                .TypeId,
             document.GetUnits()
-                    .GetFormatOptions(SpecTypeId.Volume)
-                    .GetUnitTypeId()
-                    .TypeId,
+                .GetFormatOptions
+                    (SpecTypeId.Length)
+                .GetUnitTypeId()
+                .TypeId,
             document.GetUnits()
-                    .GetFormatOptions(SpecTypeId.Length)
-                    .GetUnitTypeId()
-                    .TypeId,
+                .GetFormatOptions
+                    (SpecTypeId.Area)
+                .GetUnitTypeId()
+                .TypeId,
             document.GetUnits()
-                    .GetFormatOptions(SpecTypeId.Area)
-                    .GetUnitTypeId()
-                    .TypeId,
+                .GetFormatOptions
+                    (SpecTypeId.Angle)
+                .GetUnitTypeId()
+                .TypeId,
             document.GetUnits()
-                    .GetFormatOptions(SpecTypeId.Angle)
-                    .GetUnitTypeId()
-                    .TypeId,
+                .GetFormatOptions
+                    (SpecTypeId.Currency)
+                .GetUnitTypeId()
+                .TypeId,
             document.GetUnits()
-                    .GetFormatOptions(SpecTypeId.Currency)
-                    .GetUnitTypeId()
-                    .TypeId,
+                .GetFormatOptions
+                    (SpecTypeId.Number)
+                .GetUnitTypeId()
+                .TypeId,
             document.GetUnits()
-                    .GetFormatOptions(SpecTypeId.Number)
-                    .GetUnitTypeId()
-                    .TypeId,
+                .GetFormatOptions
+                    (SpecTypeId.RotationAngle)
+                .GetUnitTypeId()
+                .TypeId,
             document.GetUnits()
-                    .GetFormatOptions(SpecTypeId.RotationAngle)
-                    .GetUnitTypeId()
-                    .TypeId,
+                .GetFormatOptions
+                    (SpecTypeId.SheetLength)
+                .GetUnitTypeId()
+                .TypeId,
             document.GetUnits()
-                    .GetFormatOptions(SpecTypeId.SheetLength)
-                    .GetUnitTypeId()
-                    .TypeId,
+                .GetFormatOptions
+                    (SpecTypeId.SiteAngle)
+                .GetUnitTypeId()
+                .TypeId,
             document.GetUnits()
-                    .GetFormatOptions(SpecTypeId.SiteAngle)
-                    .GetUnitTypeId()
-                    .TypeId,
+                .GetFormatOptions
+                    (SpecTypeId.Slope)
+                .GetUnitTypeId()
+                .TypeId,
             document.GetUnits()
-                    .GetFormatOptions(SpecTypeId.Slope)
-                    .GetUnitTypeId()
-                    .TypeId,
+                .GetFormatOptions
+                    (SpecTypeId.Speed)
+                .GetUnitTypeId()
+                .TypeId,
             document.GetUnits()
-                    .GetFormatOptions(SpecTypeId.Speed)
-                    .GetUnitTypeId()
-                    .TypeId,
-            document.GetUnits()
-                    .GetFormatOptions(SpecTypeId.Time)
-                    .GetUnitTypeId()
-                    .TypeId);
+                .GetFormatOptions
+                    (SpecTypeId.Time)
+                .GetUnitTypeId()
+                .TypeId);
     }
 }

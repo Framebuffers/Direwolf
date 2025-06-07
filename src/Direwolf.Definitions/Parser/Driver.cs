@@ -1,5 +1,4 @@
 ﻿namespace Direwolf.Definitions.Parser;
 
-public readonly record struct Driver(
-    string                     Name,
-    Dictionary<string, string> Parameters);
+// Unimplemented feature as of 2025-05-29
+public readonly record struct Driver(string Name, Dictionary<string, string> Parameters);

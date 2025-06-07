@@ -2,7 +2,5 @@
 
 namespace Direwolf.Definitions.Parser;
 
-public readonly record struct Query(
-    string                          Name,
-    string                          Target,
-    Dictionary<string, Transaction> Transactions);
+// Unimplemented feature as of 2025-05-29
+public readonly record struct Query(string Name, string Target, Dictionary<string, Transaction> Transactions);

@@ -2,8 +2,5 @@
 
 namespace Direwolf.Definitions.Parser;
 
-public readonly record struct Target(
-    Realm      Realm,
-    TargetType Type,
-    string     Name,
-    string[]   Arguments);
+// Unimplemented feature as of 2025-05-29
+public readonly record struct Target(Realm Realm, TargetType Type, string Name, string[] Arguments);

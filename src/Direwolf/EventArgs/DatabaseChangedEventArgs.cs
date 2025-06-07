@@ -2,7 +2,13 @@
 
 namespace Direwolf.EventArgs;
 
+/// <summary>
+///     Defines which kind of operation has been performed on the DB: CreateRevitId, Read, Update or Delete.
+/// </summary>
 public class DatabaseChangedEventArgs : System.EventArgs
 {
-    public CrudOperation Operation {get; set;}
+    /// <summary>
+    ///     Specifies one of four operations: CreateRevitId, Read, Update or Delete.
+    /// </summary>
+    public CrudOperation Operation { get; init; }
 }
