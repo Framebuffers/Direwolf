@@ -66,7 +66,7 @@ public class TestCommands : ExternalCommand
         foreach (var door in doors)
         {
             var uuid = Document.GetElement(door).UniqueId;
-            db.Add(uuid,
+            db.AddOrUpdateRevitElement(uuid,
                 Document);
             addedUniqueItems.Add(uuid);
             Debug.Print($"Added: {door.Value}");
@@ -81,7 +81,7 @@ public class TestCommands : ExternalCommand
 
         WriteToConsole("Checking DB:");
         WriteToConsole("\tCount between Cached and Collected Elements");
-        var readInfo = db.Read(addedUniqueItems.ToArray(), Document);
+        var readInfo = Direwolf.Read(addedUniqueItems.ToArray(), Document);
         var counterDict = new Dictionary<string, int>();
         foreach (var record in readInfo)
         {
@@ -198,9 +198,9 @@ public class TestCommands : ExternalCommand
         foreach (var rvtElement in chosen)
             WriteToConsole($"Check DB Query::Found: {rvtElement?.Id}");
         using StringWriter sw = new();
-        var w = DirewolfExport.Create(Document,
+        var w = WolfpackCollectionLegacy.Create(Document,
             "DoorIfcGUID",
-            Realm.Category,
+            Method.Category,
             chosen,
             new Dictionary<string, object>
             {

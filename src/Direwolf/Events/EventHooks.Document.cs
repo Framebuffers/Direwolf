@@ -41,7 +41,7 @@ public partial class EventManager
         application.DocumentClosed += (sender, args) =>
         {
             AddTimeIntervalCheck
-            (Realm.Document,
+            (Method.RevitDocument,
                 EventCondition.OnClosing);
         };
     }
@@ -64,7 +64,7 @@ public partial class EventManager
                 act?.Invoke();
 
             AddTimeIntervalCheck
-            (Realm.Document,
+            (Method.RevitDocument,
                 EventCondition.OnOpening);
         };
     }
@@ -74,7 +74,7 @@ public partial class EventManager
         application.DocumentChanged += (sender, args) =>
         {
             Counters.Add
-            (new TriggerEventData(Realm.Document,
+            (new TriggerEventData(Method.RevitDocument,
                 EventCondition.OnModifying,
                 DateTime.Now));
         };
@@ -97,13 +97,13 @@ public partial class EventManager
         application.DocumentSaved += (sender, args) =>
         {
             AddTimeIntervalCheck
-            (Realm.Document,
+            (Method.RevitDocument,
                 EventCondition.OnSaving);
         };
         application.DocumentSavedAs += (sender, args) =>
         {
             AddTimeIntervalCheck
-            (Realm.Document,
+            (Method.RevitDocument,
                 EventCondition.OnSavingAs);
         };
     }

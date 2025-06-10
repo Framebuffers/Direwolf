@@ -4,7 +4,9 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Direwolf.Definitions.Drivers;
 using Direwolf.Definitions.Extensions;
+using Direwolf.Definitions.Internal;
 using Direwolf.Definitions.Internal.Enums;
+using Direwolf.Definitions.Parser;
 using Direwolf.Definitions.RevitApi;
 using Direwolf.EventArgs;
 using Exception = System.Exception;
@@ -51,12 +53,13 @@ public sealed class Direwolf
     private static Direwolf? _instance;
     private static readonly CacheItemPolicy Policy = new() { SlidingExpiration = TimeSpan.FromMinutes(60) };
     private readonly List<Transaction> _exceptions = [];
+    private static readonly Dictionary<Document, Wolfden?> WolfdenInstances = [];
 
     private Direwolf(Document document)
     {
         DatabaseChangedEventHandler += DatabaseEvent;
         _instance = this;
-        _instance.PopulateDatabase(document);
+        WolfdenInstances.Add(document, Wolfden.CreateInstance(document));
     }
 
     public event EventHandler<DatabaseChangedEventArgs>? DatabaseChangedEventHandler;
@@ -84,34 +87,6 @@ public sealed class Direwolf
     }
 
     /// <summary>
-    ///     The Direwolf database schema is a flat, linear structure where
-    ///     <see cref="Autodesk.Revit.DB.ElementId.Value" />
-    ///     as a string is the key, and <see cref="RevitElement" /> is the value.
-    ///     When the document is fully loaded, Direwolf will populate this database
-    ///     with a record of each valid element.
-    ///     The result is stored in <see cref="ElementCache" />. Each subsequent
-    ///     operation is performed over those caches.
-    ///     <remarks>
-    ///         When the cache has to be built from scratch,
-    ///         use this schema to flush and rebuild the in-memory DB.
-    ///     </remarks>
-    /// </summary>
-    private void PopulateDatabase(Document doc)
-    {
-        //TODO: add elements as elements without parameters. when a parameter is requested, shallow copy with the parameters attached. 
-        try
-        {
-            foreach (var cacheItem in doc.GetRevitDatabaseAsCacheItems()) ElementCache.Add(cacheItem, Policy);
-            DatabaseChangedEventHandler?.Invoke(this,
-                new DatabaseChangedEventArgs() { Operation = CrudOperation.Create });
-        }
-        catch (Exception ex)
-        {
-            ex.LogException(_exceptions);
-        }
-    }
-
-    /// <summary>
     ///     Adds a new <see cref="RevitElement" /> to the cache, or updates its value.
     /// </summary>
     /// <param name="elementUniqueId">
@@ -120,14 +95,17 @@ public sealed class Direwolf
     /// </param>
     /// <param name="doc"></param>
     /// <returns>True if the operation was completed successfully, false otherwise. </returns>
-    public bool Add(string elementUniqueId, Document doc)
+    public bool AddOrUpdateRevitElement(string elementUniqueId, Document doc)
     {
         try
         {
-            var element = RevitElement.CreateAsCacheItem(doc, elementUniqueId, out _);
-            if (element is null) return false;
+            var wolfden = WolfdenInstances[doc];
+            var element = RevitElement.Create(doc, elementUniqueId);
             
-            ElementCache?.Add(element, Policy);
+            if (wolfden is null || element is null) return false;
+
+            wolfden.AddOrUpdateElements(
+                CreateFromElementUniqueIds(elementUniqueId, doc), out var _);
             Debug.Print($"Adding to Document: {doc.GetDocumentUuidHash()}::{doc.Title}");
             return true;
         }
@@ -137,43 +115,7 @@ public sealed class Direwolf
             return false;
         }
     }
-    
-    //TODO: Whenever an update is triggered, check by the key (Element.UniqueID), match and shallow-copy
-    //TODO: Don't know if the lifecycle of the element includes its parameters, or if something else changes, it's destroyed and reissued.
-    public bool Update(string elementUniqueId, Document doc)
-    {
-        try
-        {
-            if (ElementCache?.Contains(elementUniqueId) is true)
-            {
-                Debug.Print($"\tUpdating from Document: {doc.GetDocumentUuidHash()}::{doc.Title}");
-                var element = (RevitElement)ElementCache.Get(elementUniqueId);
-                // ReSharper disable once HeapView.BoxingAllocation
-                ElementCache.Add(
-                    new CacheItem(element.ElementUniqueId,
-                        element with
-                        {
-                            CategoryType = element.CategoryType,
-                            BuiltInCategory = element.BuiltInCategory,
-                            ElementId = element.ElementId,
-                            Parameters = element.Parameters,
-                        }), Policy);
-            }
-            else
-            {
-                return false;
-            }
 
-            DatabaseChangedEventHandler?.Invoke(this,
-                new DatabaseChangedEventArgs() { Operation = CrudOperation.Delete });
-            return true;
-        }
-        catch (Exception e)
-        {
-            e.LogException(_exceptions);
-            return false;
-        }
-    }
 
     /// <summary>
     ///     Deletes a <see cref="RevitElement" /> with the same
@@ -184,37 +126,19 @@ public sealed class Direwolf
     ///     The Transaction containing the ElementId to add, and
     ///     any other data to add.
     /// </param>
+    /// <param name="elementUniqueId"></param>
     /// <param name="doc">Revit Document</param>
     /// <returns>True if the operation was completed successfully, false otherwise. </returns>
-    public bool Delete(string elementUniqueId, Document doc)
+    public bool DeleteRevitElement(string elementUniqueId, Document doc)
     {
         try
         {
             Debug.Print($"\tUpdating from Document: {doc.GetDocumentUuidHash()}::{doc.Title}");
-            //
-            // // for all elements in the cache
-            // foreach (var element in Wolfden)
-            // {
-            //     // if I accidentally loaded a transaction here, avoid
-            //     if (element.Value is not RevitElement r) continue;
-            //
-            //     // check if the element belongs to that document
-            //     if (!RevitElement.BelongsToDocument
-            //         (r,
-            //             doc))
-            //         continue;
-            //
-            //     // check if the element exists by uniqueID
-            //     if (!r.ElementUniqueId.Equals
-            //             (transaction.ElementUniqueId))
-            //         continue;
-            //
-            //     // if found, remove itself using the CUID of the value
-            //     Wolfden.Remove
-            //         (element.Key);
-            // }
-            DatabaseChangedEventHandler?.Invoke(this,
-                new DatabaseChangedEventArgs() { Operation = CrudOperation.Delete });
+            var wolfden = WolfdenInstances[doc];
+
+            if (wolfden is null) return false;
+            wolfden.RemoveElements(CreateFromElementUniqueIds(elementUniqueId, doc), out var _);
+      
             return true;
         }
         catch (Exception e)
@@ -230,37 +154,14 @@ public sealed class Direwolf
     ///     used to store the element, and the <see cref="RevitElement" /> as value.
     /// </summary>
     /// <param name="id">An enumerable containing all the ID's to query.</param>
+    /// <param name="elementUniqueIds"></param>
     /// <param name="doc">Revit Document</param>
     /// <returns>True if the operation was completed successfully, false otherwise.</returns>
-    public IEnumerable<RevitElement?> Read(string[] elementUniqueIds, Document doc)
+    public static IEnumerable<RevitElement?> Read(string[] elementUniqueIds, Document doc)
     {
         Debug.Print($"\tReading Enumerable from Document: {doc.GetDocumentUuidHash()}::{doc.Title}");
-        return GetDocumentElements(doc).Where(x => elementUniqueIds.Contains(x!.Value.ElementUniqueId)); 
-
-        // if (docElements is not null)
-        //     foreach (var revitElement in docElements)
-        //     {
-        //         if (revitElement.ElementId is null) continue;
-        //         foreach (var elementId in elementIds)
-        //         {
-        //             if (!elementId.Value.Equals
-        //                     (revitElement.ElementId.Value))
-        //                 continue;
-        //             TransactionCache.Add
-        //             (Transaction.CreateAsCacheItem
-        //                 (elementId,
-        //                     doc,
-        //                     CrudOperation.Read,
-        //                     DataType.Element),
-        //                 Policy);
-        //
-        //             yield return revitElement;
-        //         }
-        //     }
-
-        // DatabaseChangedEventHandler?.Invoke
-        // (this,
-        //     new DatabaseChangedEventArgs { Operation = CrudOperation.Read });
+        
+        return (GetDocumentElements(doc) ?? []).Where(x => x.HasValue).Where(x => x is not null && elementUniqueIds.Contains(x.Value.ElementUniqueId)).Select(x => x);
     }
 
     /// <summary>
@@ -274,7 +175,8 @@ public sealed class Direwolf
     {
         DatabaseChangedEventHandler?.Invoke(this, new DatabaseChangedEventArgs() { Operation = CrudOperation.Read });
         Debug.Print($"\tReading Element from Document: {doc.GetDocumentUuidHash()}::{doc.Title}");
-        return GetDocumentElements(doc).Where(x => x is not null).Select(x => x!.Value).FirstOrDefault();
+        
+        return (GetDocumentElements(doc) ?? throw new InvalidOperationException()).FirstOrDefault(x => id.Equals(x?.ElementUniqueId));
     }
 
     public static void HookTimers(ControlledApplication controlledApplication)
@@ -293,43 +195,32 @@ public sealed class Direwolf
         };
     }
 
-    private static IEnumerable<RevitElement?> GetDocumentElements(Document doc)
+    private static Howl CreateFromElementUniqueIds(string elementUniqueId, Document doc)
+    {
+        var element = RevitElement.Create(doc, elementUniqueId);
+        if (element is null) throw new NullReferenceException(nameof(RevitElement));
+
+        return Howl.Create(
+            DataType.Element,
+            Method.Object,
+            new Dictionary<PayloadId, object>()
+            {
+                [new PayloadId(DataType.Element, element.Value.ElementUniqueId, element.Value.ElementName ?? string.Empty)] =
+                    elementUniqueId,
+            }, RevitElementJsonSchema.JsonSchema, $"{nameof(AddOrUpdateRevitElement)}: {elementUniqueId}");
+    }
+
+    private static RevitElement?[]? GetDocumentElements(Document doc)
     {
         ArgumentNullException.ThrowIfNull(doc);
         Debug.Print($"\tGetting DB from Document: {doc.GetDocumentUuidHash()}::{doc.Title}");
-        // foreach (var cachedElement in Wolfden)
-        // {
-        //     var dict = new Dictionary<string, List<RevitElement>>();
-        //     if (cachedElement.Value is not RevitElement r) continue;
-        //     if (!dict.TryGetValue(r.ElementUniqueId, out var list))
-        //     {
-        //         list = [];
-        //         dict[r.ElementUniqueId] = list;
-        //     }
-        //
-        //     dict[r.ElementUniqueId].Add(r);
-        //     foreach (var found in dict)
-        //     {
-        //         yield return (found.Value.OrderByDescending(x => x.Id.TimestampMilliseconds).First());
-        //     }
-        // }
-        return ElementCache
-            .Where(cachedElement => cachedElement.Value is RevitElement)
-            .Select(cachedElement => (RevitElement?)cachedElement.Value)
-            .Where(x => x.HasValue)
+        
+        var wolfden = WolfdenInstances[doc];
+        var elements = wolfden?.Values;
+        return elements?.Where(x => x.HasValue)
             .GroupBy(r => r!.Value.ElementUniqueId)
             .Select(found => found.OrderByDescending(x => x!.Value.Id.TimestampMilliseconds).First())
-            .AsEnumerable();
-        // try
-        // {
-        //     // return Wolfden.Where(x => x.Key.Contains(doc.GetDocumentTrackingId()))
-        //     //     .Where(x => x.Value is RevitElement).Select(x => (RevitElement)x.Value).GroupBy(y => y.ElementUniqueId)
-        //     //     .Select(y => y.OrderByDescending(z => z.Id.TimestampMilliseconds).First()).ToArray();
-        // }
-        // catch (Exception e)
-        // {
-        //     e.LogException(_exceptions);
-        //     return null;
-        // }
+            .ToArray();
+     
     }
 }

@@ -28,13 +28,13 @@ public record ModelHealthIndicators()
     public List<Room> UnenclosedRoom { get; init; } = [];
     public List<Viewport> Viewports { get; init; } = [];
 
-    public static DirewolfExport Create(Document document, IEnumerable<Element> elementsToCheck)
+    public static WolfpackCollectionLegacy Create(Document document, IEnumerable<Element> elementsToCheck)
     {
         var docIdValues = (document.GetDocumentVersionCounter(), document.GetDocumentUuidHash());
-        return new DirewolfExport(
+        return new WolfpackCollectionLegacy(
             Cuid.CreateRevitId(document, out docIdValues), 
             nameof(ModelHealthIndicators), 
-            Realm.Document,
+            Method.Document,
             document.GetDocumentUuidHash(), 
             document.GetDocumentVersionHash())
         {

@@ -4,6 +4,7 @@ using System.Windows.Documents;
 using Direwolf.Definitions.Internal.Enums;
 using Direwolf.Definitions.Parser;
 using Direwolf.Definitions.RevitApi;
+using Direwolf.Extensions;
 using Direwolf.Revit.Commands;
 using Direwolf.Revit.Commands.Testing;
 using Nice3point.Revit.Toolkit.External;
@@ -33,11 +34,13 @@ public class Application : ExternalApplication
             if (args.GetAddedElementIds().Count != 0)
                 foreach (var element in args.GetAddedElementIds())
                 {
-                    Direwolf.GetDatabase(args.GetDocument())!.Add(doc.GetElement(element).UniqueId, doc);
+                    Direwolf.GetDatabase(args.GetDocument())!.AddOrUpdateRevitElement(doc.GetElement(element).UniqueId, doc);
                     //
                     var a = RevitElement.Create(args.GetDocument(), element.ToElement(args.GetDocument()).UniqueId);
                     a.Value.Deconstruct(out var cuid, out var categoryType, out var bic, out var elementTypeId,
                         out var uniqueId, out var elementId, out var name, out var _);
+                    Direwolf.GetDatabase(doc).GetElementCache().ToList().;
+                    
                     var valuesList = new List<object>
                     {
                         cuid,
@@ -47,6 +50,7 @@ public class Application : ExternalApplication
                         uniqueId,
                         elementId,
                         name
+                        
                     };
                     Debug.Print(JsonSerializer.Serialize(valuesList, new JsonSerializerOptions() { WriteIndented = true }));
                     //
@@ -55,7 +59,7 @@ public class Application : ExternalApplication
             if (args.GetDeletedElementIds().Count != 0)
                 foreach (var element in args.GetAddedElementIds())
                 {
-                    Direwolf.GetDatabase(args.GetDocument())!.Delete(doc.GetElement(element).UniqueId, doc);
+                    Direwolf.GetDatabase(args.GetDocument())!.DeleteRevitElement(doc.GetElement(element).UniqueId, doc);
                     //
                    var a = RevitElement.Create(args.GetDocument(), element.ToElement(args.GetDocument()).UniqueId);
                     a.Value.Deconstruct(out var cuid, out var categoryType, out var bic, out var elementTypeId,

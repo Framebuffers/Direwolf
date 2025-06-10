@@ -164,6 +164,7 @@ public readonly record struct RevitElement(
         Document doc) =>
         doc.GetDocumentUuidHash()
             .Equals(GetEmbeddedDocumentId(r));
+    
 
     /// <summary>
     ///     Checks if an <see cref="Autodesk.Revit.DB.Element"/> has a valid <see cref="Autodesk.Revit.DB.Category"/>,

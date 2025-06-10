@@ -1,6 +1,9 @@
-﻿using Autodesk.Revit.DB;
+﻿using System.Collections.ObjectModel;
+using System.Runtime.CompilerServices;
+using Autodesk.Revit.DB;
 using Direwolf.Definitions.Drivers;
 using Direwolf.Definitions.Extensions;
+using Direwolf.Definitions.Internal;
 using Direwolf.Definitions.Internal.Enums;
 using Direwolf.Definitions.Parser;
 using Direwolf.Definitions.RevitApi;
@@ -14,11 +17,11 @@ namespace Direwolf.Definitions;
 /// </summary>
 /// <param name="Id">Collision-Resistant Unique Identifier.</param>
 /// <param name="Name">Name of the query.</param>
-/// <param name="Realm">Context of which this query has been executed on.</param>
-public record DirewolfExport(
+/// <param name="Method">Context of which this query has been executed on.</param>
+public record WolfpackCollectionLegacy(
     Cuid Id,
     string Name,
-    Realm Realm,
+    Method Method,
     string DocumentFingerprint,
     string DocumentSaveStateId)
 {
@@ -26,18 +29,18 @@ public record DirewolfExport(
     public Dictionary<string, object>? Payload { get; init; }
     public List<string>? ElementUniqueIds { get; init; }
 
-    public static DirewolfExport Create(Document doc, string name, Realm realm,
+    public static WolfpackCollectionLegacy Create(Document doc, string name, Method method,
         IEnumerable<RevitElement?> results, Dictionary<string, object>? payload = null)
     {
         var docId = (doc.GetDocumentVersionCounter(), doc.GetDocumentUuidHash());
-        return new DirewolfExport(Cuid.CreateRevitId(doc, out docId), name, realm, doc.GetDocumentUuidHash(),
+        return new WolfpackCollectionLegacy(Cuid.CreateRevitId(doc, out docId), name, method, doc.GetDocumentUuidHash(),
             doc.GetDocumentVersionCounter())
         {
             Payload = payload,
         };
     }
 
-    public static DirewolfExport ExportCategory(Document doc, string name, Realm realm, string[] elementUniqueIds,
+    public static WolfpackCollectionLegacy ExportCategory(Document doc, string name, Method method, string[] elementUniqueIds,
         BuiltInCategory[] categories, Dictionary<string, object>? additionalPayload = null)
     {
         var elements = new List<RevitElement>();
@@ -48,10 +51,10 @@ public record DirewolfExport(
             .Where(t => categories.Contains(t.rvtElement.BuiltInCategory))
             .Select(t => t.rvtElement));
         var docId = (doc.GetDocumentVersionCounter(), doc.GetDocumentUuidHash());
-        return new DirewolfExport(
+        return new WolfpackCollectionLegacy(
             Cuid.CreateRevitId(doc, out docId),
             name,
-            realm,
+            method,
             doc.GetDocumentUuidHash(),
             doc.GetDocumentVersionCounter())
         {
@@ -59,3 +62,28 @@ public record DirewolfExport(
         };
     }
 }
+
+public readonly record struct Wolfpack(
+    Cuid? Id,
+    Method Method,
+    string? Name,
+    string? Description,
+    ReadOnlyDictionary<string, string>? Properties,
+    IReadOnlyList<Howl> Payload)
+{
+    public static Wolfpack CreateInstance(Cuid? id,
+        Method method,
+        string? name,
+        string? description,
+        ReadOnlyDictionary<string, string>? properties,
+        IReadOnlyList<Howl> payload)
+    {
+        var wp = new Wolfpack(id, method, name, description, properties, payload);  
+        WolfpackCreated?.Invoke(wp, EventArgs.Empty);
+        return wp;
+    }
+
+    public static event EventHandler? WolfpackCreated;
+    public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
+    
+};

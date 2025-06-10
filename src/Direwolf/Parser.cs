@@ -45,7 +45,7 @@ namespace Direwolf;
  *      - Scope of the query [Document/Category/Element/Parameter/Type/Family/Instance/Annotative/Model/Schedules]
  *          - Each one is mapped to the definition of a FilteredElementCollector.
  *          - Queries can be united together (using .Union()) or manipulated using any LINQ operator.
- *      - Destination of the data [defined by a DriverCommonDto, taking the raw data as input]
+ *      - Method of the data [defined by a DriverCommonDto, taking the raw data as input]
  *
  * In the case of data input queries:
  *      - DataType of the parameters
@@ -56,19 +56,19 @@ namespace Direwolf;
 
 public class Parser
 {
-    public static Wolfpack Parse(string yamlStream)
-    {
-        using var reader = new StreamReader
-            (yamlStream);
-        var yaml = new YamlStream();
-        yaml.Load
-            (reader);
-
-        var deserialize = new DeserializerBuilder().WithNamingConvention
-                (CamelCaseNamingConvention.Instance)
-            .Build();
-
-        return deserialize.Deserialize<Wolfpack>
-            (yamlStream);
-    }
+    // public static Howl Parse(string yamlStream)
+    // {
+    //     using var reader = new StreamReader
+    //         (yamlStream);
+    //     var yaml = new YamlStream();
+    //     yaml.Load
+    //         (reader);
+    //
+    //     var deserialize = new DeserializerBuilder().WithNamingConvention
+    //             (CamelCaseNamingConvention.Instance)
+    //         .Build();
+    //
+    //     return deserialize.Deserialize<Howl>
+    //         (yamlStream);
+    // }
 }

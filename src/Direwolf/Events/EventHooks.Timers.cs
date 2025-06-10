@@ -29,11 +29,11 @@ public partial class EventManager
     private readonly Stopwatch _viewOperationTimer = new();
     private readonly Stopwatch _worksharingOperationTimer = new();
 
-    private void AddTimeIntervalCheck(Realm op, EventCondition eventCondition)
+    private void AddTimeIntervalCheck(Method op, EventCondition eventCondition)
     {
         switch (op)
         {
-            case Realm.Query:
+            case Method.Query:
                 _direwolfQueryOperationTimer.Stop();
                 Timers.Add
                 (new TimerEventData(op,
@@ -45,7 +45,7 @@ public partial class EventManager
                 _direwolfQueryOperationTimer.Restart();
 
                 break;
-            case Realm.Set:
+            case Method.Set:
                 _direwolfSetOperationTimer.Stop();
                 Timers.Add
                 (new TimerEventData(op,
@@ -57,7 +57,7 @@ public partial class EventManager
                 _direwolfSetOperationTimer.Restart();
 
                 break;
-            case Realm.InternalDatabase:
+            case Method.InternalDatabase:
                 _direwolfInternalOperationTimer.Stop();
                 Timers.Add
                 (new TimerEventData(op,
@@ -69,7 +69,7 @@ public partial class EventManager
                 _direwolfInternalOperationTimer.Restart();
 
                 break;
-            case Realm.Parameter:
+            case Method.Parameter:
                 _parameterOperationTimer.Stop();
                 Timers.Add
                 (new TimerEventData(op,
@@ -81,7 +81,7 @@ public partial class EventManager
                 _parameterOperationTimer.Restart();
 
                 break;
-            case Realm.Instances:
+            case Method.Instances:
                 _instancesOperationTimer.Stop();
                 Timers.Add
                 (new TimerEventData(op,
@@ -93,7 +93,7 @@ public partial class EventManager
                 _instancesOperationTimer.Restart();
 
                 break;
-            case Realm.Element:
+            case Method.ElementID:
                 _elementOperationTimer.Stop();
                 Timers.Add
                 (new TimerEventData(op,
@@ -105,7 +105,7 @@ public partial class EventManager
                 _elementOperationTimer.Restart();
 
                 break;
-            case Realm.ElementType:
+            case Method.ElementType:
                 _elementTypeOperationTimer.Stop();
                 Timers.Add
                 (new TimerEventData(op,
@@ -117,7 +117,7 @@ public partial class EventManager
                 _elementTypeOperationTimer.Restart();
 
                 break;
-            case Realm.Group:
+            case Method.Group:
                 _groupOperationTimer.Stop();
                 Timers.Add
                 (new TimerEventData(op,
@@ -129,7 +129,7 @@ public partial class EventManager
                 _groupOperationTimer.Restart();
 
                 break;
-            case Realm.View:
+            case Method.View:
                 _viewOperationTimer.Stop();
                 Timers.Add
                 (new TimerEventData(op,
@@ -141,7 +141,7 @@ public partial class EventManager
                 _viewOperationTimer.Restart();
 
                 break;
-            case Realm.Schedule:
+            case Method.Schedule:
                 _scheduleOperationTimer.Stop();
                 Timers.Add
                 (new TimerEventData(op,
@@ -153,7 +153,7 @@ public partial class EventManager
                 _scheduleOperationTimer.Restart();
 
                 break;
-            case Realm.Link:
+            case Method.Link:
                 _linkOperationTimer.Stop();
                 Timers.Add
                 (new TimerEventData(op,
@@ -165,7 +165,7 @@ public partial class EventManager
                 _linkOperationTimer.Restart();
 
                 break;
-            case Realm.Family:
+            case Method.Family:
                 _familyOperationTimer.Stop();
                 Timers.Add
                 (new TimerEventData(op,
@@ -177,7 +177,7 @@ public partial class EventManager
                 _familyOperationTimer.Restart();
 
                 break;
-            case Realm.Category:
+            case Method.Category:
                 _categoryOperationTimer.Stop();
                 Timers.Add
                 (new TimerEventData(op,
@@ -189,7 +189,7 @@ public partial class EventManager
                 _categoryOperationTimer.Restart();
 
                 break;
-            case Realm.Document:
+            case Method.Document:
                 _documentOperationTimer.Stop();
                 Timers.Add
                 (new TimerEventData(op,
@@ -201,7 +201,7 @@ public partial class EventManager
                 _documentOperationTimer.Restart();
 
                 break;
-            case Realm.RevitDatabase:
+            case Method.RevitDatabase:
                 _revitDatabaseOperationTimer.Stop();
                 Timers.Add
                 (new TimerEventData(op,
@@ -213,7 +213,7 @@ public partial class EventManager
                 _revitDatabaseOperationTimer.Restart();
 
                 break;
-            case Realm.RevitUIApplication:
+            case Method.RevitUIApplication:
                 _revitUIApplicationOperationTimer.Stop();
                 Timers.Add
                 (new TimerEventData(op,
@@ -225,7 +225,7 @@ public partial class EventManager
                 _revitUIApplicationOperationTimer.Restart();
 
                 break;
-            case Realm.File:
+            case Method.File:
                 _fileOperationTimer.Stop();
                 Timers.Add
                 (new TimerEventData(op,
@@ -239,7 +239,7 @@ public partial class EventManager
                 break;
             default:
                 Debug.Print
-                    ("Unknown Realm. No operation performed.");
+                    ("Unknown Method. No operation performed.");
 
                 break;
         }

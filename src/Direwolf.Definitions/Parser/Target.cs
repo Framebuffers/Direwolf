@@ -3,4 +3,4 @@
 namespace Direwolf.Definitions.Parser;
 
 // Unimplemented feature as of 2025-05-29
-public readonly record struct Target(Realm Realm, TargetType Type, string Name, string[] Arguments);
+public readonly record struct Target(Method Method, TargetType Type, string Name, string[] Arguments);
