@@ -28,6 +28,7 @@ public static class DocumentExtensions
             .WhereElementIsNotElementType()
             .WhereElementIsViewIndependent()
             .ToElements()
+            .Where(x => x.Id != ElementId.InvalidElementId)
             .Select
             (element => new
             {
@@ -75,6 +76,7 @@ public static class DocumentExtensions
             .WhereElementIsNotElementType()
             .WhereElementIsViewIndependent()
             .ToElements()
+            .Where(x => x.Id != ElementId.InvalidElementId)
             .Select
             (element => new
             {

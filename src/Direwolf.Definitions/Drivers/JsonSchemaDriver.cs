@@ -1,3 +1,6 @@
 ﻿namespace Direwolf.Definitions.Drivers;
 
-public record PostgresConnectionString;
+public class JsonSchemaDriver
+{
+    
+}

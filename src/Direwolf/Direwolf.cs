@@ -3,15 +3,14 @@ using System.Runtime.Caching;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Direwolf.Definitions.Drivers;
+using Direwolf.Definitions.Drivers.JSON;
 using Direwolf.Definitions.Extensions;
 using Direwolf.Definitions.Internal;
 using Direwolf.Definitions.Internal.Enums;
-using Direwolf.Definitions.Parser;
 using Direwolf.Definitions.RevitApi;
 using Direwolf.EventArgs;
 using Exception = System.Exception;
 using MemoryCache = System.Runtime.Caching.MemoryCache;
-using Transaction = Direwolf.Definitions.Internal.Transaction;
 
 // ReSharper disable HeapView.ObjectAllocation.Evident
 // ReSharper disable HeapView.ClosureAllocation
@@ -52,7 +51,7 @@ public sealed class Direwolf
     private static ControlledApplication? _controlledApplication;
     private static Direwolf? _instance;
     private static readonly CacheItemPolicy Policy = new() { SlidingExpiration = TimeSpan.FromMinutes(60) };
-    private readonly List<Transaction> _exceptions = [];
+    private readonly List<Howl> _exceptions = [];
     private static readonly Dictionary<Document, Wolfden?> WolfdenInstances = [];
 
     private Direwolf(Document document)
@@ -95,24 +94,24 @@ public sealed class Direwolf
     /// </param>
     /// <param name="doc"></param>
     /// <returns>True if the operation was completed successfully, false otherwise. </returns>
-    public bool AddOrUpdateRevitElement(string elementUniqueId, Document doc)
+    public Response AddOrUpdateRevitElement(string elementUniqueId, Document doc)
     {
         try
         {
             var wolfden = WolfdenInstances[doc];
             var element = RevitElement.Create(doc, elementUniqueId);
             
-            if (wolfden is null || element is null) return false;
+            if (wolfden is null || element is null) return Response.Error;
 
             wolfden.AddOrUpdateElements(
                 CreateFromElementUniqueIds(elementUniqueId, doc), out var _);
             Debug.Print($"Adding to Document: {doc.GetDocumentUuidHash()}::{doc.Title}");
-            return true;
+            return Response.Result;
         }
         catch (Exception e)
         {
             e.LogException(_exceptions);
-            return false;
+            return Response.Error;
         }
     }
 
@@ -129,22 +128,22 @@ public sealed class Direwolf
     /// <param name="elementUniqueId"></param>
     /// <param name="doc">Revit Document</param>
     /// <returns>True if the operation was completed successfully, false otherwise. </returns>
-    public bool DeleteRevitElement(string elementUniqueId, Document doc)
+    public Response DeleteRevitElement(string elementUniqueId, Document doc)
     {
         try
         {
             Debug.Print($"\tUpdating from Document: {doc.GetDocumentUuidHash()}::{doc.Title}");
             var wolfden = WolfdenInstances[doc];
 
-            if (wolfden is null) return false;
+            if (wolfden is null) return Response.Error;
             wolfden.RemoveElements(CreateFromElementUniqueIds(elementUniqueId, doc), out var _);
       
-            return true;
+            return Response.Result;
         }
         catch (Exception e)
         {
             e.LogException(_exceptions);
-            return false;
+            return Response.Error;
         }
     }
 
@@ -157,11 +156,12 @@ public sealed class Direwolf
     /// <param name="elementUniqueIds"></param>
     /// <param name="doc">Revit Document</param>
     /// <returns>True if the operation was completed successfully, false otherwise.</returns>
-    public static IEnumerable<RevitElement?> Read(string[] elementUniqueIds, Document doc)
+    public static Response Read(string[] elementUniqueIds, Document doc, out IEnumerable<RevitElement?> elements)
     {
         Debug.Print($"\tReading Enumerable from Document: {doc.GetDocumentUuidHash()}::{doc.Title}");
         
-        return (GetDocumentElements(doc) ?? []).Where(x => x.HasValue).Where(x => x is not null && elementUniqueIds.Contains(x.Value.ElementUniqueId)).Select(x => x);
+        elements = (GetDocumentElements(doc) ?? []).Where(x => x.HasValue).Where(x => x is not null && elementUniqueIds.Contains(x.Value.ElementUniqueId)).Select(x => x);
+        return Response.Result;
     }
 
     /// <summary>
@@ -171,14 +171,22 @@ public sealed class Direwolf
     /// <param name="id">The ID used as a key to store the element inside the cache.</param>
     /// <param name="doc">Revit Document</param>
     /// <returns>The requested element. Null if it's not found.</returns>
-    public RevitElement? Read(string id, Document doc)
+    public Response Read(string id, Document doc, out RevitElement? element)
     {
-        DatabaseChangedEventHandler?.Invoke(this, new DatabaseChangedEventArgs() { Operation = CrudOperation.Read });
+        DatabaseChangedEventHandler?.Invoke(this, new DatabaseChangedEventArgs() { Operation = Response.Result });
         Debug.Print($"\tReading Element from Document: {doc.GetDocumentUuidHash()}::{doc.Title}");
         
-        return (GetDocumentElements(doc) ?? throw new InvalidOperationException()).FirstOrDefault(x => id.Equals(x?.ElementUniqueId));
+        element = (GetDocumentElements(doc) ?? throw new InvalidOperationException()).FirstOrDefault(x => id.Equals(x?.ElementUniqueId));
+        return Response.Result;
     }
 
+    public Response GetWolfden(Document doc, out Wolfden wolfden)
+    {
+        wolfden = WolfdenInstances[doc] ?? throw new NullReferenceException(nameof(Wolfden));
+        return Response.Result;
+    }
+
+    //TODO: try load elements from here.
     public static void HookTimers(ControlledApplication controlledApplication)
     {
         _controlledApplication = controlledApplication;
@@ -201,13 +209,16 @@ public sealed class Direwolf
         if (element is null) throw new NullReferenceException(nameof(RevitElement));
 
         return Howl.Create(
-            DataType.Element,
-            Method.Object,
+            DataType.Object,
+            Method.Post,
             new Dictionary<PayloadId, object>()
             {
-                [new PayloadId(DataType.Element, element.Value.ElementUniqueId, element.Value.ElementName ?? string.Empty)] =
-                    elementUniqueId,
-            }, RevitElementJsonSchema.JsonSchema, $"{nameof(AddOrUpdateRevitElement)}: {elementUniqueId}");
+                [PayloadId.Create(DataType.Object, "object", new Dictionary<string, object>()
+                    {
+                        [nameof(element.Value.ElementUniqueId)]  = elementUniqueId,
+                    })] =
+                    element,
+            }, RevitElementJsonSchema.RevitElement, $"{nameof(AddOrUpdateRevitElement)}: {elementUniqueId}");
     }
 
     private static RevitElement?[]? GetDocumentElements(Document doc)

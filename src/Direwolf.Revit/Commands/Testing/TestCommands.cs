@@ -32,14 +32,17 @@ public class TestCommands : ExternalCommand
      * 1. Populate Database.
      *      On start, check if the DB is not null.
      *      Expected: Any value >0.
-     *      Benchmark: Boolean, true if conditions are met, false otherwise.
+     *      Benchmark: Response.Result if conditions are met, Response.Error otherwise.
      */
-    private bool Check_PopulateDB()
+    private Response Check_PopulateDB()
     {
         WriteToConsole("Populating Database");
-        return Direwolf.GetDatabase(Document)
+        if(Direwolf.GetDatabase(Document)
                    .GetDatabaseCount() !=
-               0;
+               0)
+            return Response.Result;
+        WriteToConsole("Database not found");
+        return Response.Error;
     }
 
     /*
@@ -48,10 +51,10 @@ public class TestCommands : ExternalCommand
      *      add them to the DB and then read their value.
      *      Expected:  Either an add or update to the cache, and values to be
      *                 identical to those introduced.
-     *      Benchmark: Boolean, true if conditions are met, false otherwise.
+     *      Benchmark: Response.Result if conditions are met, Response.Error otherwise.
      *      Note:      Some values *might* change during the test.
      */
-    private bool Check_ReadWriteDB()
+    private Response Check_ReadWriteDB()
     {
         var db = Direwolf.GetDatabase(Document);
         var doors = Document.GetElements()
@@ -76,12 +79,12 @@ public class TestCommands : ExternalCommand
         {
             WriteToConsole(
                 $"Mismatch between Transactions and Elements in list: Added = {addedUniqueItems.Count}. In Collector = {doors.Count}");
-            return false;
+            return Response.Error;
         }
 
         WriteToConsole("Checking DB:");
         WriteToConsole("\tCount between Cached and Collected Elements");
-        var readInfo = Direwolf.Read(addedUniqueItems.ToArray(), Document);
+        Direwolf.Read(addedUniqueItems.ToArray(), Document, out var readInfo);
         var counterDict = new Dictionary<string, int>();
         foreach (var record in readInfo)
         {
@@ -109,7 +112,7 @@ public class TestCommands : ExternalCommand
             if (!addedUniqueItems.Contains(unique))
             {
                 WriteToConsole($"UniqueID not found: {unique}");
-                return false;
+                return Response.Error;
             }
 
             WriteToConsole($"Found: {door.Value}");
@@ -119,7 +122,7 @@ public class TestCommands : ExternalCommand
             readInfo.ToString(),
             out var t);
         WriteToConsole($"Time taken: {t}");
-        return true;
+        return Response.Result;
     }
 
     /*
@@ -130,7 +133,7 @@ public class TestCommands : ExternalCommand
      *                 using the RevitElement and RevitParameter format.
      *      Benchmark: Time taken.
      */
-    private bool Check_JsonFromCache()
+    private Response Check_JsonFromCache()
     {
         try
         {
@@ -139,12 +142,12 @@ public class TestCommands : ExternalCommand
                 out var t);
             WriteToConsole("Wrote JSON from cache.");
             WriteToConsole($"Time taken to write from Cache: {t}");
-            return true;
+            return Response.Notification;
         }
         catch (Exception e)
         {
             WriteToConsole(e.Message);
-            return false;
+            return Response.Error;
         }
     }
 
@@ -157,7 +160,7 @@ public class TestCommands : ExternalCommand
      *                 using the RevitElement and RevitParameter format.
      *      Benchmark: Time taken.
      */
-    private bool Check_JsonFromDisk()
+    private Response Check_JsonFromDisk()
     {
         try
         {
@@ -167,12 +170,12 @@ public class TestCommands : ExternalCommand
                 out var t);
             WriteToConsole("Wrote JSON from Disk");
             WriteToConsole($"Time taken to write from Disk: {t}");
-            return true;
+            return Response.Notification;
         }
         catch (Exception e)
         {
             WriteToConsole(e.Message);
-            return false;
+            return Response.Error;
         }
     }
 
@@ -185,7 +188,7 @@ public class TestCommands : ExternalCommand
      *     Benchmark: If a file is produced, and the content is correct.
      *                Time taken to perform the query.
      */
-    private bool Check_DatabaseQuery()
+    private Response Check_DatabaseQuery()
     {
         var chosen = Document.GetElements()
             .OfCategory(BuiltInCategory.OST_Doors)
@@ -194,13 +197,13 @@ public class TestCommands : ExternalCommand
                 x.UniqueId))
             .ToList();
         if (chosen.Count == 0)
-            return false;
+            return Response.Error;
         foreach (var rvtElement in chosen)
             WriteToConsole($"Check DB Query::Found: {rvtElement?.Id}");
         using StringWriter sw = new();
         var w = WolfpackCollectionLegacy.Create(Document,
             "DoorIfcGUID",
-            Method.Category,
+            Method.Get,
             chosen,
             new Dictionary<string, object>
             {
@@ -221,16 +224,16 @@ public class TestCommands : ExternalCommand
             });
         if (w.ToString()
             .IsNullOrEmpty())
-            return false;
+            return Response.Error;
         StringWriter?.Write($"{w}");
         WriteFile("DTO_test.json",
             JsonSerializer.Serialize(w),
             out var time);
         WriteToConsole($"Time taken: {time}");
-        return true;
+        return Response.Result;
     }
 
-    private bool Check_ModelHealthIndicators()
+    private Response Check_ModelHealthIndicators()
     {
         var validEid = Document
             .GetElements()
@@ -242,7 +245,7 @@ public class TestCommands : ExternalCommand
         StringWriter?.Write(mh.ToString()); 
         WriteFile("model_health.json", JsonSerializer.Serialize(mh), out var time);
          WriteToConsole($"Time taken: {time}");
-                return true;
+                return Response.Result;
     }
 
     public override void Execute()
@@ -267,27 +270,27 @@ public class TestCommands : ExternalCommand
             GetSavePath();
             WriteToConsole("Direwolf Testing Suite for v0.4-alpha 2025-05-27");
             WriteToConsole("Running Test 1: Populating DB");
-            WriteToConsole(Check_PopulateDB()
+            WriteToConsole(Check_PopulateDB() != Response.Result
                 ? "Test passed."
                 : "Test failed.");
             WriteToConsole("Running Test 2: Read and Write to DB");
-            WriteToConsole(Check_ReadWriteDB()
+            WriteToConsole(Check_ReadWriteDB() != Response.Result
                 ? "Test passed."
                 : "Test failed.");
             WriteToConsole("Running Test 3: JSON to Cache");
-            WriteToConsole(Check_JsonFromCache()
+            WriteToConsole(Check_JsonFromCache() != Response.Notification
                 ? "Test passed."
                 : "Test failed.");
             WriteToConsole("Running Test 4: JSON to Disk");
-            WriteToConsole(Check_JsonFromDisk()
+            WriteToConsole(Check_JsonFromDisk() != Response.Notification
                 ? "Test passed."
                 : "Test failed.");
             WriteToConsole("Running Test 5: Query (IFC GUID to JSON)");
-            WriteToConsole(Check_DatabaseQuery()
+            WriteToConsole(Check_DatabaseQuery() != Response.Result
                 ? "Test passed."
                 : "Test failed.");
             WriteToConsole("Running test 6: Model Health Check");
-            WriteToConsole(Check_ModelHealthIndicators()
+            WriteToConsole(Check_ModelHealthIndicators() != Response.Result
                 ? "Test passed"
                 : "Test failed.");
             WriteToConsole($"Tests finished at {DateTime.UtcNow}");

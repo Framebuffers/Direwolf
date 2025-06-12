@@ -1,11 +1,9 @@
-﻿using System.Collections.ObjectModel;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using Autodesk.Revit.DB;
 using Direwolf.Definitions.Drivers;
 using Direwolf.Definitions.Extensions;
-using Direwolf.Definitions.Internal;
 using Direwolf.Definitions.Internal.Enums;
-using Direwolf.Definitions.Parser;
+using Direwolf.Definitions.Parsers;
 using Direwolf.Definitions.RevitApi;
 
 #pragma warning disable VISLIB0001
@@ -62,28 +60,3 @@ public record WolfpackCollectionLegacy(
         };
     }
 }
-
-public readonly record struct Wolfpack(
-    Cuid? Id,
-    Method Method,
-    string? Name,
-    string? Description,
-    ReadOnlyDictionary<string, string>? Properties,
-    IReadOnlyList<Howl> Payload)
-{
-    public static Wolfpack CreateInstance(Cuid? id,
-        Method method,
-        string? name,
-        string? description,
-        ReadOnlyDictionary<string, string>? properties,
-        IReadOnlyList<Howl> payload)
-    {
-        var wp = new Wolfpack(id, method, name, description, properties, payload);  
-        WolfpackCreated?.Invoke(wp, EventArgs.Empty);
-        return wp;
-    }
-
-    public static event EventHandler? WolfpackCreated;
-    public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
-    
-};

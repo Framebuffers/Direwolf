@@ -1,29 +1,7 @@
 ﻿using System.Text.Json.Serialization;
-using Autodesk.Revit.DB;
-using Direwolf.Definitions.Internal.Enums;
-using Direwolf.Definitions.Parser;
+using Direwolf.Definitions.Parsers;
 
-namespace Direwolf.Definitions.Internal;
-
-public enum Response
-{
-    Request,
-    Result,
-    Error,
-    Notification
-}
-
-public enum Result
-{
-    Accepted,
-    Rejected,
-    Cancelled
-}
-
-public readonly record struct PayloadId(
-    DataType DataType,
-    string Name,
-    string Description);
+namespace Direwolf.Definitions.Internal.Enums;
 
 /// <summary>
 /// A <see cref="Howl"/> is the specialized interchange format of <see cref="Direwolf"/>. Any and all communications
@@ -51,7 +29,8 @@ public readonly record struct PayloadId(
 /// <param name="Payload">Any or all information that has to be transported. Can be null.</param>
 /// <param name="JsonSchema">The schema that will be used by <see cref="JsonConverter{T}"/> to serialize/deserialize this <see cref="Howl"/>.</param> 
 public readonly record struct Howl(
-    Response? Response,
+    Cuid Id,
+    Response Response,
     Result? Result,
     DataType DataType,
     Method Method,
@@ -59,17 +38,12 @@ public readonly record struct Howl(
     string? Description,
     string JsonSchema)
 {
-    public static event EventHandler? HowlCreated;
-    public static event EventHandler? HowlUpdated;
-    private Cuid? Id { get; init; } = Cuid.Create(); // JSON-RPC 2.0 requires the ID to be nullable.
-    public Cuid? GetCuid() => Id;
-    
     /// <summary>
     /// Creates a specialized deep clone of a <see cref="Howl"/>, on which only <see cref="Result"/>
     /// and <see cref="Payload"/> are modified.
     /// </summary>
     /// <param name="token">Another token with different Payload and Result payloads.</param>
-    private Howl(Howl token) : this(token.Response, token.Result, token.DataType, token.Method, token.Payload,
+    private Howl(Howl token) : this(Cuid.Create(), token.Response, token.Result, token.DataType, token.Method, token.Payload,
         token.Description, token.JsonSchema)
     {
     }
@@ -89,8 +63,7 @@ public readonly record struct Howl(
     public static Howl Create(DataType dt, Method destinationOfData, Dictionary<PayloadId, object> payload, string jsonSchema,
         string? description = null)
     {
-        var howl = new Howl(Response: Internal.Response.Request, Result: null, dt, destinationOfData, payload, description, jsonSchema);
-        HowlCreated?.Invoke(howl, EventArgs.Empty);
+        var howl = new Howl(Cuid.Create(), Response: Enums.Response.Request, Result: Enums.Result.Rejected, dt, destinationOfData, payload, description, jsonSchema);
         return howl;
     }
 
@@ -108,7 +81,6 @@ public readonly record struct Howl(
     /// <returns></returns>
     public Howl ShallowCopy()
     {
-        HowlUpdated?.Invoke(this, EventArgs.Empty);
         return new Howl(this) { Id = Id };
     }
 
@@ -129,7 +101,6 @@ public readonly record struct Howl(
     /// <returns></returns>
     public Howl DeepCopy(Result result, Dictionary<PayloadId, object> newData)
     {
-        HowlUpdated?.Invoke(this, EventArgs.Empty);
-        return this with { Result = result, Payload = newData };
+        return this with { Result = result, Payload = newData, Response = Response.Result};
     }
 }

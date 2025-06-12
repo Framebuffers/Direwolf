@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Direwolf.Definitions;
+namespace Direwolf.Definitions.Extensions;
 
 public static class DirewolfExtensions
 {

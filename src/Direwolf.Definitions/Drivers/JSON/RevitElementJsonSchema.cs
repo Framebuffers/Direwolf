@@ -1,4 +1,4 @@
-﻿namespace Direwolf.Definitions.Parser;
+﻿namespace Direwolf.Definitions.Drivers.JSON;
 
 public static class RevitElementJsonSchema
 {
@@ -8,7 +8,7 @@ public static class RevitElementJsonSchema
   /// </summary>
   // ReSharper disable once UnusedMember.Global
 #pragma warning disable CA2211
-    public const string JsonSchema = """
+    public const string RevitElement = """
                                      {
                                        "$schema": "http://json-schema.org/draft-07/schema#",
                                        "type": "object",

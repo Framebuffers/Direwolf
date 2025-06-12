@@ -6,7 +6,7 @@ using Autodesk.Revit.DB.Plumbing;
 using Direwolf.Definitions.Drivers;
 using Direwolf.Definitions.Extensions;
 using Direwolf.Definitions.Internal.Enums;
-using Direwolf.Definitions.Parser;
+using Direwolf.Definitions.Parsers;
 
 namespace Direwolf.Definitions.ModelHealth;
 
@@ -34,7 +34,7 @@ public record ModelHealthIndicators()
         return new WolfpackCollectionLegacy(
             Cuid.CreateRevitId(document, out docIdValues), 
             nameof(ModelHealthIndicators), 
-            Method.Document,
+            Method.Get,
             document.GetDocumentUuidHash(), 
             document.GetDocumentVersionHash())
         {
@@ -192,7 +192,7 @@ public record ModelHealthIndicators()
                         case BuiltInCategory.OST_Rooms:
                             if (e is Room room)
                             {
-                                IList<IList<BoundarySegment>> boundarySegments =
+                                var boundarySegments =
                                     room.GetBoundarySegments(new SpatialElementBoundaryOptions());
                                 if (boundarySegments == null || boundarySegments.Count == 0) UnenclosedRoom.Add(room);
                             }

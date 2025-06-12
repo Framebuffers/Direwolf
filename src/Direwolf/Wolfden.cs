@@ -14,7 +14,7 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace Direwolf;
 
-public class Wolfden(Document document) : ConcurrentDictionary<Guid, RevitElement?>
+public sealed class Wolfden(Document document) : ConcurrentDictionary<Guid, RevitElement?>
 {
     public static Wolfden CreateInstance(Document document)
     {
@@ -49,14 +49,14 @@ public class Wolfden(Document document) : ConcurrentDictionary<Guid, RevitElemen
         }
     }
 
-    public bool AddOrUpdateElements(Howl h, out IEnumerable<RevitElement?>? elements)
+    public Response AddOrUpdateElements(Howl h, out IEnumerable<RevitElement?>? elements)
     {
         try
         {
             if (h.Payload is null)
             {
                 elements = null;
-                return false;
+                return Response.Error;
             }
 
             var results = Extract(h) ?? throw new NullReferenceException(nameof(RevitElement));
@@ -75,21 +75,21 @@ public class Wolfden(Document document) : ConcurrentDictionary<Guid, RevitElemen
             }
 
             elements = results;
-            return true;
+            return Response.Result;
         }
         catch
         {
             elements = null;
-            return false;
+            return Response.Error;
         }
     }
 
-    public bool RemoveElements(Howl h, out RevitElement?[]? element)
+    public Response RemoveElements(Howl h, out RevitElement?[]? element)
     {
         if (h.Payload is null)
         {
             element = null;
-            return false;
+            return Response.Error;
         }
 
         var results = Extract(h) ?? throw new NullReferenceException(nameof(RevitElement));
@@ -102,14 +102,14 @@ public class Wolfden(Document document) : ConcurrentDictionary<Guid, RevitElemen
         }
 
         element = output.ToArray();
-        return true;
+        return Response.Result;
     }
 
     public bool PopTransaction(out RevitElement? element) => _transactionStack.TryPop(out element);
     public void SpoolWolfpack(Wolfpack? w) => _operationQueue.Enqueue(w);
 
     private static RevitElement?[]? Extract(Howl h) =>
-        h.Payload?.Where(x => x.Key.DataType is DataType.Element).Where(x => x.Value is RevitElement)
+        h.Payload?.Where(x => x.Key.DataType is DataType.Object).Where(x => x.Value is RevitElement)
             .Select(x => (RevitElement?)x.Value).ToArray();
 
 }

@@ -2,7 +2,7 @@
 using Autodesk.Revit.DB;
 using Autodesk.Revit.Exceptions;
 using Direwolf.Definitions.RevitApi;
-using static Direwolf.Definitions.DirewolfExtensions;
+using static Direwolf.Definitions.Extensions.DirewolfExtensions;
 
 namespace Direwolf.Definitions.Extensions;
 

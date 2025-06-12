@@ -3,7 +3,7 @@ using Autodesk.Revit.DB;
 using Direwolf.Definitions.Drivers;
 using Direwolf.Definitions.Extensions;
 
-namespace Direwolf.Definitions.Parser;
+namespace Direwolf.Definitions.Parsers;
 
 /// <summary>
 ///     A Collision-Resistant Unique Identifier is a lighter type of unique identifier, aimed to offer better

@@ -1,25 +1,18 @@
 ﻿namespace Direwolf.Definitions.Internal.Enums;
 
 /// <summary>
-///     The bounds of the set that will be queried and returned as a result.
+///     The operation to perform on a Direwolf context.
+///
+/// <remarks>
+///     Direwolf uses HTTP-like (if not, the) Transport Protocols, often used to communicate between clients and servers.
+///     However, their interpretations inside the Direwolf scope may heavily vary from its HTTP counterpart.
+/// </remarks>
 /// </summary>
 public enum Method
 {
-    // standard
-    Object,
-    Array,
-    String,
-    Number,
-    Boolean,
-    // RVT
-    ElementID,
-    ParameterNone,
-    ParameterInteger,
-    ParameterDouble,
-    ParameterString,
-    ParameterElement,
-    Category,
-    Schedule,
-    View,
-    RevitDocument
+    Get,        // read data
+    Post,       // update data
+    Put,        // add data
+    Delete,     // remove data
+    Patch
 }

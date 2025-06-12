@@ -3,19 +3,18 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Autodesk.Revit.DB;
-using Direwolf.Definitions.Drivers;
 using Direwolf.Definitions.Extensions;
 using Direwolf.Definitions.RevitApi;
 using static System.Enum;
 
-namespace Direwolf.Definitions.Parser;
+namespace Direwolf.Definitions.Parsers;
 
 [SuppressMessage("ReSharper", "RedundantAssignment")]
 public sealed class ElementJsonParser : JsonConverter<RevitElement>
 {
     public override bool HandleNull => true;
 
-    // TODO: Test the reader.
+    // TODO: Test the reade.
     public override RevitElement Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType is not JsonTokenType.StartObject) throw new JsonException(nameof(options));
@@ -86,7 +85,8 @@ public sealed class ElementJsonParser : JsonConverter<RevitElement>
                     break;
                 }
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(reader));
+                    reader.Skip();
+                    break;
             }
         }
 

@@ -15,7 +15,7 @@ public class CheckStabilityOfElements : ExternalCommand
     public override void Execute()
     {
         var selection = this.UiDocument.Selection;
-        using StringWriter sw = new StringWriter();
+        using var sw = new StringWriter();
         var selectedElements = selection.GetElementIds().ToElements(Document);
         foreach (var element in selectedElements)
         {
