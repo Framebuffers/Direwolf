@@ -27,7 +27,7 @@ public readonly record struct Cuid(int Length = 16)
 
     public static Cuid Create(int length = 16)
     {
-        var cuid = CuidDriver.GenerateCuid(16);
+        var cuid = CuidDriver.GenerateCuid();
         var s = cuid.Value;
         Span<Range> random = [20..];
         var timestamp = s!.Substring(1, 7);

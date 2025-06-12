@@ -22,6 +22,5 @@ public readonly record struct DocumentEpisode(string DocumentUniqueId, string Do
             Document.GetDocumentVersion
                     (doc)
                 .NumberOfSaves);
-        
     }
 }

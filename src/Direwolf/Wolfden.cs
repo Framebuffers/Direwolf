@@ -1,21 +1,19 @@
 ﻿using System.Collections.Concurrent;
-using System.Collections.Specialized;
-using System.Runtime.Caching;
-using System.Runtime.CompilerServices;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Events;
 using Direwolf.Definitions;
 using Direwolf.Definitions.Extensions;
-using Direwolf.Definitions.Internal;
 using Direwolf.Definitions.Internal.Enums;
 using Direwolf.Definitions.RevitApi;
-using Direwolf.EventArgs;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace Direwolf;
 
 public sealed class Wolfden(Document document) : ConcurrentDictionary<Guid, RevitElement?>
 {
+    private static Wolfden? _instance;
+    private readonly Queue<Wolfpack?> _operationQueue = [];
+
+    private readonly Stack<RevitElement?> _transactionStack = [];
+
     public static Wolfden CreateInstance(Document document)
     {
         var wolfden = new Wolfden(document);
@@ -24,10 +22,10 @@ public sealed class Wolfden(Document document) : ConcurrentDictionary<Guid, Revi
         return new Wolfden(document);
     }
 
-    private readonly Stack<RevitElement?> _transactionStack = [];
-    private readonly Queue<Wolfpack?> _operationQueue = [];
-    private static Wolfden? _instance;
-    public Wolfden GetInstance() => _instance ?? throw new NullReferenceException(nameof(Wolfden));
+    public Wolfden GetInstance()
+    {
+        return _instance ?? throw new NullReferenceException(nameof(Wolfden));
+    }
 
     private bool PopulateDatabase()
     {
@@ -105,11 +103,19 @@ public sealed class Wolfden(Document document) : ConcurrentDictionary<Guid, Revi
         return Response.Result;
     }
 
-    public bool PopTransaction(out RevitElement? element) => _transactionStack.TryPop(out element);
-    public void SpoolWolfpack(Wolfpack? w) => _operationQueue.Enqueue(w);
+    public bool PopTransaction(out RevitElement? element)
+    {
+        return _transactionStack.TryPop(out element);
+    }
 
-    private static RevitElement?[]? Extract(Howl h) =>
-        h.Payload?.Where(x => x.Key.DataType is DataType.Object).Where(x => x.Value is RevitElement)
+    public void SpoolWolfpack(Wolfpack? w)
+    {
+        _operationQueue.Enqueue(w);
+    }
+
+    private static RevitElement?[]? Extract(Howl h)
+    {
+        return h.Payload?.Where(x => x.Value is RevitElement)
             .Select(x => (RevitElement?)x.Value).ToArray();
-
+    }
 }

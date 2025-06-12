@@ -37,9 +37,9 @@ public class TestCommands : ExternalCommand
     private Response Check_PopulateDB()
     {
         WriteToConsole("Populating Database");
-        if(Direwolf.GetDatabase(Document)
-                   .GetDatabaseCount() !=
-               0)
+        if (Direwolf.GetDatabase(Document)
+                .GetDatabaseCount() !=
+            0)
             return Response.Result;
         WriteToConsole("Database not found");
         return Response.Error;
@@ -211,16 +211,16 @@ public class TestCommands : ExternalCommand
                     .Where(x => x is not null)
                     .Select(x => RevitElement.CreateWithSpecificParameters(Document, x!.Value.ElementUniqueId,
                         [BuiltInParameter.IFC_GUID]))
-                    .ToList() 
-                
-                    // .Where(x => x is not null)
-                    // .SelectMany(x => x!.Value.Parameters
-                    //     .Where(y => y.HasValue)
-                    //     .Where(y => y!.Value.Key.Equals("IfcGUID"))
-                    //     .Select(y => y!.Value)
-                    //     .Where(y => y.Key.Equals("IfcGUID"))
-                    //     .SelectMany(y => y.Value)
-                    //     .ToList()),
+                    .ToList()
+
+                // .Where(x => x is not null)
+                // .SelectMany(x => x!.Value.Parameters
+                //     .Where(y => y.HasValue)
+                //     .Where(y => y!.Value.Key.Equals("IfcGUID"))
+                //     .Select(y => y!.Value)
+                //     .Where(y => y.Key.Equals("IfcGUID"))
+                //     .SelectMany(y => y.Value)
+                //     .ToList()),
             });
         if (w.ToString()
             .IsNullOrEmpty())
@@ -240,17 +240,17 @@ public class TestCommands : ExternalCommand
             .WhereElementIsNotElementType()
             .WhereElementIsViewIndependent()
             .ToElements();
-        
+
         var mh = ModelHealthIndicators.Create(Document, validEid);
-        StringWriter?.Write(mh.ToString()); 
+        StringWriter?.Write(mh.ToString());
         WriteFile("model_health.json", JsonSerializer.Serialize(mh), out var time);
-         WriteToConsole($"Time taken: {time}");
-                return Response.Result;
+        WriteToConsole($"Time taken: {time}");
+        return Response.Result;
     }
 
     public override void Execute()
     {
-        using Autodesk.Revit.DB.Transaction trans = new(Document,
+        using Transaction trans = new(Document,
             "Running tests");
         var t2 = TaskDialog.Show("Executing Direwolf Tests",
             "This Command will run through five tests to determine if Direwolf is running correctly." +

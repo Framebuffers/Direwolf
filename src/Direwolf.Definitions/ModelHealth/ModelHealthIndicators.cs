@@ -1,16 +1,14 @@
-﻿using System.Collections.ObjectModel;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
-using Direwolf.Definitions.Drivers;
 using Direwolf.Definitions.Extensions;
 using Direwolf.Definitions.Internal.Enums;
 using Direwolf.Definitions.Parsers;
 
 namespace Direwolf.Definitions.ModelHealth;
 
-public record ModelHealthIndicators()
+public record ModelHealthIndicators
 {
     public List<Element> AnnotativeElements { get; init; } = [];
     public List<DesignOption> DesignOptions { get; init; } = [];
@@ -32,10 +30,10 @@ public record ModelHealthIndicators()
     {
         var docIdValues = (document.GetDocumentVersionCounter(), document.GetDocumentUuidHash());
         return new WolfpackCollectionLegacy(
-            Cuid.CreateRevitId(document, out docIdValues), 
-            nameof(ModelHealthIndicators), 
+            Cuid.CreateRevitId(document, out docIdValues),
+            nameof(ModelHealthIndicators),
             Method.Get,
-            document.GetDocumentUuidHash(), 
+            document.GetDocumentUuidHash(),
             document.GetDocumentVersionHash())
         {
             Payload = new ModelHealthIndicators().GetModelHealthIndicators(document, elementsToCheck)
@@ -227,9 +225,8 @@ public record ModelHealthIndicators()
                             {
                                 var connectors = mepModel.ConnectorManager.Connectors;
                                 foreach (Connector connector in connectors)
-                                {
-                                    if (!connector.IsConnected) UnconnectedElectrical.Add(connector);
-                                }
+                                    if (!connector.IsConnected)
+                                        UnconnectedElectrical.Add(connector);
                             }
 
                             builtInCategory = e?.Category?.BuiltInCategory.ToString();
@@ -266,10 +263,8 @@ public record ModelHealthIndicators()
 
             // view not in sheet. needs to be done after all are done.
             foreach (var viewElement in _viewsInsideDocument)
-            {
                 if (viewElement is { IsTemplate: false } && !_viewsInsideDocument.Contains(viewElement))
                     NotInSheets.Add(viewElement);
-            }
             foreach (var reference in ExternalFileUtils.GetAllExternalFileReferences(document))
             {
                 using var ext = document.GetElement(reference);
@@ -280,7 +275,7 @@ public record ModelHealthIndicators()
             // HashSet<ElementId> viewsOnSheets = [.. Viewports.Select(vp => vp.ViewId)];
         }
 
-        return new Dictionary<string, object>()
+        return new Dictionary<string, object>
         {
             { "viewsInsideDocument", _viewsInsideDocument.Count },
             { "notInSheets", NotInSheets.Count },
@@ -299,7 +294,7 @@ public record ModelHealthIndicators()
             { "unconnectedElectrical", UnconnectedElectrical.Count },
             { "nonNativeStyles", NonNativeStyles.Count },
             { "isFlipped", IsFlipped.Count },
-            { "worksetElementCount", _worksetElementCount.Count },
+            { "worksetElementCount", _worksetElementCount.Count }
         };
     }
 }

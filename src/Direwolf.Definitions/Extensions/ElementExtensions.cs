@@ -80,12 +80,13 @@ public static class ElementExtensions
                 : null);
     }
 
-   
 
-    public static (Element? Element, ElementId? ElementId, Type? ElementType, ElementId? ElementTypeId) DeconstructElementUniqueId(this string elementUniqueId, Document doc)
-        {
-            var element = doc.GetElement(elementUniqueId);
-            return element is null ? (null, null, null, null) 
-                : (element, element.Id, TryDo(() => element.GetType()), element?.GetTypeId());
-        } 
+    public static (Element? Element, ElementId? ElementId, Type? ElementType, ElementId? ElementTypeId)
+        DeconstructElementUniqueId(this string elementUniqueId, Document doc)
+    {
+        var element = doc.GetElement(elementUniqueId);
+        return element is null
+            ? (null, null, null, null)
+            : (element, element.Id, TryDo(() => element.GetType()), element?.GetTypeId());
+    }
 }

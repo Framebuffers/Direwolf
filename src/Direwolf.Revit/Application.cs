@@ -1,9 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Text.Json;
-using System.Windows.Documents;
-using Direwolf.Definitions.Internal.Enums;
-using Direwolf.Definitions.RevitApi;
-using Direwolf.Extensions;
 using Direwolf.Revit.Commands;
 using Direwolf.Revit.Commands.Testing;
 using Nice3point.Revit.Toolkit.External;
@@ -31,22 +27,17 @@ public class Application : ExternalApplication
             var doc = args.GetDocument();
             if (args.GetAddedElementIds().Count != 0)
                 foreach (var element in args.GetAddedElementIds())
-                {
-                    Direwolf.GetDatabase(args.GetDocument())!.AddOrUpdateRevitElement(doc.GetElement(element).UniqueId, doc);
-                }
+                    Direwolf.GetDatabase(args.GetDocument())!.AddOrUpdateRevitElement(doc.GetElement(element).UniqueId,
+                        doc);
 
             if (args.GetDeletedElementIds().Count != 0)
                 foreach (var element in args.GetAddedElementIds())
-                {
                     Direwolf.GetDatabase(args.GetDocument())!.DeleteRevitElement(doc.GetElement(element).UniqueId, doc);
-                }
 
             if (args.GetModifiedElementIds().Count != 0)
                 foreach (var element in args.GetModifiedElementIds())
-                {
                     Direwolf.GetDatabase(args.GetDocument())!.AddOrUpdateRevitElement(doc.GetElement(element).UniqueId,
                         doc);
-                }
         };
     }
 
@@ -60,5 +51,13 @@ public class Application : ExternalApplication
         panel.AddPushButton<TestCommands>("Run Tests");
         panel.AddPushButton<About>("About").SetImage("Resources/Icons/RibbonIcon16.png");
         panel.AddPushButton<CheckStabilityOfElements>("Check ElementIDs");
+        panel.AddPushButton<Prompt>("Prompt");
+        var x = panel.AddTextBox("prompt");
+        x.PromptText = "Prompt Text";
+        x.EnterPressed += (sender, args) =>
+        {
+            Debug.Print(JsonSerializer.Serialize(
+                Direwolf.CreatePrompt(x?.Value.ToString()!), new JsonSerializerOptions { WriteIndented = true }));
+        };
     }
 }

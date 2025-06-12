@@ -22,7 +22,7 @@ public static class DocumentExtensions
     {
         ArgumentNullException.ThrowIfNull
             (doc);
-        
+
         using var filteredElementCollector = new FilteredElementCollector(doc);
         return filteredElementCollector
             .WhereElementIsNotElementType()
@@ -33,7 +33,7 @@ public static class DocumentExtensions
             (element => new
             {
                 el = RevitElement.Create
-                (doc, element.UniqueId)
+                    (doc, element.UniqueId)
             })
             .Select
                 (t => t.el);
@@ -81,7 +81,7 @@ public static class DocumentExtensions
             (element => new
             {
                 el = RevitElement.CreateAsCacheItem
-                (doc, element.UniqueId, out _)
+                    (doc, element.UniqueId, out _)
             })
             .Select
                 (t => t.el);
@@ -90,7 +90,7 @@ public static class DocumentExtensions
     internal static IEnumerable<Element?> GetAllElementsFromDocument(this Document doc)
     {
         ArgumentNullException.ThrowIfNull(doc);
-        
+
         using var filteredElementCollector = new FilteredElementCollector(doc);
         return filteredElementCollector
             .WhereElementIsNotElementType()

@@ -61,7 +61,7 @@ public sealed class ElementJsonParser : JsonConverter<RevitElement>
                             if (string.IsNullOrEmpty(reader.GetString()))
                                 throw new JsonException("Invalid ElementId value");
                             if (!ElementId.TryParse(reader.GetString(), out elementTypeId))
-                                throw new JsonException($"CategoryType is invalid: {elementTypeId}"); 
+                                throw new JsonException($"CategoryType is invalid: {elementTypeId}");
                             break;
                         case "elementName":
                             elementName = reader.GetString() ?? string.Empty;
@@ -82,6 +82,7 @@ public sealed class ElementJsonParser : JsonConverter<RevitElement>
                             parameters = ReadParameters(ref reader);
                             break;
                     }
+
                     break;
                 }
                 default:

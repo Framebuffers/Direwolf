@@ -1,7 +1,6 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI.Selection;
 using Direwolf.Definitions.Extensions;
 using Direwolf.Definitions.Parsers;
 
@@ -118,7 +117,10 @@ public static partial class CuidDriver
     ///     identifier.
     /// </summary>
     /// <param name="doc">Revit Document</param>
-    /// <param name="documentIdentifier">A tuple with the hashed Base36 truncated string of the <see cref="Document"/> VersionID and the <see cref="Document.CreationGUID"/></param>
+    /// <param name="documentIdentifier">
+    ///     A tuple with the hashed Base36 truncated string of the <see cref="Document" />
+    ///     VersionID and the <see cref="Document.CreationGUID" />
+    /// </param>
     /// <param name="length">Length of the random part of the identifier.</param>
     /// <returns>
     ///     A Collision-Resistant Unique Identifier string with its Counter and Fingerprint referencing the given

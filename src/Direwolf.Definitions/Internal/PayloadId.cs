@@ -1,5 +1,4 @@
-﻿using Autodesk.Revit.DB;
-using Direwolf.Definitions.Internal.Enums;
+﻿using Direwolf.Definitions.Internal.Enums;
 using Direwolf.Definitions.Parsers;
 
 namespace Direwolf.Definitions.Internal;
@@ -19,9 +18,9 @@ public readonly record struct PayloadId(
     {
         return new PayloadId(Cuid.Create(), DataType.Invalid, null, null);
     }
-    
+
     public bool Equals(PayloadId? obj)
     {
-        return (obj is { } payloadId && payloadId.InternalId.Equals(InternalId));
+        return obj is { } payloadId && payloadId.InternalId.Equals(InternalId);
     }
 }

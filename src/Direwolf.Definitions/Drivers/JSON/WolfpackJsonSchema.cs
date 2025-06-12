@@ -27,14 +27,14 @@ public static class WolfpackJsonSchema
                                          "nullable": true,
                                          "description": "Optional description."
                                        },
-                                       "Properties": {
+                                       "Parameters": {
                                          "type": "object",
                                          "additionalProperties": {
                                            "type": "string"
                                          },
                                          "description": "An space to load any kind of API-specific property, outside the Direwolf context."
                                        },
-                                       "Payload": {
+                                       "Data": {
                                          "type": "array",
                                          "items": {
                                            "$ref": "#/definitions/Howl"
@@ -42,7 +42,7 @@ public static class WolfpackJsonSchema
                                          "description": "A list of elements that define transactions, operations or states to and from Direwolf. It is the transactional unit of Direwolf."
                                        }
                                      },
-                                     "required": ["Id", "Method", "Payload"],
+                                     "required": ["Id", "Method", "Data"],
                                      "definitions": {
                                        "Howl": {
                                          "type": "object",

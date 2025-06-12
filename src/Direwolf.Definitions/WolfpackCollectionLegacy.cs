@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using Autodesk.Revit.DB;
-using Direwolf.Definitions.Drivers;
+﻿using Autodesk.Revit.DB;
 using Direwolf.Definitions.Extensions;
 using Direwolf.Definitions.Internal.Enums;
 using Direwolf.Definitions.Parsers;
@@ -10,7 +8,7 @@ using Direwolf.Definitions.RevitApi;
 namespace Direwolf.Definitions;
 
 /// <summary>
-///     The base Payload Operation Object type inside Direwolf. Holds any operation
+///     The base Data Operation Object type inside Direwolf. Holds any operation
 ///     generated to and/or from an external source.
 /// </summary>
 /// <param name="Id">Collision-Resistant Unique Identifier.</param>
@@ -34,15 +32,16 @@ public record WolfpackCollectionLegacy(
         return new WolfpackCollectionLegacy(Cuid.CreateRevitId(doc, out docId), name, method, doc.GetDocumentUuidHash(),
             doc.GetDocumentVersionCounter())
         {
-            Payload = payload,
+            Payload = payload
         };
     }
 
-    public static WolfpackCollectionLegacy ExportCategory(Document doc, string name, Method method, string[] elementUniqueIds,
+    public static WolfpackCollectionLegacy ExportCategory(Document doc, string name, Method method,
+        string[] elementUniqueIds,
         BuiltInCategory[] categories, Dictionary<string, object>? additionalPayload = null)
     {
         var elements = new List<RevitElement>();
-   
+
         elements.AddRange(doc.GetRevitDatabaseAsCacheItems()
             .Where(element => element is not null)
             .Select(element => (element, rvtElement: (RevitElement)element!.Value))

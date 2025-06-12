@@ -2,11 +2,10 @@
 using System.Runtime.Caching;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
-using Direwolf.Definitions.Drivers;
-using Direwolf.Definitions.Drivers.JSON;
+using Direwolf.Definitions;
 using Direwolf.Definitions.Extensions;
-using Direwolf.Definitions.Internal;
 using Direwolf.Definitions.Internal.Enums;
+using Direwolf.Definitions.Parsers;
 using Direwolf.Definitions.RevitApi;
 using Direwolf.EventArgs;
 using Exception = System.Exception;
@@ -51,8 +50,8 @@ public sealed class Direwolf
     private static ControlledApplication? _controlledApplication;
     private static Direwolf? _instance;
     private static readonly CacheItemPolicy Policy = new() { SlidingExpiration = TimeSpan.FromMinutes(60) };
-    private readonly List<Howl> _exceptions = [];
     private static readonly Dictionary<Document, Wolfden?> WolfdenInstances = [];
+    private readonly List<Howl> _exceptions = [];
 
     private Direwolf(Document document)
     {
@@ -100,11 +99,8 @@ public sealed class Direwolf
         {
             var wolfden = WolfdenInstances[doc];
             var element = RevitElement.Create(doc, elementUniqueId);
-            
             if (wolfden is null || element is null) return Response.Error;
-
-            wolfden.AddOrUpdateElements(
-                CreateFromElementUniqueIds(elementUniqueId, doc), out var _);
+            wolfden.AddOrUpdateElements(CreateFromElementUniqueIds(elementUniqueId, doc), out _);
             Debug.Print($"Adding to Document: {doc.GetDocumentUuidHash()}::{doc.Title}");
             return Response.Result;
         }
@@ -114,7 +110,6 @@ public sealed class Direwolf
             return Response.Error;
         }
     }
-
 
     /// <summary>
     ///     Deletes a <see cref="RevitElement" /> with the same
@@ -134,10 +129,8 @@ public sealed class Direwolf
         {
             Debug.Print($"\tUpdating from Document: {doc.GetDocumentUuidHash()}::{doc.Title}");
             var wolfden = WolfdenInstances[doc];
-
             if (wolfden is null) return Response.Error;
-            wolfden.RemoveElements(CreateFromElementUniqueIds(elementUniqueId, doc), out var _);
-      
+            wolfden.RemoveElements(CreateFromElementUniqueIds(elementUniqueId, doc), out _);
             return Response.Result;
         }
         catch (Exception e)
@@ -159,8 +152,8 @@ public sealed class Direwolf
     public static Response Read(string[] elementUniqueIds, Document doc, out IEnumerable<RevitElement?> elements)
     {
         Debug.Print($"\tReading Enumerable from Document: {doc.GetDocumentUuidHash()}::{doc.Title}");
-        
-        elements = (GetDocumentElements(doc) ?? []).Where(x => x.HasValue).Where(x => x is not null && elementUniqueIds.Contains(x.Value.ElementUniqueId)).Select(x => x);
+        elements = (GetDocumentElements(doc) ?? []).Where(x => x.HasValue)
+            .Where(x => x is not null && elementUniqueIds.Contains(x.Value.ElementUniqueId)).Select(x => x);
         return Response.Result;
     }
 
@@ -173,10 +166,10 @@ public sealed class Direwolf
     /// <returns>The requested element. Null if it's not found.</returns>
     public Response Read(string id, Document doc, out RevitElement? element)
     {
-        DatabaseChangedEventHandler?.Invoke(this, new DatabaseChangedEventArgs() { Operation = Response.Result });
+        DatabaseChangedEventHandler?.Invoke(this, new DatabaseChangedEventArgs { Operation = Response.Result });
         Debug.Print($"\tReading Element from Document: {doc.GetDocumentUuidHash()}::{doc.Title}");
-        
-        element = (GetDocumentElements(doc) ?? throw new InvalidOperationException()).FirstOrDefault(x => id.Equals(x?.ElementUniqueId));
+        element = (GetDocumentElements(doc) ?? throw new InvalidOperationException()).FirstOrDefault(x =>
+            id.Equals(x?.ElementUniqueId));
         return Response.Result;
     }
 
@@ -207,31 +200,48 @@ public sealed class Direwolf
     {
         var element = RevitElement.Create(doc, elementUniqueId);
         if (element is null) throw new NullReferenceException(nameof(RevitElement));
-
-        return Howl.Create(
-            DataType.Object,
-            Method.Post,
-            new Dictionary<PayloadId, object>()
+        return Howl.Create(DataType.Object, Method.Post,
+            new Dictionary<string, object>
             {
-                [PayloadId.Create(DataType.Object, "object", new Dictionary<string, object>()
-                    {
-                        [nameof(element.Value.ElementUniqueId)]  = elementUniqueId,
-                    })] =
-                    element,
-            }, RevitElementJsonSchema.RevitElement, $"{nameof(AddOrUpdateRevitElement)}: {elementUniqueId}");
+                [nameof(DataType)] = DataType.Object,
+                [nameof(element.Value.ElementUniqueId)] = elementUniqueId
+            }, $"{nameof(AddOrUpdateRevitElement)}: {elementUniqueId}");
+    }
+
+    public static Wolfpack CreatePrompt(string prompt)
+    {
+        var howl = Howl.Create(
+            DataType.String,
+            Method.Post,
+            new Dictionary<string, object> { ["data"] = prompt },
+            "");
+
+        var w = Wolfpack.CreateInstance(
+            Cuid.Create(),
+            Method.Post,
+            "promptFromRevit",
+            new Dictionary<string, object>
+            {
+                ["jsonrpc"] = "2.0",
+                ["method"] = "string",
+                ["parameters"] = new Dictionary<string, object>
+                {
+                    ["direwolf"] = "1",
+                    ["client"] = "com.autodesk.revit::2025",
+                    ["wolfpackVersion"] = "0.2-alpha",
+                    ["model"] = ""
+                }
+            }.AsReadOnly(), new List<Howl> { howl }.AsReadOnly());
+        return w;
     }
 
     private static RevitElement?[]? GetDocumentElements(Document doc)
     {
         ArgumentNullException.ThrowIfNull(doc);
         Debug.Print($"\tGetting DB from Document: {doc.GetDocumentUuidHash()}::{doc.Title}");
-        
         var wolfden = WolfdenInstances[doc];
         var elements = wolfden?.Values;
-        return elements?.Where(x => x.HasValue)
-            .GroupBy(r => r!.Value.ElementUniqueId)
-            .Select(found => found.OrderByDescending(x => x!.Value.Id.TimestampMilliseconds).First())
-            .ToArray();
-     
+        return elements?.Where(x => x.HasValue).GroupBy(r => r!.Value.ElementUniqueId)
+            .Select(found => found.OrderByDescending(x => x!.Value.Id.TimestampMilliseconds).First()).ToArray();
     }
 }

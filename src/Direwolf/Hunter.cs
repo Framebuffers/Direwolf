@@ -1,13 +1,10 @@
-﻿using YamlDotNet.RepresentationModel;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
+﻿namespace Direwolf;
 
-namespace Direwolf;
 public sealed class Hunter
 {
     //TODO: receive JSON from MCP source, use MCP JSON schema and JSON-RCP standards
     //
-    
+
     // public static Howl Parse(string yamlStream)
     // {
     //     using var reader = new StreamReader

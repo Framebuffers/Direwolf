@@ -80,6 +80,9 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Reference Include="RevitLookup.UI">
+            <HintPath>..\..\..\..\..\AppData\Roaming\Autodesk\Revit\Addins\2025\RevitLookup\RevitLookup.UI.dll</HintPath>
+        </Reference>
         <Reference Include="System.Windows.Forms">
             <HintPath>..\..\..\..\..\..\..\Program Files\dotnet\shared\Microsoft.WindowsDesktop.App\8.0.13\System.Windows.Forms.dll</HintPath>
             <Private>False</Private>
