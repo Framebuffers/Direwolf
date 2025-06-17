@@ -19,7 +19,7 @@ public static class ExceptionExtensions
         var payloadId = PayloadId.Create(DataType.DirewolfException, "string");
 
         var howl = Howl.Create(DataType.DirewolfException,
-            Method.Put,
+            RequestType.Put,
             new Dictionary<string, object>
             {
                 [ex.GetType().Name] = ex!.Message
@@ -33,14 +33,14 @@ public static class ExceptionExtensions
                 exceptionList.Add(howl with
                 {
                     DataType = DataType.Invalid,
-                    Result = Result.Rejected
+                    Result = ResultType.Rejected
                 });
                 break;
             default:
                 if (ex is null) break;
                 exceptionList.Add(howl with
                 {
-                    Result = Result.Rejected
+                    Result = ResultType.Rejected
                 });
 
                 break;

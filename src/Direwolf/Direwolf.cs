@@ -44,20 +44,18 @@ namespace Direwolf;
 public sealed class Direwolf
 {
     private static readonly object Lock = new();
-    internal static readonly ObjectCache ElementCache = MemoryCache.Default;
 
     // ReSharper disable once MemberCanBePrivate.Global
     private static ControlledApplication? _controlledApplication;
     private static Direwolf? _instance;
-    private static readonly CacheItemPolicy Policy = new() { SlidingExpiration = TimeSpan.FromMinutes(60) };
-    private static readonly Dictionary<Document, Wolfden?> WolfdenInstances = [];
     private readonly List<Howl> _exceptions = [];
+    private static Wolfden? _wolfden;
 
     private Direwolf(Document document)
     {
         DatabaseChangedEventHandler += DatabaseEvent;
         _instance = this;
-        WolfdenInstances.Add(document, Wolfden.CreateInstance(document));
+        _wolfden = Wolfden.GetInstance(document);
     }
 
     public event EventHandler<DatabaseChangedEventArgs>? DatabaseChangedEventHandler;
@@ -93,21 +91,33 @@ public sealed class Direwolf
     /// </param>
     /// <param name="doc"></param>
     /// <returns>True if the operation was completed successfully, false otherwise. </returns>
-    public Response AddOrUpdateRevitElement(string elementUniqueId, Document doc)
+    public MessageType AddOrUpdateRevitElement(string elementUniqueId, Document doc)
     {
         try
         {
-            var wolfden = WolfdenInstances[doc];
             var element = RevitElement.Create(doc, elementUniqueId);
-            if (wolfden is null || element is null) return Response.Error;
-            wolfden.AddOrUpdateElements(CreateFromElementUniqueIds(elementUniqueId, doc), out _);
+            if (element is null) return MessageType.Error;
+            var howl = Howl.Create(DataType.Object, RequestType.Put,
+                new Dictionary<string, object>() { [elementUniqueId] = element });
+            var cache = Wolfden.GetInstance(doc).KeyCache;
+            if (!cache.TryGetValue(elementUniqueId, out var cachedElement))
+            {
+                cachedElement = howl.Id;
+                cache.Add(elementUniqueId, cachedElement);
+            }
+            else
+            {
+                cache[elementUniqueId] = howl.Id;
+            }
+
+            _wolfden?.AddOrUpdateElements(howl);
             Debug.Print($"Adding to Document: {doc.GetDocumentUuidHash()}::{doc.Title}");
-            return Response.Result;
+            return MessageType.Result;
         }
         catch (Exception e)
         {
             e.LogException(_exceptions);
-            return Response.Error;
+            return MessageType.Error;
         }
     }
 
@@ -123,20 +133,22 @@ public sealed class Direwolf
     /// <param name="elementUniqueId"></param>
     /// <param name="doc">Revit Document</param>
     /// <returns>True if the operation was completed successfully, false otherwise. </returns>
-    public Response DeleteRevitElement(string elementUniqueId, Document doc)
+    public MessageType DeleteRevitElement(string elementUniqueId, Document doc)
     {
         try
         {
             Debug.Print($"\tUpdating from Document: {doc.GetDocumentUuidHash()}::{doc.Title}");
-            var wolfden = WolfdenInstances[doc];
-            if (wolfden is null) return Response.Error;
-            wolfden.RemoveElements(CreateFromElementUniqueIds(elementUniqueId, doc), out _);
-            return Response.Result;
+            var howl = Howl.Create(DataType.String, RequestType.Delete,
+                new Dictionary<string, object>() { ["key"] = elementUniqueId, ["value"] = null! });
+            var cache = _wolfden?.KeyCache;
+            cache?.Remove(elementUniqueId, out var _);
+            _wolfden?.RemoveElements(howl);
+            return MessageType.Result;
         }
         catch (Exception e)
         {
             e.LogException(_exceptions);
-            return Response.Error;
+            return MessageType.Error;
         }
     }
 
@@ -149,34 +161,55 @@ public sealed class Direwolf
     /// <param name="elementUniqueIds"></param>
     /// <param name="doc">Revit Document</param>
     /// <returns>True if the operation was completed successfully, false otherwise.</returns>
-    public static Response Read(string[] elementUniqueIds, Document doc, out IEnumerable<RevitElement?> elements)
+    public static MessageType Read(string[] elementUniqueIds, Document doc, out IEnumerable<RevitElement?>? elements)
     {
         Debug.Print($"\tReading Enumerable from Document: {doc.GetDocumentUuidHash()}::{doc.Title}");
-        elements = (GetDocumentElements(doc) ?? []).Where(x => x.HasValue)
-            .Where(x => x is not null && elementUniqueIds.Contains(x.Value.ElementUniqueId)).Select(x => x);
-        return Response.Result;
+        var l = new List<RevitElement?>();
+        var cuids = new List<Cuid>();
+        var cache = _wolfden?.KeyCache;
+        foreach (var id in elementUniqueIds)
+        {
+            if (cache is null || !cache.TryGetValue(id, out var cachedElement)) continue;
+            cuids.Add(cachedElement);
+        }
+
+        var howl = Howl.Create(DataType.Array, RequestType.Get,
+            new Dictionary<string, object>() { ["key"] = cuids.ToArray() });
+        Wolfden.ReadElements(howl, out var e);
+      
+        elements = e.Values.Where(x => x is RevitElement).Select(x => (RevitElement?)x).AsEnumerable();
+        return MessageType.Result;
     }
 
     /// <summary>
     ///     Returns a RevitElement matching the
     ///     <see cref="Autodesk.Revit.DB.ElementId" /> in the args.
     /// </summary>
-    /// <param name="id">The ID used as a key to store the element inside the cache.</param>
+    /// <param name="elementUniqueId">The ID used as a key to store the element inside the cache.</param>
     /// <param name="doc">Revit Document</param>
     /// <returns>The requested element. Null if it's not found.</returns>
-    public Response Read(string id, Document doc, out RevitElement? element)
+    public MessageType Read(string elementUniqueId, Document doc, out RevitElement? element)
     {
-        DatabaseChangedEventHandler?.Invoke(this, new DatabaseChangedEventArgs { Operation = Response.Result });
+        DatabaseChangedEventHandler?.Invoke(this, new DatabaseChangedEventArgs { Operation = MessageType.Result });
         Debug.Print($"\tReading Element from Document: {doc.GetDocumentUuidHash()}::{doc.Title}");
-        element = (GetDocumentElements(doc) ?? throw new InvalidOperationException()).FirstOrDefault(x =>
-            id.Equals(x?.ElementUniqueId));
-        return Response.Result;
+        var howl = Howl.Create(DataType.Object, RequestType.Get,
+            new Dictionary<string, object>() { ["key"] = elementUniqueId });
+        var cache = Wolfden.GetCache();
+        if (!cache.TryGetValue(elementUniqueId, out var cachedElement))
+        {
+            cachedElement = howl.Id;
+            cache.Add(elementUniqueId, cachedElement);
+        }
+
+        Wolfden.ReadElements(howl, out var resultElements);
+        element = (RevitElement?)resultElements.Values.FirstOrDefault(x => x is RevitElement);
+        return MessageType.Result;
     }
 
-    public Response GetWolfden(Document doc, out Wolfden wolfden)
+    public static MessageType GetWolfden(Document doc, out Wolfden wolfden)
     {
-        wolfden = WolfdenInstances[doc] ?? throw new NullReferenceException(nameof(Wolfden));
-        return Response.Result;
+        wolfden = Wolfden.GetInstance(doc);
+        return MessageType.Result;
     }
 
     //TODO: try load elements from here.
@@ -200,48 +233,19 @@ public sealed class Direwolf
     {
         var element = RevitElement.Create(doc, elementUniqueId);
         if (element is null) throw new NullReferenceException(nameof(RevitElement));
-        return Howl.Create(DataType.Object, Method.Post,
+        return Howl.Create(DataType.Object, RequestType.Post,
             new Dictionary<string, object>
             {
-                [nameof(DataType)] = DataType.Object,
-                [nameof(element.Value.ElementUniqueId)] = elementUniqueId
+                [nameof(DataType)] = DataType.Object, [nameof(element.Value.ElementUniqueId)] = elementUniqueId
             }, $"{nameof(AddOrUpdateRevitElement)}: {elementUniqueId}");
     }
 
-    public static Wolfpack CreatePrompt(string prompt)
+    public static Wolfpack CreatePrompt(Document doc, string name, string? description, Howl result, string uri)
     {
-        var howl = Howl.Create(
-            DataType.String,
-            Method.Post,
-            new Dictionary<string, object> { ["data"] = prompt },
-            "");
-
-        var w = Wolfpack.CreateInstance(
-            Cuid.Create(),
-            Method.Post,
-            "promptFromRevit",
-            new Dictionary<string, object>
-            {
-                ["jsonrpc"] = "2.0",
-                ["method"] = "string",
-                ["parameters"] = new Dictionary<string, object>
-                {
-                    ["direwolf"] = "1",
-                    ["client"] = "com.autodesk.revit::2025",
-                    ["wolfpackVersion"] = "0.2-alpha",
-                    ["model"] = ""
-                }
-            }.AsReadOnly(), new List<Howl> { howl }.AsReadOnly());
-        return w;
-    }
-
-    private static RevitElement?[]? GetDocumentElements(Document doc)
-    {
-        ArgumentNullException.ThrowIfNull(doc);
-        Debug.Print($"\tGetting DB from Document: {doc.GetDocumentUuidHash()}::{doc.Title}");
-        var wolfden = WolfdenInstances[doc];
-        var elements = wolfden?.Values;
-        return elements?.Where(x => x.HasValue).GroupBy(r => r!.Value.ElementUniqueId)
-            .Select(found => found.OrderByDescending(x => x!.Value.Id.TimestampMilliseconds).First()).ToArray();
+        var howl = Howl.Create(DataType.String, RequestType.Get, result.Payload!) with { Result = ResultType.Accepted };
+        var args = WolfpackArguments.Create(howl, uri);
+        var id = Cuid.CreateRevitId(doc, out var _);
+        var results = new[] { Howl.AsPayload(howl) };
+        return Wolfpack.Create(id, RequestType.Get, name, args, results, description);
     }
 }

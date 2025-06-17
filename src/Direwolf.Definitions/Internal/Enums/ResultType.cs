@@ -1,6 +1,6 @@
 ﻿namespace Direwolf.Definitions.Internal.Enums;
 
-public enum Result
+public enum ResultType
 {
     Accepted,
     Rejected,

@@ -26,18 +26,14 @@ public record ModelHealthIndicators
     public List<Room> UnenclosedRoom { get; init; } = [];
     public List<Viewport> Viewports { get; init; } = [];
 
-    public static WolfpackCollectionLegacy Create(Document document, IEnumerable<Element> elementsToCheck)
+    public static Wolfpack Create(Document document, IEnumerable<Element> elementsToCheck)
     {
         var docIdValues = (document.GetDocumentVersionCounter(), document.GetDocumentUuidHash());
-        return new WolfpackCollectionLegacy(
-            Cuid.CreateRevitId(document, out docIdValues),
-            nameof(ModelHealthIndicators),
-            Method.Get,
-            document.GetDocumentUuidHash(),
-            document.GetDocumentVersionHash())
-        {
-            Payload = new ModelHealthIndicators().GetModelHealthIndicators(document, elementsToCheck)
-        };
+        var mhi = new ModelHealthIndicators().GetModelHealthIndicators(document, elementsToCheck)!;
+        
+        var howl = Howl.Create(DataType.Object, RequestType.Get, mhi, "ModelHealthIndicators");
+        
+        return new Wolfpack(Cuid.CreateRevitId(document, out _).Value!, RequestType.Get, "ModelHealthIndicators", WolfpackArguments.Create(howl, "wolfpack://com.revit.autodesk-2025.4/direwolf/custom?t=ModelHealthIndicators"), [Howl.AsPayload(howl with {Result = ResultType.Accepted})], "Model Health Indicators");
     }
 
     private Dictionary<string, object>? GetModelHealthIndicators(Document document,
@@ -237,7 +233,7 @@ public record ModelHealthIndicators
                     }
 
                     //TODO: check for unused
-                    //Debug.Print(e.Name + "" + typeof(Element).Name);
+                    //Debug.Print(e.ArgumentName + "" + typeof(Element).ArgumentName);
                     break;
             }
 

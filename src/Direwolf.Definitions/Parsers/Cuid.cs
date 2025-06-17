@@ -44,7 +44,7 @@ public readonly record struct Cuid(int Length = 16)
     }
 
     /// <summary>
-    ///     Helper method for <see cref="CuidDriver.NewDirewolfId" />.
+    ///     Helper requestType for <see cref="CuidDriver.NewDirewolfId" />.
     ///     Generates a CUID where the <see cref="CounterSubstring" /> corresponds to a Base36 hash of the
     /// </summary>
     /// <param name="doc"></param>

@@ -4,7 +4,7 @@ namespace Direwolf.Definitions.Telemetry;
 
 // Unimplemented feature as of 2025-05-29
 public readonly record struct TriggerEventData(
-    Method Method,
+    RequestType RequestType,
     EventCondition EventCondition,
     DateTime CreatedAt,
     bool TriggerResult = true);

@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Runtime.Caching;
+using System.Text.Json.Serialization;
 using Direwolf.Definitions.Parsers;
 
 namespace Direwolf.Definitions.Internal.Enums;
@@ -24,9 +25,9 @@ namespace Direwolf.Definitions.Internal.Enums;
 ///         standard for transport across Clients and Servers.
 ///     </remarks>
 /// </summary>
-/// <param name="Response">The objective or nature of this message-- what is it asking or what it is about.</param>
+/// <param name="MessageType">The objective or nature of this message-- what is it asking or what it is about.</param>
 /// <param name="Result">The truth value of the request performed: Accepted, Rejected or Cancelled.</param>
-/// <param name="DataType">The entry value in this Enum that represents the Type of the <see cref="Payload" /> keys,</param>
+/// <param name="DataType">The entry value in this Enum that represents the JsonType of the <see cref="Payload" /> keys,</param>
 /// <param name="Payload">Any or all information that has to be transported. Can be null.</param>
 /// <param name="JsonSchema">
 ///     The schema that will be used by <see cref="JsonConverter{T}" /> to serialize/deserialize this
@@ -34,29 +35,30 @@ namespace Direwolf.Definitions.Internal.Enums;
 /// </param>
 public readonly record struct Howl(
     Cuid Id,
-    Response Response,
-    Result? Result,
+    MessageType MessageType,
+    ResultType? Result,
     DataType DataType,
-    Method Method,
+    RequestType RequestType,
     Dictionary<string, object>? Payload,
-    string? Description)
+    string? Description,
+    string? Name)
 {
     /// <summary>
     ///     Creates a specialized deep clone of a <see cref="Howl" />, on which only <see cref="Result" />
     ///     and <see cref="Payload" /> are modified.
     /// </summary>
-    /// <param name="token">Another token with different Data and Result payloads.</param>
-    private Howl(Howl token) : this(Cuid.Create(), token.Response, token.Result, token.DataType, token.Method,
+    /// <param name="token">Another token with different Data and ResultType payloads.</param>
+    private Howl(Howl token) : this(Cuid.Create(), token.MessageType, token.Result, token.DataType, token.RequestType,
         token.Payload,
-        token.Description)
+        token.Description, token.Name)
     {
     }
 
     /// <summary>
     ///     <remarks>
-    ///         <see cref="Response" /> and <see cref="Result" /> are null upon creation. They, alongside the
+    ///         <see cref="MessageType" /> and <see cref="Result" /> are null upon creation. They, alongside the
     ///         <see cref="Payload" />,
-    ///         must be assigned a value by using the <see cref="ShallowCopy" /> method.
+    ///         must be assigned a value by using the <see cref="ShallowCopy" /> requestType.
     ///     </remarks>
     /// </summary>
     /// <param name="dt"></param>
@@ -64,12 +66,13 @@ public readonly record struct Howl(
     /// <param name="payload"></param>
     /// <param name="jsonSchema"></param>
     /// <param name="description"></param>
+    /// <param name="name">Name for this Howl</param>
     /// <returns></returns>
-    public static Howl Create(DataType dt, Method destinationOfData, Dictionary<string, object> payload,
-        string? description = null)
+    public static Howl Create(DataType dt, RequestType destinationOfData, Dictionary<string, object> payload,
+        string? description = null, string? name = null)
     {
-        var howl = new Howl(Cuid.Create(), Response.Request, Enums.Result.Rejected, dt, destinationOfData, payload,
-            description);
+        var howl = new Howl(Cuid.Create(), MessageType.Request, Enums.ResultType.Rejected, dt, destinationOfData, payload,
+            description, name ?? string.Empty);
         return howl;
     }
 
@@ -97,11 +100,44 @@ public readonly record struct Howl(
     ///         does not modify the original.
     ///     </remarks>
     /// </summary>
-    /// <param name="result"></param>
+    /// <param name="resultType"></param>
     /// <param name="newData"></param>
     /// <returns></returns>
-    public Howl DeepCopy(Result result, Dictionary<string, object> newData)
+    public Howl DeepCopy(ResultType resultType, Dictionary<string, object> newData)
     {
-        return this with { Result = result, Payload = newData, Response = Response.Result };
+        return this with { Result = resultType, Payload = newData, MessageType = MessageType.Result };
     }
+
+    public static string GetHowlDataTypeAsString(Howl howl)
+    {
+        return howl.DataType switch
+        {
+            DataType.Null => "null",
+            DataType.Empty => "null",
+            DataType.Invalid => "object",
+            Enums.DataType.String => "string",
+            Enums.DataType.Boolean => "bool",
+            Enums.DataType.Numbers => "numbers",
+            DataType.Double => "numbers",
+            DataType.FloatingPoint => "numbers",
+            Enums.DataType.Array => "array",
+            Enums.DataType.Object => "object",
+            _ => "object",
+        }; 
+    }
+
+    public static CacheItem AsCacheItem(Howl? howl)
+    {
+        return new CacheItem(
+            howl!.Value.Id.Value,
+            howl.Value.Payload!.Values);
+    }
+    
+    public static PromptPayload AsPayload(Howl howl)
+    {
+        var type = GetHowlDataTypeAsString(howl);
+        howl = howl with { Result = ResultType.Accepted };
+        return howl.Payload is null ? new PromptPayload(type, null) : new PromptPayload(type, howl.Payload);
+    }
+    
 }

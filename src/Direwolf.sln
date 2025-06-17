@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Direwolf.Revit", "Direwolf.
 		{8B67BD0C-FE01-4FE7-8D11-F3E6725FAAF9} = {8B67BD0C-FE01-4FE7-8D11-F3E6725FAAF9}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Direwolf.Driver.MCP", "Direwolf.Driver.MCP\Direwolf.Driver.MCP.csproj", "{E4D19D63-A44B-41F9-87DC-DE6554250242}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,5 +34,9 @@ Global
 		{7FDBBC48-6364-4D38-A81A-08D4EE9DCBC0}.Debug|Any CPU.Build.0 = Debug R25|Any CPU
 		{7FDBBC48-6364-4D38-A81A-08D4EE9DCBC0}.Release|Any CPU.ActiveCfg = Release R25|Any CPU
 		{7FDBBC48-6364-4D38-A81A-08D4EE9DCBC0}.Release|Any CPU.Build.0 = Release R25|Any CPU
+		{E4D19D63-A44B-41F9-87DC-DE6554250242}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4D19D63-A44B-41F9-87DC-DE6554250242}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4D19D63-A44B-41F9-87DC-DE6554250242}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4D19D63-A44B-41F9-87DC-DE6554250242}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

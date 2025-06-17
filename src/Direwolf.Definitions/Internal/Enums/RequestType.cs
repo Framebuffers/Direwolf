@@ -8,7 +8,7 @@
 ///         However, their interpretations inside the Direwolf scope may heavily vary from its HTTP counterpart.
 ///     </remarks>
 /// </summary>
-public enum Method
+public enum RequestType
 {
     Get, // read data
     Post, // update data

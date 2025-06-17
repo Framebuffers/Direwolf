@@ -5,6 +5,7 @@ using Direwolf.Definitions.Internal.Enums;
 
 namespace Direwolf.Definitions.Parsers;
 
+// unimplemented
 public sealed class WolfpackJsonParser : JsonConverter<Wolfpack>
 {
     public override Wolfpack Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -13,7 +14,7 @@ public sealed class WolfpackJsonParser : JsonConverter<Wolfpack>
         while (reader.Read())
         {
             Cuid c = new();
-            Method? m = null;
+            RequestType? m = null;
             string? name = null;
             Dictionary<string, object>? properties = null;
             List<Howl>? payload = null;
@@ -22,7 +23,8 @@ public sealed class WolfpackJsonParser : JsonConverter<Wolfpack>
             switch (reader)
             {
                 case { TokenType: JsonTokenType.EndObject }:
-                    return new Wolfpack(c, m, name, properties?.AsReadOnly(), payload?.AsReadOnly());
+                    break;
+                    // return Wolfpack.Create(c, m, name, null, );
                 case { TokenType: JsonTokenType.PropertyName }:
                     reader.Read();
                     switch (propertyName)
@@ -32,20 +34,20 @@ public sealed class WolfpackJsonParser : JsonConverter<Wolfpack>
                                 throw new JsonException($"{nameof(Cuid)} in Id is empty.");
                             c = reader.GetString()!.ParseAsCuid();
                             break;
-                        case "Method":
+                        case "RequestType":
                             if (string.IsNullOrEmpty(reader.GetString()))
-                                throw new JsonException($"{nameof(Method)} is empty.");
-                            if (!Enum.TryParse<Method>(reader.GetString()!, true, out var method))
-                                throw new JsonException($"{nameof(Method)} is not a valid method.");
+                                throw new JsonException($"{nameof(RequestType)} is empty.");
+                            if (!Enum.TryParse<RequestType>(reader.GetString()!, true, out var method))
+                                throw new JsonException($"{nameof(RequestType)} is not a valid requestType.");
                             m = method;
                             break;
-                        case "Name":
+                        case "ArgumentName":
                             if (string.IsNullOrEmpty(reader.GetString()))
                                 throw new JsonException($"{nameof(name)} is empty.");
                             name = reader.GetString();
                             break;
 
-                        case "Parameters":
+                        case "Arguments":
                             if (string.IsNullOrEmpty(reader.GetString()))
                                 throw new JsonException($"{nameof(properties)} is empty.");
                             if (reader.TokenType == JsonTokenType.StartObject)

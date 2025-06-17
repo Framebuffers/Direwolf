@@ -52,7 +52,7 @@ public static class RevitElementJsonSchema
                                                "properties": {
                                                  "key": {
                                                    "type": "string",
-                                                   "description": "The Definition.Name property on a given Parameter, defaulting to "undefined" if null."
+                                                   "description": "The Definition.ArgumentName property on a given Parameter, defaulting to "undefined" if null."
                                                  },
                                                  "value": {
                                                    "type": "string",
@@ -65,7 +65,7 @@ public static class RevitElementJsonSchema
                                                },
                                                "required": ["key", "value", "storageType"]
                                              },
-                                             "description": "An array of key-value pairs representing the Parameters held inside a given Element."
+                                             "description": "An array of key-value pairs representing the Arguments held inside a given Element."
                                            }
                                          },
                                          "required": [

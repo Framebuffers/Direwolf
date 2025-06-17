@@ -175,8 +175,8 @@ public sealed class ElementJsonParser : JsonConverter<RevitElement>
         _ = options;
 
         // {
-        //   "<Definition.Name>": "<Value>",
-        //   "storageType": "StorageType.Type"
+        //   "<Definition.ArgumentName>": "<Value>",
+        //   "storageType": "StorageType.JsonType"
         //  },
         //
         // or

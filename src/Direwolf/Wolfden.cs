@@ -1,121 +1,140 @@
 ﻿using System.Collections.Concurrent;
+using System.Runtime.Caching;
 using Autodesk.Revit.DB;
 using Direwolf.Definitions;
 using Direwolf.Definitions.Extensions;
 using Direwolf.Definitions.Internal.Enums;
+using Direwolf.Definitions.Parsers;
 using Direwolf.Definitions.RevitApi;
 
 namespace Direwolf;
 
-public sealed class Wolfden(Document document) : ConcurrentDictionary<Guid, RevitElement?>
+public sealed class Wolfden
 {
     private static Wolfden? _instance;
-    private readonly Queue<Wolfpack?> _operationQueue = [];
-
-    private readonly Stack<RevitElement?> _transactionStack = [];
-
-    public static Wolfden CreateInstance(Document document)
+    private static readonly object Lock = new();
+    private static readonly ObjectCache ElementCache = MemoryCache.Default;
+    private static readonly CacheItemPolicy Policy = new() { SlidingExpiration = TimeSpan.FromMinutes(60) };
+    private readonly Queue<Howl?> _operationQueue = [];
+    private readonly Stack<Howl?> _transactionStack = [];
+    internal readonly Dictionary<string, Cuid> KeyCache = [];
+    private static Document? _document;
+    
+    private Wolfden(Document document)
     {
-        var wolfden = new Wolfden(document);
-        _instance = wolfden;
-        if (!wolfden.PopulateDatabase()) throw new InvalidOperationException(nameof(Wolfden));
-        return new Wolfden(document);
+        _instance = this;
+        _document = document;
+        if (PopulateDatabase() is MessageType.Error) throw new InvalidOperationException(nameof(Wolfden));
+    }
+    
+    public static IDictionary<string, object> GetCache() => ElementCache.ToDictionary();
+    
+    public static Wolfden GetInstance(Document doc)
+    {
+        if (_instance is not null) return _instance;
+        lock (Lock)
+        {
+            if (_instance is not null) return _instance;
+            _instance = new Wolfden(doc);
+            return _instance;
+        }
     }
 
-    public Wolfden GetInstance()
-    {
-        return _instance ?? throw new NullReferenceException(nameof(Wolfden));
-    }
-
-    private bool PopulateDatabase()
+    private static MessageType PopulateDatabase()
     {
         try
         {
-            var revitDb = document.GetRevitDatabase().ToList();
+            var revitDb = _document?.GetRevitDatabaseAsCacheItems();
+            if (revitDb is null) return MessageType.Error;
             foreach (var cacheItem in revitDb)
             {
-                if (cacheItem is null || !Guid.TryParse(cacheItem.Value.ElementUniqueId, out var elementUniqueId))
-                    continue;
-                GetOrAdd(elementUniqueId, RevitElement.Create(document, elementUniqueId.ToString()));
+                if (cacheItem is null) continue;
+                ElementCache.Add(cacheItem, Policy);
             }
 
-            return true;
+            return MessageType.Result;
         }
         catch
         {
-            return false;
+            return MessageType.Error;
         }
     }
 
-    public Response AddOrUpdateElements(Howl h, out IEnumerable<RevitElement?>? elements)
+    public MessageType AddOrUpdateElements(Howl? r)
     {
         try
         {
-            if (h.Payload is null)
+            if (r is null)
             {
-                elements = null;
-                return Response.Error;
+                return MessageType.Error;
             }
 
-            var results = Extract(h) ?? throw new NullReferenceException(nameof(RevitElement));
-            foreach (var element in results)
-            {
-                if (element is null) continue;
-                AddOrUpdate(Guid.Parse(element.Value.ElementUniqueId), guid =>
-                {
-                    // ReSharper disable once ConvertToLambdaExpression
-                    return RevitElement.Create(document, guid.ToString());
-                }, (guid, revitElement) =>
-                {
-                    _transactionStack.Push(this[guid]); // save the old value
-                    return this[guid] = revitElement;
-                });
-            }
+            var element = Howl.AsCacheItem(r);
+            if (ElementCache.Contains(element.Key)) ElementCache.Remove(element.Key);
+            ElementCache.Add(Howl.AsCacheItem(r), Policy);
+            _transactionStack.Push(r);
+            // foreach (var element in results)
+            // {
+            //     if (element is null) continue;
+            //     // AddOrUpdate(Guid.Parse(element.Value.ElementUniqueId), guid =>
+            //     // {
+            //     //     // ReSharper disable once ConvertToLambdaExpression
+            //     //     return RevitElement.Create(document, guid.ToString());
+            //     // }, (guid, revitElement) =>
+            //     // {
+            //     //     _transactionStack.Push(this[guid]); // save the old value
+            //     //     return this[guid] = revitElement;
+            //     // });
+            // }
 
-            elements = results;
-            return Response.Result;
+            return MessageType.Result;
         }
         catch
         {
-            elements = null;
-            return Response.Error;
+            return MessageType.Error;
         }
     }
 
-    public Response RemoveElements(Howl h, out RevitElement?[]? element)
+    public MessageType RemoveElements(Howl h)
     {
         if (h.Payload is null)
         {
-            element = null;
-            return Response.Error;
+            return MessageType.Error;
         }
-
-        var results = Extract(h) ?? throw new NullReferenceException(nameof(RevitElement));
-        List<RevitElement?> output = [];
-        foreach (var result in results)
-        {
-            if (result?.ElementUniqueId is null) continue;
-            TryRemove(Guid.Parse(result.Value.ElementUniqueId), out var extracted);
-            output.Add(extracted);
-        }
-
-        element = output.ToArray();
-        return Response.Result;
+        var keyToRemove = (string)h.Payload["key"];
+        
+        ElementCache.Remove(keyToRemove);
+        _transactionStack.Push(h);
+        // var results = Extract(h) ?? throw new NullReferenceException(nameof(RevitElement));
+        // List<RevitElement?> output = [];
+        // foreach (var result in results)
+        // {
+        //     if (result?.ElementUniqueId is null) continue;
+        //     TryRemove(Guid.Parse(result.Value.ElementUniqueId), out var extracted);
+        //     output.Add(extracted);
+        // }
+        //
+        // element = output.ToArray();
+        return MessageType.Result;
     }
 
-    public bool PopTransaction(out RevitElement? element)
+    public static MessageType ReadElements(Howl h, out IDictionary<string, object?>? results)
+    {
+        if (h.Payload is null)
+        {
+            results = null;
+            return MessageType.Error;
+        }
+
+        var values = (Cuid[])h.Payload["key"];
+        var found = ElementCache.GetValues(values.Select(x => x.Value));
+        results = found;
+        return MessageType.Result;
+    }
+
+    public bool PopTransaction(out Howl? element)
     {
         return _transactionStack.TryPop(out element);
     }
 
-    public void SpoolWolfpack(Wolfpack? w)
-    {
-        _operationQueue.Enqueue(w);
-    }
-
-    private static RevitElement?[]? Extract(Howl h)
-    {
-        return h.Payload?.Where(x => x.Value is RevitElement)
-            .Select(x => (RevitElement?)x.Value).ToArray();
-    }
 }

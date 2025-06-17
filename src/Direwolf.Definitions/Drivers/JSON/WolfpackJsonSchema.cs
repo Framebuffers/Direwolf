@@ -12,12 +12,12 @@ public static class WolfpackJsonSchema
                                          "format": "string",
                                          "description": "Unique identifier using a Collision-Resistant Unique Identifier format."
                                        },
-                                       "Method": {
+                                       "RequestType": {
                                          "type": "string",
                                          "enum": ["GET", "POST", "PUT", "DELETE"],
                                          "description": "The operation being performed with this Wolfpack"
                                        },
-                                       "Name": {
+                                       "ArgumentName": {
                                          "type": "string",
                                          "nullable": true,
                                          "description": "Optional name."
@@ -27,7 +27,7 @@ public static class WolfpackJsonSchema
                                          "nullable": true,
                                          "description": "Optional description."
                                        },
-                                       "Parameters": {
+                                       "Arguments": {
                                          "type": "object",
                                          "additionalProperties": {
                                            "type": "string"
@@ -42,7 +42,7 @@ public static class WolfpackJsonSchema
                                          "description": "A list of elements that define transactions, operations or states to and from Direwolf. It is the transactional unit of Direwolf."
                                        }
                                      },
-                                     "required": ["Id", "Method", "Data"],
+                                     "required": ["Id", "RequestType", "Data"],
                                      "definitions": {
                                        "Howl": {
                                          "type": "object",

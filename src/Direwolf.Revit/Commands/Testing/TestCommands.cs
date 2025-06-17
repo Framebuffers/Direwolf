@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 using Autodesk.Revit.Attributes;
@@ -7,10 +8,12 @@ using Direwolf.Definitions;
 using Direwolf.Definitions.Extensions;
 using Direwolf.Definitions.Internal.Enums;
 using Direwolf.Definitions.ModelHealth;
+using Direwolf.Definitions.Parsers;
 using Direwolf.Definitions.RevitApi;
 using Direwolf.Extensions;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Nice3point.Revit.Toolkit.External;
+using Exception = System.Exception;
 using TaskDialog = Autodesk.Revit.UI.TaskDialog;
 using TaskDialogResult = Autodesk.Revit.UI.TaskDialogResult;
 
@@ -27,22 +30,21 @@ public class TestCommands : ExternalCommand
 {
     private static readonly StringWriter? StringWriter = new();
     private static string _path = string.Empty;
-
+    private static List<Howl> _results = [];
+    private const string Uri = "wolfpack://com.revit.autodesk-2025/direwolf/custom?t=";
     /*
      * 1. Populate Database.
      *      On start, check if the DB is not null.
      *      Expected: Any value >0.
-     *      Benchmark: Response.Result if conditions are met, Response.Error otherwise.
+     *      Benchmark: MessageType.ResultType if conditions are met, MessageType.Error otherwise.
      */
-    private Response Check_PopulateDB()
+    private MessageType Check_PopulateDB()
     {
         WriteToConsole("Populating Database");
-        if (Direwolf.GetDatabase(Document)
-                .GetDatabaseCount() !=
-            0)
-            return Response.Result;
+        Direwolf.GetWolfden(Document, out var wolfden);
+        if (!(Document.GetDatabaseCount() > 0)) return MessageType.Result;
         WriteToConsole("Database not found");
-        return Response.Error;
+        return MessageType.Error;
     }
 
     /*
@@ -51,10 +53,10 @@ public class TestCommands : ExternalCommand
      *      add them to the DB and then read their value.
      *      Expected:  Either an add or update to the cache, and values to be
      *                 identical to those introduced.
-     *      Benchmark: Response.Result if conditions are met, Response.Error otherwise.
+     *      Benchmark: MessageType.ResultType if conditions are met, MessageType.Error otherwise.
      *      Note:      Some values *might* change during the test.
      */
-    private Response Check_ReadWriteDB()
+    private MessageType Check_ReadWriteDB()
     {
         var db = Direwolf.GetDatabase(Document);
         var doors = Document.GetElements()
@@ -65,89 +67,75 @@ public class TestCommands : ExternalCommand
             .Where(x => !x.Equals(ElementId.InvalidElementId))
             .ToList();
         WriteToConsole($"Looping through all Door instances: {doors.Count}");
-        var addedUniqueItems = new List<string>();
+        
+        List<string> uuids = [];
         foreach (var door in doors)
         {
             var uuid = Document.GetElement(door).UniqueId;
-            db.AddOrUpdateRevitElement(uuid,
-                Document);
-            addedUniqueItems.Add(uuid);
+            uuids.Add(uuid);
             Debug.Print($"Added: {door.Value}");
         }
-
-        if (addedUniqueItems.Count != doors.Count)
-        {
-            WriteToConsole(
-                $"Mismatch between Transactions and Elements in list: Added = {addedUniqueItems.Count}. In Collector = {doors.Count}");
-            return Response.Error;
-        }
-
+        
         WriteToConsole("Checking DB:");
-        WriteToConsole("\tCount between Cached and Collected Elements");
-        Direwolf.Read(addedUniqueItems.ToArray(), Document, out var readInfo);
-        var counterDict = new Dictionary<string, int>();
-        foreach (var record in readInfo)
-        {
-            if (record is null) continue;
-            var id = record.Value.Id.CounterSubstring + record.Value.Id.FingerprintSubstring;
-            if (!counterDict.TryGetValue(record.Value.ElementUniqueId,
-                    out var counter))
-            {
-                counter = 0;
-                counterDict.Add(record.Value.ElementUniqueId,
-                    counter);
-            }
-
-            counter++;
-            WriteToConsole(
-                $"{record.Value.ElementUniqueId}::StoredID:{id}::DocumentID:{Document.GetDocumentUuidHash()}::Counter:{counter}");
-        }
-
-        Debug.Print(JsonSerializer.Serialize(counterDict));
+        Direwolf.Read(uuids.ToArray(), Document, out var elements);
+       
+        Debug.Print(JsonSerializer.Serialize(elements));
         WriteToConsole("Checking ElementUniqueId");
-        foreach (var door in doors)
-        {
-            var unique = Document.GetElement(door)
-                .UniqueId;
-            if (!addedUniqueItems.Contains(unique))
+        var howl = Howl.Create(DataType.Array, RequestType.Get, new() { [nameof(doors)] = elements!},
+                "FoundElements") with
             {
-                WriteToConsole($"UniqueID not found: {unique}");
-                return Response.Error;
-            }
-
-            WriteToConsole($"Found: {door.Value}");
-        }
+                Result = ResultType.Accepted,
+            };
+        var wolfpack = Wolfpack.Create(Cuid.CreateRevitId(Document, out var _), RequestType.Get, "Doors",
+            WolfpackArguments.Create(howl, $"{Uri}getdoors"),
+            [Howl.AsPayload(howl)],
+            "Gets the complete Revit database as RevitElement, and serializes each element to JSON."); 
 
         WriteFile("test_db_read_write.json",
-            readInfo.ToString(),
+            JsonSerializer.Serialize(wolfpack),
             out var t);
         WriteToConsole($"Time taken: {t}");
-        return Response.Result;
+        
+        _results.Add(howl);
+        return MessageType.Result;
     }
 
     /*
      * 3. Exporting to JSON from cache.
      *      This test serializes *the whole cache* of RevitElements to a
      *      JSON file in a directory chosen by the user.
-     *      Expected:  A (big) JSON with every single Element's Parameters
+     *      Expected:  A (big) JSON with every single Element's Arguments
      *                 using the RevitElement and RevitParameter format.
      *      Benchmark: Time taken.
      */
-    private Response Check_JsonFromCache()
+    private MessageType Check_JsonFromWolfden()
     {
         try
         {
+            var howl = Howl.Create(DataType.Array, RequestType.Get, Wolfden.GetCache().ToDictionary(), "", "") with
+            {
+                Result = ResultType.Accepted
+            };
+            var wolfpack = Wolfpack.Create(Cuid.CreateRevitId(Document, out var _), RequestType.Get, "GetDatabase", WolfpackArguments.Create(howl, $"{Uri}getDatabase"), [Howl.AsPayload(howl with {Result = ResultType.Accepted})], "Get the whole Revit Database as a JSON file"); 
+            
             WriteFile("jsonFromCache.json",
-                JsonSerializer.Serialize(Document.GetCacheByCategory()),
+                JsonSerializer.Serialize(wolfpack),
                 out var t);
-            WriteToConsole("Wrote JSON from cache.");
-            WriteToConsole($"Time taken to write from Cache: {t}");
-            return Response.Notification;
+            WriteToConsole("Wrote JSON from Wolfden.");
+            WriteToConsole($"Time taken to write from Wolfden: {t}");
+            _results.Add(howl with
+            {
+                Payload = new()
+                {
+                    ["result"] = howl.Payload!.Count
+                }
+            });
+            return MessageType.Notification;
         }
         catch (Exception e)
         {
             WriteToConsole(e.Message);
-            return Response.Error;
+            return MessageType.Error;
         }
     }
 
@@ -156,26 +144,41 @@ public class TestCommands : ExternalCommand
      *      This test serializes the whole Document from scratch, creating a new
      *      RevitElement for it and sending it to a JsonSerializer, to a JSON
      *      file in a directory of the user's choice.
-     *      Expected:  A (big) JSON with every single Element's Parameters
+     *      Expected:  A (big) JSON with every single Element's Arguments
      *                 using the RevitElement and RevitParameter format.
      *      Benchmark: Time taken.
      */
-    private Response Check_JsonFromDisk()
+    private MessageType Check_JsonFromDisk()
     {
         try
         {
-            var db = Document.GetRevitDbByCategory();
+            var database = Document.GetRevitDbByCategory();
+            var howl = Howl.Create(DataType.Array, RequestType.Get, database.ToDictionary(x => x.Key.ToString(), x => (object)x.Value!), Document.Title) with
+            {
+                Result = ResultType.Accepted
+            };
+            var wolfpack = Wolfpack.Create(Cuid.CreateRevitId(Document, out var _), RequestType.Get, "GetElements",
+                WolfpackArguments.Create(howl, $"{Uri}jsonFromDisk"),
+                [PromptPayload.Create(howl)], "Result from query");  
+            
             WriteFile("jsonFromDisk.json",
-                JsonSerializer.Serialize(db),
+                JsonSerializer.Serialize(wolfpack),
                 out var t);
             WriteToConsole("Wrote JSON from Disk");
             WriteToConsole($"Time taken to write from Disk: {t}");
-            return Response.Notification;
+            _results.Add(howl with
+            {
+                Payload = new()
+                {
+                    ["result"] = howl.Payload!.Count
+                }
+            });
+            return MessageType.Notification;
         }
         catch (Exception e)
         {
             WriteToConsole(e.Message);
-            return Response.Error;
+            return MessageType.Error;
         }
     }
 
@@ -188,7 +191,7 @@ public class TestCommands : ExternalCommand
      *     Benchmark: If a file is produced, and the content is correct.
      *                Time taken to perform the query.
      */
-    private Response Check_DatabaseQuery()
+    private MessageType Check_DatabaseQuery()
     {
         var chosen = Document.GetElements()
             .OfCategory(BuiltInCategory.OST_Doors)
@@ -196,44 +199,41 @@ public class TestCommands : ExternalCommand
             .Select(x => RevitElement.Create(Document,
                 x.UniqueId))
             .ToList();
-        if (chosen.Count == 0)
-            return Response.Error;
+      
         foreach (var rvtElement in chosen)
             WriteToConsole($"Check DB Query::Found: {rvtElement?.Id}");
         using StringWriter sw = new();
-        var w = WolfpackCollectionLegacy.Create(Document,
-            "DoorIfcGUID",
-            Method.Get,
-            chosen,
-            new Dictionary<string, object>
-            {
-                ["IfcGUID"] = chosen
-                    .Where(x => x is not null)
-                    .Select(x => RevitElement.CreateWithSpecificParameters(Document, x!.Value.ElementUniqueId,
-                        [BuiltInParameter.IFC_GUID]))
-                    .ToList()
+       
+        var x = chosen.ToDictionary(x => x!.Value.ElementUniqueId,
+            x => (object)x!.Value.Parameters.First(y => y is not null && y.Value.Key.Contains("IfcGUID"))!);
 
-                // .Where(x => x is not null)
-                // .SelectMany(x => x!.Value.Parameters
-                //     .Where(y => y.HasValue)
-                //     .Where(y => y!.Value.Key.Equals("IfcGUID"))
-                //     .Select(y => y!.Value)
-                //     .Where(y => y.Key.Equals("IfcGUID"))
-                //     .SelectMany(y => y.Value)
-                //     .ToList()),
-            });
-        if (w.ToString()
-            .IsNullOrEmpty())
-            return Response.Error;
-        StringWriter?.Write($"{w}");
+        var howl = Howl.Create(DataType.Array, RequestType.Get, x) with
+        {
+            Result   = ResultType.Accepted
+        };
+
+        var wolfpack = Wolfpack.Create(Cuid.CreateRevitId(Document, out _), RequestType.Get, "GetIfcGuid",
+            WolfpackArguments.Create(howl, $"{Uri}getIfcGuid"),
+            [Howl.AsPayload(howl)], "This prompt gets all the IfcGUID from each door inside the model.");
+
+        if (wolfpack.Data is null) return MessageType.Error;
+        
         WriteFile("DTO_test.json",
-            JsonSerializer.Serialize(w),
+            JsonSerializer.Serialize(wolfpack),
             out var time);
         WriteToConsole($"Time taken: {time}");
-        return Response.Result;
+        
+        _results.Add(howl with
+        {
+            Payload = new()
+            {
+                ["result"] = howl.Payload!.Count
+            }
+        });
+        return MessageType.Result;
     }
 
-    private Response Check_ModelHealthIndicators()
+    private MessageType Check_ModelHealthIndicators()
     {
         var validEid = Document
             .GetElements()
@@ -241,11 +241,11 @@ public class TestCommands : ExternalCommand
             .WhereElementIsViewIndependent()
             .ToElements();
 
-        var mh = ModelHealthIndicators.Create(Document, validEid);
-        StringWriter?.Write(mh.ToString());
-        WriteFile("model_health.json", JsonSerializer.Serialize(mh), out var time);
+        var wolfpack = ModelHealthIndicators.Create(Document, validEid);
+        WriteFile("model_health.json", JsonSerializer.Serialize(wolfpack), out var time);
         WriteToConsole($"Time taken: {time}");
-        return Response.Result;
+        
+        return MessageType.Result;
     }
 
     public override void Execute()
@@ -254,7 +254,7 @@ public class TestCommands : ExternalCommand
             "Running tests");
         var t2 = TaskDialog.Show("Executing Direwolf Tests",
             "This Command will run through five tests to determine if Direwolf is running correctly." +
-            "Would you like to continue?",
+            " Would you like to continue?",
             TaskDialogCommonButtons.Yes | TaskDialogCommonButtons.No);
         if (TaskDialogResult.Yes == t2)
             RunTests();
@@ -270,30 +270,45 @@ public class TestCommands : ExternalCommand
             GetSavePath();
             WriteToConsole("Direwolf Testing Suite for v0.4-alpha 2025-05-27");
             WriteToConsole("Running Test 1: Populating DB");
-            WriteToConsole(Check_PopulateDB() != Response.Result
+            WriteToConsole(Check_PopulateDB() != MessageType.Result
                 ? "Test passed."
                 : "Test failed.");
             WriteToConsole("Running Test 2: Read and Write to DB");
-            WriteToConsole(Check_ReadWriteDB() != Response.Result
+            WriteToConsole(Check_ReadWriteDB() != MessageType.Result
                 ? "Test passed."
                 : "Test failed.");
             WriteToConsole("Running Test 3: JSON to Cache");
-            WriteToConsole(Check_JsonFromCache() != Response.Notification
+            WriteToConsole(Check_JsonFromWolfden() != MessageType.Notification
                 ? "Test passed."
                 : "Test failed.");
             WriteToConsole("Running Test 4: JSON to Disk");
-            WriteToConsole(Check_JsonFromDisk() != Response.Notification
+            WriteToConsole(Check_JsonFromDisk() != MessageType.Notification
                 ? "Test passed."
                 : "Test failed.");
             WriteToConsole("Running Test 5: Query (IFC GUID to JSON)");
-            WriteToConsole(Check_DatabaseQuery() != Response.Result
+            WriteToConsole(Check_DatabaseQuery() != MessageType.Result
                 ? "Test passed."
                 : "Test failed.");
             WriteToConsole("Running test 6: Model Health Check");
-            WriteToConsole(Check_ModelHealthIndicators() != Response.Result
+            WriteToConsole(Check_ModelHealthIndicators() != MessageType.Result
                 ? "Test passed"
                 : "Test failed.");
-            WriteToConsole($"Tests finished at {DateTime.UtcNow}");
+
+            var args = new WolfpackArguments(
+                "direwolfSelfCheck",
+                "Tests several use cases for Direwolf: populating the DB, reading and writing, getting a JSON of all Elements from Cache and from disk, and performing a Model Health Check.",
+                false,
+                "query",
+                1,
+                MessageType.Result.ToString(),
+                Result.Succeeded.ToString(),
+                $"{Uri}direwolfSelfCheck");
+
+            var wolfpackAll = Wolfpack.Create(RequestType.Get, "direwolfTestSuite", args,
+                PromptPayload.Create(_results.ToArray()), "Results from all tests");
+            
+            WriteFile("wolfpack.json", JsonSerializer.Serialize(wolfpackAll), out var time);
+            WriteToConsole($"Tests finished at {DateTime.UtcNow}, time: {time}");
         }
         catch (Exception e)
         {

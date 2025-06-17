@@ -21,7 +21,7 @@ public class ExportToJsonFromScratch : ExternalCommand
     {
         using var saveDialog = new SaveFileDialog();
         saveDialog.Filter = "JSON (*.json)|*.json";
-        saveDialog.Title = "Save Result";
+        saveDialog.Title = "Save ResultType";
         saveDialog.DefaultExt = "json";
         saveDialog.AddExtension = true;
 

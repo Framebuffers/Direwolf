@@ -10,5 +10,5 @@ public class DatabaseChangedEventArgs : System.EventArgs
     /// <summary>
     ///     Specifies one of four operations: CreateRevitId, Read, Update or DeleteRevitElement.
     /// </summary>
-    public Response Operation { get; init; }
+    public MessageType Operation { get; init; }
 }

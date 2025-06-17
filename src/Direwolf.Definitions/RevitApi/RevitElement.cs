@@ -17,13 +17,13 @@ namespace Direwolf.Definitions.RevitApi;
 ///     retrieved faster than doing a normal Revit API query.
 /// </summary>
 /// <param name="Id">A Collision-Resistant Unique Identifier</param>
-/// <param name="CategoryType">Category Type: Annotative, Model, Internal, AnalyticalModel, Invalid</param>
+/// <param name="CategoryType">Category JsonType: Annotative, Model, Internal, AnalyticalModel, Invalid</param>
 /// <param name="BuiltInCategory">BuiltInCategory Enum</param>
 /// <param name="ElementTypeId">ElementId of the type corresponding to the Element being defined.</param>
 /// <param name="ElementUniqueId">The UniqueId of this Element</param>
 /// <param name="ElementId">The ElementId value of this Element</param>
 /// <param name="ElementName">The human-readable name of this Element, if applicable.</param>
-/// <param name="Parameters">A list of all the Parameters held inside this Element.</param>
+/// <param name="Parameters">A list of all the Arguments held inside this Element.</param>
 [JsonConverter(typeof(ElementJsonParser))]
 public readonly record struct RevitElement(
     Cuid Id,
@@ -148,8 +148,8 @@ public readonly record struct RevitElement(
     ///     and Document.GetDocumentVersion(doc).NumberOfSaves of the given <see cref="Document" />
     /// </summary>
     /// <remarks>
-    ///     Each <see cref="RevitElement.Id" /> is created using <see cref="CuidDriver.NewDirewolfId" /> method.
-    ///     This method uses the <see cref="Cuid.CounterSubstring" /> and <see cref="Cuid.FingerprintSubstring" /> to
+    ///     Each <see cref="RevitElement.Id" /> is created using <see cref="CuidDriver.NewDirewolfId" /> requestType.
+    ///     This requestType uses the <see cref="Cuid.CounterSubstring" /> and <see cref="Cuid.FingerprintSubstring" /> to
     ///     store the number of saves and the <see cref="Document.CreationGUID" /> respectively, deviating a bit
     ///     from a standard CUID.
     ///     The way <see cref="Direwolf" /> indexes <see cref="RevitElement" /> inside the <see cref="ObjectCache" /> is
