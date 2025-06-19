@@ -22,8 +22,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Drivers\Categorization\"/>
-        <Folder Include="Export\"/>
-        <Folder Include="Parsers\Schemas\"/>
+      <Reference Include="Microsoft.Extensions.Primitives" />
     </ItemGroup>
 </Project>

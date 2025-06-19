@@ -1,5 +1,5 @@
-﻿using Direwolf.Definitions.Internal;
-using Direwolf.Definitions.Internal.Enums;
+﻿using Direwolf.Definitions.Enums;
+using Direwolf.Definitions.LLM;
 
 namespace Direwolf.Definitions.Extensions;
 

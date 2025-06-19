@@ -1,14 +1,13 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 using Autodesk.Revit.DB;
-using Direwolf.Definitions.Drivers;
-using Direwolf.Definitions.Parsers;
+using Direwolf.Definitions.Serialization;
 
 namespace Direwolf.Definitions.Extensions;
 
 public static class CuidExtensions
 {
-    private const string Base36Chars = "0123456789abcdefghijklmnopqrstuvwxyz";
+    internal const string Base36Chars = "0123456789abcdefghijklmnopqrstuvwxyz";
 
     public static string GetDocumentUuidHash(this Document doc)
     {
@@ -73,4 +72,6 @@ public static class CuidExtensions
             Value = s
         };
     }
+
+    public static DateTimeOffset GetDateTimeCreation(this Cuid id) => DateTimeOffset.FromUnixTimeMilliseconds(id.TimestampMilliseconds!.Value);
 }

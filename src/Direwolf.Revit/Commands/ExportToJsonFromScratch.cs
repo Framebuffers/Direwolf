@@ -10,7 +10,7 @@ using TaskDialog = Autodesk.Revit.UI.TaskDialog;
 namespace Direwolf.Revit.Commands;
 
 /// <summary>
-///     Exports the Revit <see cref="Document" /> to JSON.
+///     Exports the Revit <see cref="Document" /> to JsonSchemas.
 /// </summary>
 [UsedImplicitly]
 [Transaction
@@ -20,7 +20,7 @@ public class ExportToJsonFromScratch : ExternalCommand
     public override void Execute()
     {
         using var saveDialog = new SaveFileDialog();
-        saveDialog.Filter = "JSON (*.json)|*.json";
+        saveDialog.Filter = "JsonSchemas (*.json)|*.json";
         saveDialog.Title = "Save ResultType";
         saveDialog.DefaultExt = "json";
         saveDialog.AddExtension = true;
@@ -34,7 +34,7 @@ public class ExportToJsonFromScratch : ExternalCommand
         else
         {
             var t = new TaskDialog
-                ("Exporting Cache to JSON") { MainContent = "File not saved" };
+                ("Exporting Cache to JsonSchemas") { MainContent = "File not saved" };
             t.Show();
             t.Dispose();
         }
@@ -43,7 +43,7 @@ public class ExportToJsonFromScratch : ExternalCommand
     private void WriteFile(string fileName)
     {
         TaskDialog t = new
-            ("Exporting Results to JSON");
+            ("Exporting Results to JsonSchemas");
         Stopwatch sw = new();
         sw.Start();
         File.WriteAllText

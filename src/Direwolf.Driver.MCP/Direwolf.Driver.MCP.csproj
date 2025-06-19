@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0-windows</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Anthropic.SDK" Version="5.4.1" />
+      <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
+      <PackageReference Include="ModelContextProtocol.Core" Version="0.2.0-preview.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Direwolf.Definitions\Direwolf.Definitions.csproj" />
+      <ProjectReference Include="..\Direwolf\Direwolf.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Serialization\" />
+    </ItemGroup>
+
+</Project>

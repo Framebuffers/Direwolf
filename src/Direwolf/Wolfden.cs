@@ -1,25 +1,24 @@
-﻿using System.Collections.Concurrent;
-using System.Runtime.Caching;
+﻿using System.Runtime.Caching;
 using Autodesk.Revit.DB;
 using Direwolf.Definitions;
+using Direwolf.Definitions.Enums;
 using Direwolf.Definitions.Extensions;
-using Direwolf.Definitions.Internal.Enums;
-using Direwolf.Definitions.Parsers;
-using Direwolf.Definitions.RevitApi;
+using Direwolf.Definitions.PlatformSpecific.Extensions;
+using Direwolf.Definitions.Serialization;
 
 namespace Direwolf;
 
-public sealed class Wolfden
+internal sealed class Wolfden
 {
     private static Wolfden? _instance;
     private static readonly object Lock = new();
-    private static readonly ObjectCache ElementCache = MemoryCache.Default;
+    private readonly ObjectCache _elementCache = MemoryCache.Default;
     private static readonly CacheItemPolicy Policy = new() { SlidingExpiration = TimeSpan.FromMinutes(60) };
     private readonly Queue<Howl?> _operationQueue = [];
     private readonly Stack<Howl?> _transactionStack = [];
-    internal readonly Dictionary<string, Cuid> KeyCache = [];
-    private static Document? _document;
-    
+    internal readonly Dictionary<string, Cuid> RevitElementKeyCache = [];
+    private readonly Document? _document;
+
     private Wolfden(Document document)
     {
         _instance = this;
@@ -27,8 +26,9 @@ public sealed class Wolfden
         if (PopulateDatabase() is MessageType.Error) throw new InvalidOperationException(nameof(Wolfden));
     }
     
-    public static IDictionary<string, object> GetCache() => ElementCache.ToDictionary();
     
+    public IDictionary<string, object> GetCache() => _elementCache.ToDictionary();
+
     public static Wolfden GetInstance(Document doc)
     {
         if (_instance is not null) return _instance;
@@ -40,16 +40,17 @@ public sealed class Wolfden
         }
     }
 
-    private static MessageType PopulateDatabase()
+    private MessageType PopulateDatabase()
     {
         try
         {
+            // These cache items have the Revit Element's UniqueId as a key, and the RevitElement object as values.
             var revitDb = _document?.GetRevitDatabaseAsCacheItems();
             if (revitDb is null) return MessageType.Error;
             foreach (var cacheItem in revitDb)
             {
                 if (cacheItem is null) continue;
-                ElementCache.Add(cacheItem, Policy);
+                _elementCache.Add(cacheItem, Policy);
             }
 
             return MessageType.Result;
@@ -60,34 +61,26 @@ public sealed class Wolfden
         }
     }
 
-    public MessageType AddOrUpdateElements(Howl? r)
+    public MessageType AddOrUpdate(Howl? howl)
     {
         try
         {
-            if (r is null)
+            // Inside Direwolf, the AddOrUpdateRevitElement() method will take
+            // each Element's UniqueId, create a RevitElement as a CacheItem, and put them on an array.
+            // We know what type it's going to be, so we can cast it safely.
+            if (howl?.Properties is null) return MessageType.Error;
+            var items = (CacheItem?[])howl.Value.Properties["key"];
+
+            foreach (var item in items)
             {
-                return MessageType.Error;
+                if (item is null) continue;
+                _elementCache.Add(item, Policy);
             }
 
-            var element = Howl.AsCacheItem(r);
-            if (ElementCache.Contains(element.Key)) ElementCache.Remove(element.Key);
-            ElementCache.Add(Howl.AsCacheItem(r), Policy);
-            _transactionStack.Push(r);
-            // foreach (var element in results)
-            // {
-            //     if (element is null) continue;
-            //     // AddOrUpdate(Guid.Parse(element.Value.ElementUniqueId), guid =>
-            //     // {
-            //     //     // ReSharper disable once ConvertToLambdaExpression
-            //     //     return RevitElement.Create(document, guid.ToString());
-            //     // }, (guid, revitElement) =>
-            //     // {
-            //     //     _transactionStack.Push(this[guid]); // save the old value
-            //     //     return this[guid] = revitElement;
-            //     // });
-            // }
+            howl = howl.Value with { Result = ResultType.Accepted };
+            _transactionStack.Push(howl);
 
-            return MessageType.Result;
+            return MessageType.Notification;
         }
         catch
         {
@@ -95,46 +88,45 @@ public sealed class Wolfden
         }
     }
 
-    public MessageType RemoveElements(Howl h)
+    public MessageType Delete(Howl? howl)
     {
-        if (h.Payload is null)
+        // We know that the Howl's payload value is string[]?, if it was constructed using Direwolf
+        // Given Wolfden is Internal, all operations should go through Direwolf.
+        // So this shouldn't be a problem... right?
+        var keyToRemove = (string[]?)howl?.Properties?["key"];
+
+        if (keyToRemove is null) return MessageType.Error;
+        foreach (var item in keyToRemove)
         {
-            return MessageType.Error;
+            _elementCache.Remove(item);
         }
-        var keyToRemove = (string)h.Payload["key"];
         
-        ElementCache.Remove(keyToRemove);
-        _transactionStack.Push(h);
-        // var results = Extract(h) ?? throw new NullReferenceException(nameof(RevitElement));
-        // List<RevitElement?> output = [];
-        // foreach (var result in results)
-        // {
-        //     if (result?.ElementUniqueId is null) continue;
-        //     TryRemove(Guid.Parse(result.Value.ElementUniqueId), out var extracted);
-        //     output.Add(extracted);
-        // }
-        //
-        // element = output.ToArray();
-        return MessageType.Result;
+        howl = howl!.Value with { Result = ResultType.Accepted };
+        _transactionStack.Push(howl);
+     
+        return MessageType.Notification;
     }
 
-    public static MessageType ReadElements(Howl h, out IDictionary<string, object?>? results)
+    public MessageType Read(Howl? howl, out IDictionary<string, object?>? results)
     {
-        if (h.Payload is null)
+        if (howl?.Properties is null)
         {
             results = null;
             return MessageType.Error;
         }
-
-        var values = (Cuid[])h.Payload["key"];
-        var found = ElementCache.GetValues(values.Select(x => x.Value));
+        
+        // Same as adding, we know the type of type being loaded onto that object.
+        // This time, Direwolf is asking for string[]?
+        var items = (string[]?)howl.Value.Properties["key"];
+        
+        // Because all elements were stored as <ElementUniqueId, RevitElement>, it can be safely cast back to RevitElement
+        var found = _elementCache.GetValues(items!);
         results = found;
-        return MessageType.Result;
+        return MessageType.Notification;
     }
 
     public bool PopTransaction(out Howl? element)
     {
         return _transactionStack.TryPop(out element);
     }
-
 }
