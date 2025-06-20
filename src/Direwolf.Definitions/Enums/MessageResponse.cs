@@ -5,11 +5,11 @@
 ///     <remarks>
 ///         Conditional logic inside Direwolf will always default to an Error/Exception/False state, unless
 ///         the control flow changes the state of any given operation.
-///         Therefore, ResultType is a MessageType where it has been executed, it has changed the truth value to True,
+///         Therefore, ResultType is a MessageResponse where it has been executed, it has changed the truth value to True,
 ///         and it has a payload.
 ///     </remarks>
 /// </summary>
-public enum MessageType
+public enum MessageResponse
 {
     Error,          // Request failed.
     Request,        // Expecting a response

@@ -96,4 +96,5 @@ public static class DocumentExtensions
             .WhereElementIsViewIndependent()
             .ToElements();
     }
+    
 }

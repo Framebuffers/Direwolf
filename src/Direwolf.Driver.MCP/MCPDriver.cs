@@ -43,16 +43,16 @@ public sealed partial class MCPDriver
     }
     
 }
-
-public sealed partial class MCPDriver
-{
-    //TODO: Create handlers
-    private Dictionary<string, Func<object, Task<object>>> InitToolHandlers()
-    {
-        return new()
-        {
-            ["create_wolfpack"] = ToolFactory.CreateWolfpack,
-            
-        }
-    }
-}
+//
+// public sealed partial class MCPDriver
+// {
+//     //TODO: Create handlers
+//     private Dictionary<string, Func<object, Task<object>>> InitToolHandlers()
+//     {
+//         return new()
+//         {
+//             ["create_wolfpack"] = ToolFactory.CreateWolfpack,
+//             
+//         }
+//     }
+// }

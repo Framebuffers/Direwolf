@@ -14,7 +14,7 @@ public static class OperationHandler
     //     var data = JsonSerializer.Deserialize<JsonElement>(json);
     //     
     //     var wolfpack = Wolfpack.Create(
-    //         RequestType.Get,
+    //         MessageType.Get,
     //         data.GetProperty("name").GetString(),
     //         data.TryGetProperty("properties")
     // }

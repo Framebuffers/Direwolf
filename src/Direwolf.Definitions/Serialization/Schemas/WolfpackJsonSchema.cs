@@ -12,7 +12,7 @@ public static class WolfpackJsonSchema
                                          "format": "string",
                                          "description": "Unique identifier using a Collision-Resistant Unique Identifier format."
                                        },
-                                       "RequestType": {
+                                       "MessageType": {
                                          "type": "string",
                                          "enum": ["GET", "POST", "PUT", "DELETE"],
                                          "description": "The operation being performed with this Wolfpack"
@@ -37,14 +37,14 @@ public static class WolfpackJsonSchema
                                        "Data": {
                                          "type": "array",
                                          "items": {
-                                           "$ref": "#/definitions/Howl"
+                                           "$ref": "#/definitions/Wolfpack"
                                          },
                                          "description": "A list of elements that define transactions, operations or states to and from Direwolf. It is the transactional unit of Direwolf."
                                        }
                                      },
-                                     "required": ["Id", "RequestType", "Data"],
+                                     "required": ["Id", "MessageType", "Data"],
                                      "definitions": {
-                                       "Howl": {
+                                       "Wolfpack": {
                                          "type": "object",
                                          "properties": {
                                            "Message": {

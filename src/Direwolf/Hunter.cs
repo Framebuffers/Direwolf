@@ -5,7 +5,6 @@ using Direwolf.Definitions.LLM;
 
 namespace Direwolf;
 
-//TODO: refactor to use Howl for everything **except** finalised data out.
 public sealed class Hunter : IDirewolfClient
 {
     private static readonly object Lock = new();
@@ -35,20 +34,19 @@ public sealed class Hunter : IDirewolfClient
     }
 
 
-    public Task<McpResponse> CreateAsync(in Howl h, out Wolfpack? wolfpack)
+    public Task<McpResponse> CreateAsync(in WolfpackParams parameters, out Wolfpack? wolfpack)
     {
         try
         {
-            var wp = Wolfpack.Create(h.Id,
-                RequestType.Put,
-                h.Name,
-                WolfpackParams.Create(h, string.Empty, h.Properties),
-                h.Description);
+            var wp = Wolfpack.Create(parameters.Name, MessageResponse.Notification, RequestType.Post, parameters.Properties, parameters.Description);
             
             var cache = Wolfpack.AsCacheItem(wp);
+            
             ArgumentNullException.ThrowIfNull(cache);
-            DataCache.Add(cache,
-                Policy);
+            foreach (var item in cache)
+            {
+                DataCache.Add(item, Policy);
+            }
             wolfpack = wp;
             return Task.FromResult(NotificationAccepted);
         }
@@ -57,10 +55,9 @@ public sealed class Hunter : IDirewolfClient
             wolfpack = null;
             return (Task<McpResponse>)Task.FromException(e);
         }
-
     }
 
-    public Task<McpResponse> UpdateAsync(in Howl? updateArgs)
+    public Task<McpResponse> UpdateAsync(in Wolfpack? updateArgs)
     {
         try
         {
@@ -70,7 +67,7 @@ public sealed class Hunter : IDirewolfClient
             if (!DataCache.Contains(updateArgs.Value.Id.Value)) 
                 return Task.FromResult(NotificationRejected);
             DataCache.Remove(updateArgs.Value.Id.Value!);
-            var wp = Howl.AsCacheItem(updateArgs)!.FirstOrDefault();
+            var wp = Wolfpack.AsCacheItem(updateArgs)!.FirstOrDefault();
             DataCache.Add(wp!,
                 Policy);
             return Task.FromResult(NotificationAccepted);
@@ -148,27 +145,27 @@ public sealed class Hunter : IDirewolfClient
 
     private static McpResponse NotificationAccepted =>
         new(null,
-            $"message: {MessageType.Notification}, result: {ResultType.Accepted}",
+            $"message: {MessageResponse.Notification}, result: {ResultType.Accepted}",
             null);
 
     private static McpResponse NotificationRejected =>
         new(null,
-            $"message: {MessageType.Notification}, result: {ResultType.Rejected}",
+            $"message: {MessageResponse.Notification}, result: {ResultType.Rejected}",
             null);
 
     private static McpResponse ResultAccepted =>
         new(null,
-            $"message: {MessageType.Notification}, result: {ResultType.Accepted}",
+            $"message: {MessageResponse.Notification}, result: {ResultType.Accepted}",
             null);
 
     private static McpResponse ResultRejected =>
         new(null,
-            $"message: {MessageType.Notification}, result: {ResultType.Rejected}",
+            $"message: {MessageResponse.Notification}, result: {ResultType.Rejected}",
             null);
 
     private static McpResponse ExceptionThrown(Exception e) =>
         new McpResponse(null,
-            $"message: {MessageType.Error}, result: {ResultType.Rejected}",
+            $"message: {MessageResponse.Error}, result: {ResultType.Rejected}",
             [
                 new McpResource(Cuid.Create(),
                     null,
@@ -179,6 +176,6 @@ public sealed class Hunter : IDirewolfClient
 
     private static McpResponse RequestAccepted =>
         new(null,
-            $"message: {MessageType.Request}, result: {ResultType.Accepted}",
+            $"message: {MessageResponse.Request}, result: {ResultType.Accepted}",
             null);
 }

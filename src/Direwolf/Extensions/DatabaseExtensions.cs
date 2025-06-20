@@ -54,7 +54,7 @@ public static class DatabaseExtensions
     {
         Dictionary<BuiltInCategory, List<RevitElement?>> categories = new();
         
-        if (Direwolf.GetElementCache(doc, out var w) is not MessageType.Result) return null;
+        if (Direwolf.GetAllElements(doc, out var w) is not MessageResponse.Result) return null;
         foreach (var kvp in Wolfden.GetInstance(doc).GetCache())
             try
             {
@@ -89,7 +89,7 @@ public static class DatabaseExtensions
     /// <returns>The count of all <see cref="RevitElement" /> cached inside the Document's Wolfden.</returns>
     public static int GetDatabaseCount(this Document doc)
     {
-        Direwolf.GetElementCache(doc, out var _);
+        Direwolf.GetAllElements(doc, out var _);
         return Wolfden.GetInstance(doc).GetCache().Count;
     }
 }

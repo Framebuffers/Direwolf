@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Direwolf.Definitions.Enums;
 
 namespace Direwolf.Definitions.LLM;
 
@@ -14,15 +15,32 @@ public readonly record struct WolfpackParams(
     [property: JsonPropertyName("uri")] string Uri,
     [property: JsonPropertyName("properties")] IDictionary<string, object>? Properties)
 {
-    public static WolfpackParams Create(Howl h, string uri, IDictionary<string, object>? payload)
+    public static WolfpackParams Create(string uri, IDictionary<string, object>? payload)
     {
         return new WolfpackParams(
-            h.Name ?? null!, 
-            h.Description ?? null!, 
-            Howl.GetHowlDataTypeAsString(h),
-            1, 
-            h.MessageType.ToString(),
-            h.Result.ToString()!, uri, payload);
+            "wolfpack",
+            "",
+            "object",
+            1,
+            "",
+            ResultType.Rejected.ToString(),
+            uri,
+            payload);
+    }
+    
+
+    public static IDictionary<string, object> ToDictionary(WolfpackParams p)
+    {
+        return new Dictionary<string, object>
+        {
+            ["name"] = p.Name,
+            ["description"] = p.Description,
+            ["type"] = p.Type,
+            ["version"] = p.Version,
+            ["message_type"] = p.MessageType,
+            ["uri"] = p.Uri,
+            ["properties"] = p.Properties!
+        };
     }
 }
 

@@ -69,12 +69,12 @@ public class Application : ExternalApplication
         
         // x.EnterPressed += (sender, args) =>
         // {
-        //     var howl = Howl.Create(DataType.String, RequestType.Get, new Dictionary<string, object>()
+        //     var howl = Wolfpack.Create(DataType.String, MessageType.Get, new Dictionary<string, object>()
         //     {
         //         ["data"] = x.Value
         //     }, "", "entry");
         //
-        //     var wolfpack = Wolfpack.Create(RequestType.Get, "PromptFromUI",
+        //     var wolfpack = Wolfpack.Create(MessageType.Get, "PromptFromUI",
         //         WolfpackParams.Create(howl, $"wolfpack://com.revit.autodesk-2025/direwolf/custom?t=PromptFromUI"),
         //         [McpResourceContainer.Create(howl)], null);
         //

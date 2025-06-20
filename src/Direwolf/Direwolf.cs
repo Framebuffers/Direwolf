@@ -2,6 +2,7 @@
 using Direwolf.Definitions;
 using Direwolf.Definitions.Enums;
 using Direwolf.Definitions.Extensions;
+using Direwolf.Definitions.LLM;
 using Direwolf.Definitions.PlatformSpecific;
 using Exception = System.Exception;
 
@@ -41,7 +42,7 @@ public sealed class Direwolf
 
     // ReSharper disable once MemberCanBePrivate.Global
     private static Direwolf? _instance;
-    private readonly List<Howl> _exceptions = [];
+    private readonly List<Wolfpack> _exceptions = [];
 
     private Direwolf()
     {
@@ -68,31 +69,33 @@ public sealed class Direwolf
     /// </param>
     /// <param name="doc"></param>
     /// <returns>True if the operation was completed successfully, false otherwise. </returns>
-    public MessageType AddOrUpdateRevitElement(string[]? elementUniqueId, Document doc, out Howl? h)
+    public MessageResponse AddOrUpdateRevitElement(string[]? elementUniqueId, Document doc, out Wolfpack? h)
     {
         try
         {
             if (elementUniqueId is null || elementUniqueId.Length == 0)
             {
                 h = null;
-                return MessageType.Error;
+                return MessageResponse.Error;
             }
-
-            var elements = elementUniqueId.Select(element => RevitElement.CreateAsCacheItem(doc, element, out var _))
+            
+            // kvp: ElementUniqueId, RevitElement
+            var elements = elementUniqueId
+                .Select(element => RevitElement.CreateAsCacheItem(doc, element, out _))
                 .ToArray();
             
-            // Each Revit Element is already sorted by its UniqueId, so a Howl will contain a Dictionary with <ElementUniqueId, ElementItself>
-            h = Howl.Add(new Dictionary<string, object>(){["key"] = elements}, null, null);
+            // Each Revit Element is already sorted by its UniqueId, so a Wolfpack will contain a Dictionary with <ElementUniqueId, ElementItself>
+            h = Wolfpack.Add(new Dictionary<string, object> { ["key"] = elements });
             
-            // When pushing the Howl to Wolfden, it will already push uniquely-identifiable elements.
+            // When pushing the Wolfpack to Wolfden, it will already push uniquely-identifiable elements.
             Wolfden.GetInstance(doc).AddOrUpdate(h);
-            return MessageType.Notification;
+            return MessageResponse.Notification;
         }
         catch (Exception e)
         {
             e.LogException(_exceptions);
             h = null;
-            return MessageType.Error;
+            return MessageResponse.Error;
         }
     }
 
@@ -108,29 +111,40 @@ public sealed class Direwolf
     /// <param name="elementUniqueId"></param>
     /// <param name="doc">Revit Document</param>
     /// <returns>True if the operation was completed successfully, false otherwise. </returns>
-    public MessageType DeleteRevitElement(string[]? elementUniqueId, Document doc, out Howl? h)
+    public MessageResponse DeleteRevitElement(string[]? elementUniqueId, Document doc, out Wolfpack? h)
     {
         try
         {
             if (elementUniqueId is null || elementUniqueId.Length == 0)
             {
                 h = null;
-                return MessageType.Error;
+                return MessageResponse.Error;
             }
+            
+            var wp = new WolfpackParams(
+                "delete",
+                string.Empty,
+                "object",
+                1,
+                string.Empty,
+                ResultType.Accepted.ToString(),
+                "wolfpack://com.autodesk.revit-latest/direwolf/crud/delete",
+                new Dictionary<string, object> { ["key"] = elementUniqueId });
 
             
-            // Howl.Delete has an array of element UniqueIds to destroy
+            // Wolfpack.Delete has an array of element UniqueIds to destroy
             // stores them as string[]?
-            h = Howl.Delete(elementUniqueId, null, null);
+            h = Wolfpack.Delete(wp);
+            
             // Wolfden *knows* 
             Wolfden.GetInstance(doc).Delete(h.Value);
-            return MessageType.Notification;
+            return MessageResponse.Notification;
         }
         catch (Exception e)
         {
             e.LogException(_exceptions);
             h = null;
-            return MessageType.Error;
+            return MessageResponse.Error;
         }
     }
 
@@ -143,33 +157,41 @@ public sealed class Direwolf
     /// <param name="elementUniqueIds"></param>
     /// <param name="doc">Revit Document</param>
     /// <returns>True if the operation was completed successfully, false otherwise.</returns>
-    public MessageType ReadRevitElements(ElementId[]? element, Document doc, out RevitElement?[]? revitElement, out Howl? h)
+    public MessageResponse ReadRevitElements(ElementId[]? element, Document doc, out RevitElement?[]? revitElement)
     {
         try
         {
             var uniqueIds = element?.Select(x => doc.GetElement(x).UniqueId).ToArray();
-            
-            // Howl.Read will store all the UniqueId's as [key] = uniqueId?
-            h = Howl.Read(uniqueIds);
+             var wp = new WolfpackParams(
+                            "read",
+                            string.Empty,
+                            "object",
+                            1,
+                            string.Empty,
+                            ResultType.Accepted.ToString(),
+                            "wolfpack://com.autodesk.revit-latest/direwolf/crud/read",
+                            new Dictionary<string, object> { ["key"] = uniqueIds! });
+             
+            // Wolfpack.Read will store all the UniqueId's as [key] = uniqueId?
+            var h = Wolfpack.Read(wp);
             
             // <ElementUniqueId, RevitElement>[]
-            Wolfden.GetInstance(doc).Read(h.Value, out var e);
+            Wolfden.GetInstance(doc).Read(h, out var e);
             if (e is null)
             {
                 revitElement = [];
-                return MessageType.Error;
+                return MessageResponse.Error;
             }
             
             // if the key was the Element's UniqueId, then it's guaranteed that it will cast to RevitElement?
             revitElement = e.Values.Where(x => x is RevitElement).Select(x => (RevitElement?)x).ToArray();
-            return MessageType.Result;
+            return MessageResponse.Result;
         }
         catch (Exception e)
         {
              e.LogException(_exceptions);
              revitElement = null;
-             h = null;
-            return MessageType.Error;
+            return MessageResponse.Error;
         }
     }
 
@@ -180,29 +202,37 @@ public sealed class Direwolf
     /// <param name="elementUniqueId">The ID used as a key to store the element inside the cache.</param>
     /// <param name="doc">Revit Document</param>
     /// <returns>The requested element. Null if it's not found.</returns>
-    public MessageType ReadRevitElements(string[]? uniqueIds, Document doc, out RevitElement?[] revitElements, out Howl? h)
+    public MessageResponse ReadRevitElements(string[]? uniqueIds, Document doc, out RevitElement?[] revitElements)
     {
-        // Howl.Read will store all the UniqueId's as [key] = uniqueIds
-        h = Howl.Read(uniqueIds);
+         var wp = new WolfpackParams(
+                                    "read",
+                                    string.Empty,
+                                    "object",
+                                    1,
+                                    string.Empty,
+                                    ResultType.Accepted.ToString(),
+                                    "wolfpack://com.autodesk.revit-latest/direwolf/crud/read_array",
+                                    new Dictionary<string, object> { ["key"] = uniqueIds! });
+        // Wolfpack.Read will store all the UniqueId's as [key] = uniqueIds
+        var h = Wolfpack.Read(wp);
             
         // <ElementUniqueId, RevitElement>[]
-        Wolfden.GetInstance(doc).Read(h.Value, out var e);
+        Wolfden.GetInstance(doc).Read(h, out var e);
         if (e is null)
         {
             revitElements = [];
-            h = null;
-            return MessageType.Error;
+            return MessageResponse.Error;
         }
 
         // if the key was the Element's UniqueId, then it's guaranteed that it will cast to RevitElement?
         revitElements = e.Values.Where(x => x is RevitElement).Select(x => (RevitElement?)x).ToArray();
-        return MessageType.Result;
+        return MessageResponse.Result;
        
     }
 
-    public static MessageType GetElementCache(Document doc, out IDictionary<string, object>? elements)
+    public static MessageResponse GetAllElements(Document doc, out IDictionary<string, object>? elements)
     {
         elements = Wolfden.GetInstance(doc).GetCache();
-        return MessageType.Result;
+        return MessageResponse.Result;
     }
 }
