@@ -50,34 +50,13 @@ public class Application : ExternalApplication
     private void CreateRibbon()
     {
         var panel = Application.CreatePanel("Tests", "Direwolf");
-        var stackPanel = panel.AddStackPanel();
-        stackPanel.AddPushButton<ExportCacheToJson>("From Cache");
-        stackPanel.AddPushButton<ExportToJsonFromScratch>("From Disk");
-        stackPanel.AddLabel("LLM");
-        panel.AddPushButton<TestCommands>("Run Tests");
+        panel.AddPushButton<ExportCacheToJson>("From Cache");
+        panel.AddPushButton<ExportToJsonFromScratch>("From Disk");
         panel.AddPushButton<About>("About").SetImage("Resources/Icons/RibbonIcon16.png");
-        panel.AddPushButton<CheckStabilityOfElements>("Check ElementIDs");
-        panel.AddPushButton<Prompt>("Prompt");
-        var x = panel.AddTextBox("prompt");
-        x.PromptText = "Prompt Parameters";
-        //TODO: fix with new schema
         
-        // x.EnterPressed += (sender, args) =>
-        // {
-        //     var howl = Wolfpack.Create(DataType.String, MessageType.Get, new Dictionary<string, object>()
-        //     {
-        //         ["data"] = x.Value
-        //     }, "", "entry");
-        //
-        //     var wolfpack = Wolfpack.Create(MessageType.Get, "PromptFromUI",
-        //         WolfpackMessage.Create(howl, $"wolfpack://com.revit.autodesk-2025/direwolf/custom?t=PromptFromUI"),
-        //         [McpResourceContainer.Create(howl)], null);
-        //
-        //     var asPrompt = Wolfpack.AsPrompt(wolfpack, "getDataFromRevitUI", "Gets data from the Revit UI",
-        //         $"wolfpack://com.revit.autodesk-2025/direwolf/custom?t=PromptFromUI");
-        //     
-        //     var serialized = JsonSerializer.Serialize(asPrompt, new JsonSerializerOptions(){WriteIndented = true});
-        //     Debug.Print(serialized);
-        // };
+        var ai = Application.CreatePanel("MCP", "Direwolf");
+        ai.AddPushButton<CheckStabilityOfElements>("Check IDs");
+        ai.AddPushButton<AnthopicClient>("Init MCP Client");
+        ai.AddPushButton<TestCommands>("Self Test");
     }
 }

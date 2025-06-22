@@ -38,15 +38,14 @@ public static class ApplicationExtensions
 
     public static string ElementsOfCategoryInViewToJsonl(this View v, Document doc, Category categoryToFilter)
     {
-        var sb = new StringBuilder();
-        v.GetElementsInViewByCategory(doc, categoryToFilter)
+        var sb = new StringWriter();
+        sb.Write(v.GetElementsInViewByCategory(doc, categoryToFilter)
             .Select(x => RevitElement.Create(doc, x))
             .Where(x => x is not null)
             .SelectMany(x => x!.Value.Parameters.Where(y => y is not null)
                 .Select(y => y!.Value))
-            .ToList()
-            .ForEach(param => sb.AppendLine(JsonSerializer.Serialize(param)));
-        return sb.ToString().TrimEnd(); 
+            .ToList());
+        return sb.ToString(); 
     }
 
     

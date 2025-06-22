@@ -67,9 +67,11 @@
 
         <!-- MVVM -->
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0"/>
+        <PackageReference Include="Revit.Async" Version="2.1.1" />
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Direwolf.Driver.MCP\Direwolf.Driver.MCP.csproj" />
         <ProjectReference Include="..\Direwolf\Direwolf.csproj"/>
         <ProjectReference Include="..\Direwolf.Definitions\Direwolf.Definitions.csproj"/>
     </ItemGroup>

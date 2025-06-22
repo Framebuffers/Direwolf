@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics;
+using System.Text.Json;
 using Autodesk.Revit.DB;
 using Direwolf.Definitions;
 using Direwolf.Definitions.Enums;
@@ -195,6 +196,7 @@ public static class OperationHandler
 
     internal static Task<WolfpackMessage> HandleInitialize(in WolfpackMessage request)
     {
+        Debug.Write($"Inside {nameof(HandleInitialize)}:{JsonSerializer.Serialize(request)}");
         return Task.FromResult(request with
         {
             MessageType = MessageResponse.Result.ToString(),

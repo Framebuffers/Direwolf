@@ -17,7 +17,7 @@ namespace Direwolf.Driver.MCP;
 /// to communicate and transform data. This driver provides access to the Direwolf context, templates to communicate with
 /// BIM applications and methods to pipe information back to the client through the Host.
 /// </summary>
-public sealed partial class MCPDriver
+public sealed partial class McpDriver
 {
     /// <summary>
     /// Reference to a Direwolf instance,
@@ -25,27 +25,32 @@ public sealed partial class MCPDriver
     private static Hunter? _hunter;
 
     private static AnthropicClient? _anthropicClient;
-    private static MCPDriver? _instance;
+    private static McpDriver? _instance;
+    private static StreamingConsole? _console;
     private static readonly object Lock = new();
-    private readonly Dictionary<string, Func<object, Task<WolfpackMessage>>> _handlers = new();
+    private static Dictionary<string, Func<object, Task<WolfpackMessage>>> _handlers = new();
     
-    private MCPDriver(Hunter hunter)
+    private McpDriver(Hunter hunter)
     {
         _hunter = hunter;
     }
 
-    public static MCPDriver GetInstance(Hunter hunter, string anthropicApiKey)
+    public static McpDriver GetInstance(Hunter hunter, string anthropicApiKey)
     {
         if (_instance is not null) return _instance;
         lock (Lock)
         {
             if (_instance is not null) return _instance;
-            _instance = new MCPDriver(hunter);
+            _instance = new McpDriver(hunter);
             _anthropicClient = new AnthropicClient(anthropicApiKey);
+            _console = new StreamingConsole();
+            _handlers = InitToolHandlers();
             return _instance;
         }
     }
 
+    public static void ToConsole(string text) => _console?.StreamMessage(text);
+    
     public async Task<WolfpackMessage> HandleRequest(WolfpackMessage request)
     {
         try
@@ -76,9 +81,9 @@ public sealed partial class MCPDriver
 }
 
 //
-public sealed partial class MCPDriver
+public sealed partial class McpDriver
 {
-    private Dictionary<string, Func<object, Task<WolfpackMessage>>> InitToolHandlers()
+    private static Dictionary<string, Func<object, Task<WolfpackMessage>>> InitToolHandlers()
     {
         return new()
         {
@@ -93,7 +98,7 @@ public sealed partial class MCPDriver
     }
 }
 
-public sealed partial class MCPDriver
+public sealed partial class McpDriver
 {
     /// <summary>
     /// 
@@ -101,7 +106,7 @@ public sealed partial class MCPDriver
     /// <param name="h"></param>
     /// <param name="args">options (any additional context), key (element to analyze)</param>
     /// <returns></returns>
-    private async Task<WolfpackMessage> HandleAiAnalizeWolfpack(object args)
+    private static async Task<WolfpackMessage> HandleAiAnalizeWolfpack(object args)
     {
         var json = JsonSerializer.Serialize(args);
         var data = JsonSerializer.Deserialize<JsonElement>(json);

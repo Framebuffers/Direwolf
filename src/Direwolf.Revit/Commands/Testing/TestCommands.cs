@@ -8,6 +8,7 @@ using Direwolf.Definitions.Enums;
 using Direwolf.Definitions.LLM;
 using Direwolf.Definitions.PlatformSpecific;
 using Direwolf.Definitions.PlatformSpecific.Extensions;
+using Direwolf.Driver.MCP;
 using Direwolf.Extensions;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Nice3point.Revit.Toolkit.External;
@@ -95,10 +96,9 @@ public class TestCommands : ExternalCommand
                     {
                         Name = "json_from_wolfden",
                         Description = "Get the whole Revit Document from the local cache.",
-                        Result = ResultType.Accepted.ToString(),
-                        Parameters = new Dictionary<string, object>
+                        Result = new
                         {
-                            ["key"] = uuids
+                            key = uuids
                         }
                     };
          
@@ -145,9 +145,9 @@ public class TestCommands : ExternalCommand
             WriteToConsole($"Time taken to write from Disk: {t}");
             _results.Add(wolfpack with
             {
-                Parameters = new Dictionary<string, object>
+                McpResponseResult = new
                 {
-                    ["properties"] = wolfpack.Parameters!.Count
+                    properties = wolfpack.Parameters!.Count
                 }
             });
             return MessageResponse.Notification;
@@ -180,8 +180,7 @@ public class TestCommands : ExternalCommand
             {
                 Name = "json_from_disk",
                 Description = "Get the whole Revit Document to a JSON file.",
-                Result = ResultType.Accepted.ToString(),
-                Parameters = dictionary
+                Result = dictionary
             };
             
             var wolfpack = Wolfpack.Create("dwolf_test", MessageResponse.Result, RequestType.Get, WolfpackMessage.ToDictionary(wp));
@@ -193,9 +192,9 @@ public class TestCommands : ExternalCommand
             WriteToConsole($"Time taken to write from Disk: {t}");
             _results.Add(wolfpack with
             {
-                Parameters = new Dictionary<string, object>
+                McpResponseResult = new
                 {
-                    ["properties"] = wolfpack.Parameters!.Count
+                    properties = wolfpack.Parameters!.Count
                 }
             });
             return MessageResponse.Notification;
@@ -250,7 +249,7 @@ public class TestCommands : ExternalCommand
         
         _results.Add(wolfpack with
         {
-            Parameters = new Dictionary<string, object>
+            McpResponseResult = new Dictionary<string, object>
             {
                 ["properties"] = wolfpack.Parameters!.Count
             }
@@ -273,14 +272,15 @@ public class TestCommands : ExternalCommand
                 {
                     Name = "category_as_jsonl",
                     Description = "Get all windows as a JSONL.",
-                    Result = ResultType.Accepted.ToString(),
-                    Parameters = new Dictionary<string, object>
+                    Result = new
                     {
-                        ["result"] = jsonl
+                        result = jsonl
                     }
                 };
+        
+        McpDriver.ToConsole(wp.ToString());
                     
-                var wolfpack = Wolfpack.Create("dwolf_test", MessageResponse.Result, RequestType.Get, WolfpackMessage.ToDictionary(wp));
+                var wolfpack = Wolfpack.Create("dwolf_test", MessageResponse.Result, RequestType.Get, (Dictionary<string, object>)wp.Parameters!, wp.Description);
                 WriteFile("Test06_WindowsToJsonl.json",
                     JsonSerializer.Serialize(wolfpack),
                     out var time);
@@ -288,7 +288,7 @@ public class TestCommands : ExternalCommand
         
                 _results.Add(wolfpack with
                 {
-                    Parameters = new Dictionary<string, object>
+                    McpResponseResult = new Dictionary<string, object>
                     {
                         ["properties"] = wolfpack.Parameters!.Count
                     }
@@ -338,10 +338,12 @@ public class TestCommands : ExternalCommand
                 Name = "dwolf_selftest",
                 Description= "Runs a series of tests on Direwolf to check: \nCache is populated.\nElementCache is populated\nCan read the DB both from Cache and Document\nRun a query over the elements of its cache." +
                              "\nThis makes sure that all elements of Direwolf are working: caching, querying and serialization.",
-                Result = ResultType.Accepted.ToString(),
-                Parameters = _results.ToDictionary(x => x.Name, x => (object)x)
+                Result = _results
             };
-            var wolfpackAll = Wolfpack.Create("results", MessageResponse.Result, RequestType.Get, WolfpackMessage.ToDictionary(args), $"Completed at {DateTime.UtcNow}");
+            var wolfpackAll = Wolfpack.Create(args.Name, MessageResponse.Result, RequestType.Get, (Dictionary<string, object>)args.Parameters!, args.Description) with
+            {
+                McpResponseResult = args.Result
+            };
             
             WriteFile("wolfpack.json", JsonSerializer.Serialize(wolfpackAll), out var time);
             WriteToConsole($"Tests finished at {DateTime.UtcNow}, time: {time}");
@@ -389,6 +391,7 @@ public class TestCommands : ExternalCommand
     private static void WriteToConsole(string? message)
     {
         Debug.Print(message);
+        McpDriver.ToConsole(message!);
         StringWriter?.WriteLine(message);
     }
 }
