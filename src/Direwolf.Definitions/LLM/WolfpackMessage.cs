@@ -5,19 +5,20 @@ namespace Direwolf.Definitions.LLM;
 
 
 
-public readonly record struct WolfpackParams(
+public readonly record struct WolfpackMessage(
     [property: JsonPropertyName("name")] string Name,
     [property: JsonPropertyName("description")] string Description,
     [property: JsonPropertyName("type")] string Type,
     [property: JsonPropertyName("direwolf")] int Version,
     [property: JsonPropertyName("message_type")] string MessageType,
-    [property: JsonPropertyName("result")] string Result,
+    [property: JsonPropertyName("result")] object? Result,
     [property: JsonPropertyName("uri")] string Uri,
-    [property: JsonPropertyName("properties")] IDictionary<string, object>? Properties)
+    [property: JsonPropertyName("parameters")] IDictionary<string, object>? Parameters = null)
 {
-    public static WolfpackParams Create(string uri, IDictionary<string, object>? payload)
+    [JsonPropertyOrder(0), JsonPropertyName("jsonrpc")] public const string JsonRpc = "2.0";
+    public static WolfpackMessage Create(string uri, IDictionary<string, object>? payload)
     {
-        return new WolfpackParams(
+        return new WolfpackMessage(
             "wolfpack",
             "",
             "object",
@@ -29,7 +30,7 @@ public readonly record struct WolfpackParams(
     }
     
 
-    public static IDictionary<string, object> ToDictionary(WolfpackParams p)
+    public static IDictionary<string, object> ToDictionary(WolfpackMessage p)
     {
         return new Dictionary<string, object>
         {
@@ -39,7 +40,7 @@ public readonly record struct WolfpackParams(
             ["version"] = p.Version,
             ["message_type"] = p.MessageType,
             ["uri"] = p.Uri,
-            ["properties"] = p.Properties!
+            ["properties"] = p.Parameters!
         };
     }
 }

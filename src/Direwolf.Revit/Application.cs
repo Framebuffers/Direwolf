@@ -1,9 +1,4 @@
-﻿using System.Diagnostics;
-using System.Text.Json;
-using Direwolf.Definitions;
-using Direwolf.Definitions.Enums;
-using Direwolf.Definitions.LLM;
-using Direwolf.Revit.Commands;
+﻿using Direwolf.Revit.Commands;
 using Direwolf.Revit.Commands.Testing;
 using Nice3point.Revit.Toolkit.External;
 
@@ -64,7 +59,7 @@ public class Application : ExternalApplication
         panel.AddPushButton<CheckStabilityOfElements>("Check ElementIDs");
         panel.AddPushButton<Prompt>("Prompt");
         var x = panel.AddTextBox("prompt");
-        x.PromptText = "Prompt Data";
+        x.PromptText = "Prompt Parameters";
         //TODO: fix with new schema
         
         // x.EnterPressed += (sender, args) =>
@@ -75,7 +70,7 @@ public class Application : ExternalApplication
         //     }, "", "entry");
         //
         //     var wolfpack = Wolfpack.Create(MessageType.Get, "PromptFromUI",
-        //         WolfpackParams.Create(howl, $"wolfpack://com.revit.autodesk-2025/direwolf/custom?t=PromptFromUI"),
+        //         WolfpackMessage.Create(howl, $"wolfpack://com.revit.autodesk-2025/direwolf/custom?t=PromptFromUI"),
         //         [McpResourceContainer.Create(howl)], null);
         //
         //     var asPrompt = Wolfpack.AsPrompt(wolfpack, "getDataFromRevitUI", "Gets data from the Revit UI",

@@ -4,7 +4,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Autodesk.Revit.DB;
 using Direwolf.Definitions.Extensions;
-using Direwolf.Definitions.Serialization;
 using static System.Enum;
 
 namespace Direwolf.Definitions.PlatformSpecific.Serialization;

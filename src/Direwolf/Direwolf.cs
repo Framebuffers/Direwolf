@@ -1,4 +1,5 @@
-﻿using Autodesk.Revit.DB;
+﻿using System.Runtime.Caching;
+using Autodesk.Revit.DB;
 using Direwolf.Definitions;
 using Direwolf.Definitions.Enums;
 using Direwolf.Definitions.Extensions;
@@ -121,7 +122,7 @@ public sealed class Direwolf
                 return MessageResponse.Error;
             }
             
-            var wp = new WolfpackParams(
+            var wp = new WolfpackMessage(
                 "delete",
                 string.Empty,
                 "object",
@@ -162,7 +163,7 @@ public sealed class Direwolf
         try
         {
             var uniqueIds = element?.Select(x => doc.GetElement(x).UniqueId).ToArray();
-             var wp = new WolfpackParams(
+             var wp = new WolfpackMessage(
                             "read",
                             string.Empty,
                             "object",
@@ -204,7 +205,7 @@ public sealed class Direwolf
     /// <returns>The requested element. Null if it's not found.</returns>
     public MessageResponse ReadRevitElements(string[]? uniqueIds, Document doc, out RevitElement?[] revitElements)
     {
-         var wp = new WolfpackParams(
+         var wp = new WolfpackMessage(
                                     "read",
                                     string.Empty,
                                     "object",
@@ -232,7 +233,9 @@ public sealed class Direwolf
 
     public static MessageResponse GetAllElements(Document doc, out IDictionary<string, object>? elements)
     {
-        elements = Wolfden.GetInstance(doc).GetCache();
+        elements = Wolfden.GetInstance(doc).GetRevitCache();
         return MessageResponse.Result;
     }
+
+    public ObjectCache GetHunterCache() => Wolfden.HunterCache;
 }

@@ -1,7 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.Exceptions;
 using Direwolf.Definitions.Enums;
-using Direwolf.Definitions.Extensions;
 using Direwolf.Definitions.PlatformSpecific;
 using Direwolf.Definitions.PlatformSpecific.Extensions;
 
@@ -55,7 +54,7 @@ public static class DatabaseExtensions
         Dictionary<BuiltInCategory, List<RevitElement?>> categories = new();
         
         if (Direwolf.GetAllElements(doc, out var w) is not MessageResponse.Result) return null;
-        foreach (var kvp in Wolfden.GetInstance(doc).GetCache())
+        foreach (var kvp in Wolfden.GetInstance(doc).GetRevitCache())
             try
             {
                 var revitElement = (RevitElement)kvp.Value;
@@ -90,6 +89,6 @@ public static class DatabaseExtensions
     public static int GetDatabaseCount(this Document doc)
     {
         Direwolf.GetAllElements(doc, out var _);
-        return Wolfden.GetInstance(doc).GetCache().Count;
+        return Wolfden.GetInstance(doc).GetRevitCache().Count;
     }
 }

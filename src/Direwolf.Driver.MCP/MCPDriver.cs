@@ -1,9 +1,11 @@
-﻿using System.Runtime.Caching;
+﻿using System.Text.Json;
 using Anthropic.SDK;
+using Anthropic.SDK.Constants;
+using Anthropic.SDK.Messaging;
 using Direwolf.Definitions;
 using Direwolf.Definitions.Enums;
 using Direwolf.Definitions.LLM;
-using Direwolf.Driver.MCP.Tools;
+using MessageResponse = Direwolf.Definitions.Enums.MessageResponse;
 
 namespace Direwolf.Driver.MCP;
 
@@ -42,17 +44,99 @@ public sealed partial class MCPDriver
         }
     }
     
+    
 }
 //
-// public sealed partial class MCPDriver
-// {
-//     //TODO: Create handlers
-//     private Dictionary<string, Func<object, Task<object>>> InitToolHandlers()
-//     {
-//         return new()
-//         {
-//             ["create_wolfpack"] = ToolFactory.CreateWolfpack,
-//             
-//         }
-//     }
-// }
+public sealed partial class MCPDriver
+{
+    internal static async Task<Wolfpack> HandleAiAnalizeWolfpack(Hunter h, object args)
+    {
+        var json = JsonSerializer.Serialize(args);
+        var data = JsonSerializer.Deserialize<JsonElement>(json);
+        var elementToAnalyze = data.GetProperty("key");
+        var options = data.TryGetProperty("options", out var props)
+            ? JsonSerializer.Deserialize<Dictionary<string, object>>(props.GetRawText())
+            : null;
+        var wp = WolfpackMessage.Create("wolfpack://direwolf/hunter/llm/analyze", new Dictionary<string, object>
+        {
+            ["key"] = elementToAnalyze, ["options"] = options! // token limit, model, etc.
+        });
+        
+        var response = await h.GetAsync(in wp);
+        var jsonResponse = JsonSerializer.Serialize(response.McpResponseResult);
+        var prompt =
+            $"Analyze this entity and provide insights about its structure, potential use cases, and suggestions for improvement:\n\n{jsonResponse}";
+        var messages = new List<Message>
+        {
+            new(RoleType.User, prompt)
+        };
+
+        var parameters = new MessageParameters
+        {
+            Messages = messages,
+            MaxTokens = 1024,
+            Model = AnthropicModels.Claude4Sonnet,
+            Stream = false,
+            Temperature = 1.0m
+        };
+
+        var claudeResponse = await _anthropicClient?.Messages.GetClaudeMessageAsync(parameters)!;
+
+        wp = wp with
+        {
+            Result = claudeResponse
+        };
+
+        response = response with
+        {
+            Name = wp.Name,
+            McpResponseResult = wp.Result,
+            Description = wp.Description,
+            MessageResponse = MessageResponse.Result,
+            Parameters = wp.Parameters,
+            RequestType = RequestType.Get
+        };
+
+        return await Task.FromResult(response);
+    }
+
+    internal static async Task<object> HandleAiGenertateWolfpack(Hunter h, object args)
+    {
+        var json = JsonSerializer.Serialize(args);
+        var data = JsonSerializer.Deserialize<JsonElement>(json);
+        var k = data.GetProperty("prompt");
+        var options = data.TryGetProperty("options", out var props)
+            ? JsonSerializer.Deserialize<Dictionary<string, object>>(props.GetRawText())
+            : null;
+        var wp = WolfpackMessage.Create("wolfpack://direwolf/hunter/llm/generate", new Dictionary<string, object>
+        {
+            ["prompt"] = k, ["options"] = options! // token limit, model, etc.
+        });
+        var response = await h.GetAsync(in wp);
+        var jsonResponse = JsonSerializer.Serialize(response.McpResponseResult);
+        var prompt =
+            $"{k}:\n\n{jsonResponse}";
+        var messages = new List<Message>
+        {
+            new(RoleType.User, prompt)
+        };
+
+        var parameters = new MessageParameters
+        {
+            Messages = messages,
+            MaxTokens = 512,
+            Model = AnthropicModels.Claude4Sonnet,
+            Stream = false,
+            Temperature = 1.0m
+        };
+
+        var claudeResponse = await _anthropicClient?.Messages.GetClaudeMessageAsync(parameters)!;
+
+        wp = wp with
+        {
+            Result = claudeResponse
+        };
+
+        return await Task.FromResult(wp);
+    }
+}

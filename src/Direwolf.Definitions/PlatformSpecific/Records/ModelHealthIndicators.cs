@@ -35,7 +35,7 @@
 //         
 //         var howl = Wolfpack.Create(DataType.Object, MessageType.Get, mhi, "ModelHealthIndicators");
 //         
-//         return new Wolfpack(Cuid.CreateRevitId(document, out _).Value!, MessageType.Get, "ModelHealthIndicators", WolfpackParams.Create(howl, "wolfpack://com.revit.autodesk-2025.4/direwolf/custom?t=ModelHealthIndicators"), [Wolfpack.AsPayload(howl with {Result = ResultType.Accepted})], "Model Health Indicators");
+//         return new Wolfpack(Cuid.CreateRevitId(document, out _).Value!, MessageType.Get, "ModelHealthIndicators", WolfpackMessage.Create(howl, "wolfpack://com.revit.autodesk-2025.4/direwolf/custom?t=ModelHealthIndicators"), [Wolfpack.AsPayload(howl with {Result = ResultType.Accepted})], "Model Health Indicators");
 //     }
 //
 //     private Dictionary<string, object>? GetModelHealthIndicators(Document document,

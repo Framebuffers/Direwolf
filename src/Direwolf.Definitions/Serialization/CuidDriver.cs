@@ -12,40 +12,41 @@ public static partial class CuidDriver
     //      - Made a new record struct to hold the generated values.
     //          - This enables easy deconstruction of all parts.
     //      - Made the length of the generated value a parameter.
+    public const int RandomComponentLength = 16;
     private static readonly char[] Base36Chars = "0123456789abcdefghijklmnopqrstuvwxyz".ToCharArray();
     private static readonly object LockObject = new();
     private static long _lastTimeStamp;
     private static int _counter;
 
-    public static Cuid GenerateCuid(int length = 16)
+    public static Cuid GenerateCuid()
     {
         var timestamp = GetCurrentTimeStamp();
         var counter = GetNextCounter(timestamp);
         var timestampPart = EncodeBase36(timestamp);
         var counterPart = EncodeBase36(counter);
         var fingerprintPart = GenerateFingerprint(Environment.MachineName);
-        var randomPart = GetRandomString(length);
+        var randomPart = GetRandomString();
         var value = $"c{timestampPart}{counterPart}{fingerprintPart}{randomPart}";
-        return new Cuid(length)
+        return new Cuid
         {
             Value = value,
-            TimestampMilliseconds = timestamp,
-            TimestampSubstring = timestampPart,
-            CounterSubstring = counterPart,
-            FingerprintSubstring = fingerprintPart,
-            RandomSubstring = randomPart
+            TimestampNumeric = timestamp,
+            Timestamp = timestampPart,
+            Counter = counterPart,
+            Fingerprint = fingerprintPart,
+            Random = randomPart
         };
     }
 
     public static ( string Timestamp, string Counter, string Fingerprint, string Random, long TimeGenerated, string
-        Value ) GenerateDeconstructedCuid(int length = 4)
+        Value ) GenerateDeconstructedCuid()
     {
         var timestamp = GetCurrentTimeStamp();
         var counter = GetNextCounter(timestamp);
         var timestampPart = EncodeBase36(timestamp);
         var counterPart = EncodeBase36(counter);
         var fingerprintPart = GenerateFingerprint(Environment.MachineName);
-        var randomPart = GetRandomString(length);
+        var randomPart = GetRandomString();
         var value = $"c{timestampPart}{counterPart}{fingerprintPart}{randomPart}";
         return (timestampPart, counterPart, fingerprintPart, randomPart, timestamp, value);
     }
@@ -66,7 +67,7 @@ public static partial class CuidDriver
         }
     }
 
-    internal static string EncodeBase36(long value)
+    public static string EncodeBase36(long value)
     {
         var result = new StringBuilder();
         while (value > 0)
@@ -92,10 +93,10 @@ public static partial class CuidDriver
         return sb.ToString()[..4];
     }
 
-    private static string GetRandomString(int length)
+    private static string GetRandomString()
     {
-        var data = RandomNumberGenerator.GetBytes(length);
-        var sb = new StringBuilder(length);
+        var data = RandomNumberGenerator.GetBytes(RandomComponentLength);
+        var sb = new StringBuilder(RandomComponentLength);
         foreach (var b in data) sb.Append(Base36Chars[b % 36]);
         return sb.ToString();
     }
@@ -124,23 +125,22 @@ public static partial class CuidDriver
     ///     A Collision-Resistant Unique Identifier string with its Counter and Fingerprint referencing the given
     ///     <see cref="Document" />.
     /// </returns>
-    public static Cuid NewDirewolfId(Document doc, out (string, string) documentIdentifier, int length = 16)
+    public static Cuid NewDirewolfId(Document doc)
     {
         var timestamp = GetCurrentTimeStamp();
         var timestampPart = EncodeBase36(timestamp);
         var counterPart = EncodeBase36(Document.GetDocumentVersion(doc).VersionGUID.GetHashCode());
         var fingerprintPart = doc.GetDocumentUuidHash();
-        var randomPart = GetRandomString(length);
+        var randomPart = GetRandomString();
         var value = $"c{timestampPart}{counterPart}{fingerprintPart}{randomPart}";
-        documentIdentifier = (doc.GetDocumentVersionHash(), doc.GetDocumentUuidHash());
-        return new Cuid(length)
+        return new Cuid
         {
             Value = value,
-            TimestampMilliseconds = timestamp,
-            TimestampSubstring = timestampPart,
-            CounterSubstring = counterPart,
-            FingerprintSubstring = fingerprintPart,
-            RandomSubstring = randomPart
+            TimestampNumeric = timestamp,
+            Timestamp = timestampPart,
+            Counter = counterPart,
+            Fingerprint = fingerprintPart,
+            Random = randomPart
         };
     }
 }

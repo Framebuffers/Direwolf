@@ -1,5 +1,4 @@
 ﻿using Direwolf.Definitions.Enums;
-using Direwolf.Definitions.LLM;
 
 namespace Direwolf.Definitions.Extensions;
 
@@ -26,7 +25,7 @@ public static class ExceptionExtensions
                 {
                     MessageResponse = MessageResponse.Error,
                     RequestType = RequestType.Put,
-                    ResultMessage = ResultType.Rejected
+                    McpResponseResult = ResultType.Rejected
                 });
                 break;
             default:
@@ -35,7 +34,7 @@ public static class ExceptionExtensions
                 {
                      MessageResponse = MessageResponse.Error,
                     RequestType = RequestType.Put,
-                    ResultMessage = ResultType.Rejected
+                    McpResponseResult = ResultType.Rejected
                 });
 
                 break;

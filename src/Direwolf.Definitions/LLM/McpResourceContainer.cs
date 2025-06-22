@@ -4,7 +4,7 @@
 //
 // public readonly record struct McpResourceContainer(
 //     [property: JsonPropertyName("type")] string JsonType,
-//     [property: JsonPropertyName("data")] object? Data)
+//     [property: JsonPropertyName("data")] object? Parameters)
 // {
 //     public static McpResourceContainer Create(Wolfpack h)
 //     {

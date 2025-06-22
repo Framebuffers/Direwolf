@@ -1,5 +1,4 @@
 ﻿using System.Runtime.Caching;
-using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using Direwolf.Definitions.Enums;
 using Direwolf.Definitions.Extensions;
@@ -7,56 +6,69 @@ using Direwolf.Definitions.LLM;
 
 namespace Direwolf.Definitions;
 
+// /// <summary>
+// ///     A <see cref="Wolfpack" /> is the specialized interchange format of <see cref="Direwolf" />. Any and all communications
+// ///     made, both internally and externally, is made through <see cref="Wolfpack" />s. It is an immutable, value-typed,
+// ///     JsonSchemas-inspired,
+// ///     universal interchange object. <see cref="Wolfpack" />s are identified using <see cref="Cuid" /> (Collision-Resistant
+// ///     Unique Identifiers) to identify themselves. This format encodes both time and date, origin, and ensures a certain
+// ///     level of uniqueness and security. See <see cref="Cuid" /> for more details.
+// ///     <remarks>
+// ///         This format loosely follows the draft specification for
+// ///         <see href="https://modelcontextprotocol.io/introduction">Model Control Protocol</see>
+// ///         by Anthropic. It is designed to also serve as an interoperability object to communicate both internally and
+// ///         externally to any kind of data warehouse; including direct communication between the Direwolf instance and an
+// ///         LLM.
+// ///         <see cref="Direwolf" />, by design, is designed to be platform-agnostic. Regardless of host, any communication
+// ///         to and from the client.
+// ///         MCP is implemented as an abstract concept of information exchange between any kind of entity, as it includes
+// ///         all the information needed to comply with the
+// ///         <see href="https://www.jsonrpc.org/specification">JsonSchemas-RPC 2.0</see>
+// ///         standard for transport across Clients and Servers.
+// ///     </remarks>
+// /// </summary>
+// /// <Parameters>
+// /// 
+// /// </Parameters>
+
 /// <summary>
-///     A <see cref="Wolfpack" /> is the specialized interchange format of <see cref="Direwolf" />. Any and all communications
-///     made, both internally and externally, is made through <see cref="Wolfpack" />s. It is an immutable, value-typed,
-///     JsonSchemas-inspired,
-///     universal interchange object. <see cref="Wolfpack" />s are identified using <see cref="Cuid" /> (Collision-Resistant
-///     Unique Identifiers) to identify themselves. This format encodes both time and date, origin, and ensures a certain
-///     level of uniqueness and security. See <see cref="Cuid" /> for more details.
-///     <remarks>
-///         This format loosely follows the draft specification for
-///         <see href="https://modelcontextprotocol.io/introduction">Model Control Protocol</see>
-///         by Anthropic. It is designed to also serve as an interoperability object to communicate both internally and
-///         externally to any kind of data warehouse; including direct communication between the Direwolf instance and an
-///         LLM.
-///         <see cref="Direwolf" />, by design, is designed to be platform-agnostic. Regardless of host, any communication
-///         to and from the client.
-///         MCP is implemented as an abstract concept of information exchange between any kind of entity, as it includes
-///         all the information needed to comply with the
-///         <see href="https://www.jsonrpc.org/specification">JsonSchemas-RPC 2.0</see>
-///         standard for transport across Clients and Servers.
-///     </remarks>
+/// 
 /// </summary>
-/// <param name="MessageResponse">The objective or nature of this message-- what is it asking or what it is about.</param>
-/// <param name="Result">The truth value of the request performed: Accepted, Rejected or Cancelled.</param>
-/// <param name="DataType">The entry value in this Enum that represents the JsonType of the <see cref="Properties" /> keys,</param>
-/// <param name="Properties">Any or all information that has to be transported. Can be null.</param>
-/// <param name="JsonSchema">
-///     The schema that will be used by <see cref="JsonConverter{T}" /> to serialize/deserialize this
-///     <see cref="Wolfpack" />.
-/// </param>
+/// <param name="Id"></param>
+/// <param name="Name"></param>
+/// <param name="MessageResponse"></param>
+/// <param name="RequestType"></param>
+/// <param name="McpResponseResult"></param>
+/// <param name="Data"></param>
+/// <param name="Description"></param>
 public readonly record struct Wolfpack(
-    Cuid Id,
-    string Name,
-    MessageResponse MessageResponse,
-    RequestType RequestType,
-    ResultType? ResultMessage,
-    IDictionary<string, object>? Properties,
-    string? Description
+    [property: JsonIgnore] Cuid Id,
+    [property: JsonPropertyName("name"), JsonPropertyOrder(1)]string Name,
+    [property: JsonIgnore]MessageResponse MessageResponse,
+    [property: JsonIgnore]RequestType RequestType,
+    [property: JsonPropertyName("result")]object? McpResponseResult,
+    [property: JsonPropertyName("Parameters"), JsonPropertyOrder(3)]IDictionary<string, object>? Parameters,
+    [property: JsonPropertyName("description"), JsonPropertyOrder(2)]string? Description
 )
 {
+    [JsonPropertyName("id"), JsonPropertyOrder(0)]
+    public readonly string SerializableId = Id.ToString();
+    [JsonPropertyName("jsonrpc"), JsonPropertyOrder(0)] public const string JsonRpc = "2.0";
+    [JsonPropertyName("wolfpack")] public const string WolfpackVersion = "1.0";
+    [JsonPropertyName("createdAt")] public DateTimeOffset? CreatedAt => Id.GetDateTimeCreation();
+    [JsonPropertyName("updatedAt")] public DateTime UpdatedAt => DateTime.UtcNow;
+    
     /// <summary>
     ///     Creates a specialized deep clone of a <see cref="Wolfpack" />, on which only <see cref="Result" />
-    ///     and <see cref="Properties" /> are modified.
+    ///     and <see cref="Data" /> are modified.
     /// </summary>
-    /// <param name="token">Another token with different Data and ResultType payloads.</param>
+    /// <param name="token">Another token with different Parameters and ResultType payloads.</param>
     private Wolfpack(Wolfpack token) : this(Cuid.Create(), 
         token.Name, 
         token.MessageResponse,
         token.RequestType, 
-        token.ResultMessage, 
-        token.Properties,
+        token.McpResponseResult, 
+        token.Parameters,
         token.Description)
     {
     }
@@ -64,7 +76,7 @@ public readonly record struct Wolfpack(
     /// <summary>
     ///     <remarks>
     ///         <see cref="MessageResponse" /> and <see cref="Result" /> are null upon creation. They, alongside the
-    ///         <see cref="Properties" />,
+    ///         <see cref="Data" />,
     ///         must be assigned a value by using the <see cref="ShallowCopy" /> requestType.
     ///     </remarks>
     /// </summary>
@@ -75,9 +87,9 @@ public readonly record struct Wolfpack(
     /// <param name="description"></param>
     /// <param name="name">Name for this Wolfpack</param>
     /// <returns></returns>
-    public static Wolfpack Create(string name, MessageResponse messageResponse, RequestType requestType, IDictionary<string, object>? properties = null, string? description = null)
+    public static Wolfpack Create(string name, MessageResponse messageResponse, RequestType requestType, IDictionary<string, object>? @params = null, string? description = null)
     {
-        var howl = new Wolfpack(Cuid.Create(), name, messageResponse, requestType, null,properties, description);
+        var howl = new Wolfpack(Cuid.Create(), name, messageResponse, requestType, null,@params, description);
         return howl;
     }
 
@@ -98,7 +110,7 @@ public readonly record struct Wolfpack(
     /// <summary>
     ///     Creates a deep copy of this <see cref="Wolfpack" />.
     ///     In the <see cref="Direwolf" /> context, a deep-copy is defined as returning the same object, with a
-    ///     different <see cref="Properties" />, returning the same <see cref="DataType" />.
+    ///     different <see cref="Data" />, returning the same <see cref="DataType" />.
     ///     <remarks>
     ///         It's used to manage requests and results inside <see cref="Direwolf" />. Being value-typed, this object
     ///         is bit-by-bit copy of the original, with their respective changes. Like any deep copy, modifying this value
@@ -106,11 +118,11 @@ public readonly record struct Wolfpack(
     ///     </remarks>
     /// </summary>
     /// <param name="resultType"></param>
-    /// <param name="newData"></param>
+    /// <param name="newParams"></param>
     /// <returns></returns>
-    public Wolfpack DeepCopy(ResultType resultType, Dictionary<string, object> newData)
+    public Wolfpack DeepCopy(ResultType resultType, Dictionary<string, object> newParams)
     {
-        return this with { ResultMessage= resultType, Properties = newData, MessageResponse = MessageResponse.Result };
+        return this with { McpResponseResult= resultType, Parameters = newParams, MessageResponse = MessageResponse.Result };
     }
 
     // public static string GetHowlDataTypeAsString(Wolfpack wolfpack)
@@ -134,7 +146,7 @@ public readonly record struct Wolfpack(
     public static CacheItem[]? AsCacheItem(Wolfpack? howl)
     {
         return howl?
-            .Properties?
+                .Parameters?
             .Select(payloadElement => 
                 new CacheItem(payloadElement.Key, payloadElement.Value))
             .ToArray(); 
@@ -144,9 +156,9 @@ public readonly record struct Wolfpack(
     // To normalize all operations done with Howls, these methods are provided. Use them to make sure
     // you're doing what you want inside the ElementCache.
     
-    public static Wolfpack Read(WolfpackParams parameters)
+    public static Wolfpack Read(WolfpackMessage parameters)
     {
-        return Create("read", MessageResponse.Request, RequestType.Get, parameters.Properties!.ToDictionary(x => x.Key, x => x.Value), null);
+        return Create("read", MessageResponse.Request, RequestType.Get, parameters.Parameters!.ToDictionary(x => x.Key, x => x.Value), null);
     }
     
     public static Wolfpack Add(Dictionary<string, object> values)
@@ -154,14 +166,14 @@ public readonly record struct Wolfpack(
         return Create("add", MessageResponse.Request, RequestType.Put, values);
     }
     
-    public static Wolfpack Delete(WolfpackParams parameters)
+    public static Wolfpack Delete(WolfpackMessage parameters)
     {
-        return Create("delete", MessageResponse.Request, RequestType.Delete, parameters.Properties!.ToDictionary(x => x.Key, x => x.Value), null);
+        return Create("delete", MessageResponse.Request, RequestType.Delete, parameters.Parameters!.ToDictionary(x => x.Key, x => x.Value), null);
     }
     
-    public static Wolfpack Update(WolfpackParams parameters)
+    public static Wolfpack Update(WolfpackMessage parameters)
     {
-        return Create("update", MessageResponse.Request, RequestType.Patch, parameters.Properties!.ToDictionary(x => x.Key, x => x.Value), null);
+        return Create("update", MessageResponse.Request, RequestType.Patch, parameters.Parameters!.ToDictionary(x => x.Key, x => x.Value), null);
     }
-    
+  
 }

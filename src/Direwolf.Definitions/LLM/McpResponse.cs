@@ -1,20 +1,16 @@
-﻿using System.Collections.Immutable;
-using System.Text.Json.Serialization;
-using Direwolf.Definitions.Enums;
+﻿using System.Text.Json.Serialization;
 
 namespace Direwolf.Definitions.LLM;
 
 public readonly record struct McpResponse(
     [property: JsonPropertyName("id")] Cuid? Id,
-    [property: JsonPropertyName("error")] string? Error,
-    [property: JsonPropertyName("result")] ImmutableArray<McpResource>? Result)
+    [property: JsonPropertyName("error")] string? Error = null,
+    [property: JsonPropertyName("result")] object? Result = null)
 {
     public static McpResponse Create(
-        McpResource[]? results, 
+        object? result, 
         string? error)
     {
-        return new McpResponse(Cuid.Create(),
-            error ?? null,
-                results?.ToImmutableArray());
+        return new McpResponse(Cuid.Create(), error, result);
     }
 };

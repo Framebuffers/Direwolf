@@ -14,7 +14,7 @@
 //  * Now that I introduced MCP to the mix, I realized that Wolfpack is too bloated of a token to be passed around.
 //  * MCP needs, basically, the data from Wolfpack from start to finish. it'd make life easier if these two could merge into one.
 //  * So, this is the plan:
-//  *  - payload moves to WolfpackParams
+//  *  - payload moves to WolfpackMessage
 //  *  - howl and wolfpack merge to only have one set of data-- this way, the shallow-copy method is actually real.
 //  *    yay another refactor that'll delay this shit just cause I want it to integrate with LLM's.
 //  *  - *please* fix the formatting with properties.
@@ -22,7 +22,7 @@
 //  *      - rn direwolf is kinda useless. all the cool stuff is done by Wolfden. However, the idea is that
 //  *        direwolf deals with the **specific** implementation. Should be the other way around but dunno if it's worth
 //  *        changing at this point. either way, decoupling these two is a good idea *in paper*.
-//  *      - direwolf handles all the revit shit -> wolfden is dumb and just takes the WolfpackParams payload straight as a
+//  *      - direwolf handles all the revit shit -> wolfden is dumb and just takes the WolfpackMessage payload straight as a
 //  *        CacheElement (so, Dictionary<string, object>) and uses *that* as a key.
 //  *      - if I wanna use the howl's ID as key, use that on the payload. but the Wolfpack doesn't care about what's inside.
 //  *        it's only a supermarket trolley.
@@ -75,13 +75,13 @@
 //  */
 //
 //
-// //TODO: move payload to params and everything pointing to it. it is now inside the params.
+// //TODO: move payload to Parameters and everything pointing to it. it is now inside the Parameters.
 // public readonly record struct Wolfpack(
 //     [property: JsonPropertyName("id")]            Cuid Id, 
 //     [property: JsonPropertyName("name")]          string? Name, 
 //     [property: JsonPropertyName("description")]   string? Description,
 //     [property: JsonIgnore]                        HttpMethod Method, //   direwolf-specific
-//     [property: JsonPropertyName("@params")]       WolfpackParams Params )
+//     [property: JsonPropertyName("@Parameters")]       WolfpackMessage Params )
 // {
 //     [JsonPropertyName("jsonrpc"), JsonPropertyOrder(0)] public const string JsonRpc = "2.0";
 //     [JsonPropertyName("wolfpack")] public const string WolfpackVersion = "1.0";
@@ -92,13 +92,13 @@
 //         string? name,
 //         string? description,
 //         HttpMethod requestType, 
-//         WolfpackParams @params)
+//         WolfpackMessage @Parameters)
 //     {
 //         return new Wolfpack(id ?? Cuid.Create(),
 //             name, 
 //             description,
 //             requestType, 
-//             @params);
+//             @Parameters);
 //     }
 //    
 //
@@ -109,7 +109,7 @@
 //     //     Wolfpack[]? data,
 //     //     string uri)
 //     // {
-//     //     var args = new WolfpackParams(promptName, 
+//     //     var args = new WolfpackMessage(promptName, 
 //     //         promptDescription, 
 //     //         payloadType.ToString(), 
 //     //         1, 

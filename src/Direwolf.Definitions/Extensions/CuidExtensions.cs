@@ -21,16 +21,6 @@ public static class CuidExtensions
         return buffer.ToString();
     }
 
-    public static string GetDocumentVersionCounter(this Document doc)
-    {
-        return CuidDriver.EncodeBase36(Document.GetDocumentVersion(doc).NumberOfSaves);
-    }
-
-    public static string GetDocumentVersionHash(this Document doc)
-    {
-        return string.Concat(GetDocumentVersionCounter(doc), GetDocumentUuidHash(doc));
-    }
-
     /// <summary>
     ///     Takes a string and tries to parse it as a <see cref="Cuid" />.
     ///     <remarks>
@@ -59,19 +49,19 @@ public static class CuidExtensions
     /// <returns></returns>
     public static Cuid ParseAsCuid(this string s)
     {
-        var random = s[20..];
         var timestamp = s.Substring(1, 7);
         return new Cuid
         {
-            TimestampMilliseconds = CuidDriver.DecodeBase36(timestamp),
-            TimestampSubstring = timestamp,
-            CounterSubstring = s.Substring(8, 8),
-            FingerprintSubstring = s.Substring(16, 4),
-            RandomSubstring = random,
-            Length = random.Length,
+            TimestampNumeric = CuidDriver.DecodeBase36(timestamp), // Time of creation, in UNIX format, encoded in Base36
+            Timestamp = timestamp,
+            Counter = s.Substring(8, 8),
+            Fingerprint = s.Substring(16, 4),
+            Random = s.Substring(32, CuidDriver.RandomComponentLength),
             Value = s
         };
     }
+    
+    
 
-    public static DateTimeOffset GetDateTimeCreation(this Cuid id) => DateTimeOffset.FromUnixTimeMilliseconds(id.TimestampMilliseconds!.Value);
+    public static DateTimeOffset GetDateTimeCreation(this Cuid id) => DateTimeOffset.FromUnixTimeMilliseconds(id.TimestampNumeric!.Value);
 }

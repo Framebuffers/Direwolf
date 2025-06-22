@@ -34,7 +34,7 @@ public static class WolfpackJsonSchema
                                          },
                                          "description": "An space to load any kind of API-specific property, outside the Direwolf context."
                                        },
-                                       "Data": {
+                                       "Parameters": {
                                          "type": "array",
                                          "items": {
                                            "$ref": "#/definitions/Wolfpack"
@@ -42,7 +42,7 @@ public static class WolfpackJsonSchema
                                          "description": "A list of elements that define transactions, operations or states to and from Direwolf. It is the transactional unit of Direwolf."
                                        }
                                      },
-                                     "required": ["Id", "MessageType", "Data"],
+                                     "required": ["Id", "MessageType", "Parameters"],
                                      "definitions": {
                                        "Wolfpack": {
                                          "type": "object",
