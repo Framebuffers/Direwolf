@@ -9,7 +9,7 @@ public record McpRequest(
     [JsonPropertyName("jsonrpc"), JsonPropertyOrder(0)] public const string JsonRpc = "2.0";
 
     [JsonPropertyName("id"), JsonPropertyOrder(3)]
-    public string Id { get; set; } = Cuid.Create().Value!;
+    public Cuid Id { get; set; } = Cuid.Create();
 
     public static McpRequest Create(string method, object? @params)
     {

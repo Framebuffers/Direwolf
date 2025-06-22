@@ -13,10 +13,10 @@ public readonly record struct WolfpackMessage(
     [property: JsonPropertyName("message_type")] string MessageType,
     [property: JsonPropertyName("result")] object? Result,
     [property: JsonPropertyName("uri")] string Uri,
-    [property: JsonPropertyName("parameters")] IDictionary<string, object>? Parameters = null)
+    [property: JsonPropertyName("parameters")] object? Parameters = null)
 {
     [JsonPropertyOrder(0), JsonPropertyName("jsonrpc")] public const string JsonRpc = "2.0";
-    public static WolfpackMessage Create(string uri, IDictionary<string, object>? payload)
+    public static WolfpackMessage Create(string uri, object? payload)
     {
         return new WolfpackMessage(
             "wolfpack",

@@ -5,6 +5,7 @@ using Anthropic.SDK.Messaging;
 using Direwolf.Definitions;
 using Direwolf.Definitions.Enums;
 using Direwolf.Definitions.LLM;
+using Direwolf.Driver.MCP.Tools;
 using MessageResponse = Direwolf.Definitions.Enums.MessageResponse;
 
 namespace Direwolf.Driver.MCP;
@@ -22,10 +23,11 @@ public sealed partial class MCPDriver
     /// Reference to a Direwolf instance,
     /// </summary>
     private static Hunter? _hunter;
+
     private static AnthropicClient? _anthropicClient;
     private static MCPDriver? _instance;
     private static readonly object Lock = new();
-    private readonly Dictionary<string, Func<object, Task<object>>> _handlers = new();  
+    private readonly Dictionary<string, Func<object, Task<WolfpackMessage>>> _handlers = new();
     
     private MCPDriver(Hunter hunter)
     {
@@ -43,13 +45,63 @@ public sealed partial class MCPDriver
             return _instance;
         }
     }
-    
-    
+
+    public async Task<WolfpackMessage> HandleRequest(WolfpackMessage request)
+    {
+        try
+        {
+            if (request.Parameters is null)
+                return OperationHandler.CreateErrorResponse(-32603, "Request Parameters are null", request);
+            var method = (IDictionary<string, object>)request.Parameters;
+            return method["method"] switch
+            {
+                "initialize" => await OperationHandler.HandleInitialize(request),
+                "tools" => await OperationHandler.HandleListTools(request),
+                "tools/get" => await _hunter!.HandleGetWolfpack(request),
+                "tools/get-many" => await _hunter!.HandleGetManyWolfpack(request),
+                "tools/list" => await OperationHandler.HandleListTools(request),
+                "tools/create" => await _hunter!.HandleCreateWolfpack(request),
+                "tools/update" => await _hunter!.HandleUpdateWolfpack(request),
+                "tools/delete" => await _hunter!.HandleDeleteWolfpack(request),
+                "tools/llm/analyze" => await HandleAiAnalizeWolfpack(request),
+                "tools/llm/generate" => await HandleAiGenerateWolfpack(request),
+                _ => OperationHandler.CreateErrorResponse(-32601, "Method not found")
+            };
+        }
+        catch(Exception ex)
+        {
+            return OperationHandler.CreateErrorResponse(-32603, "Internal error", ex.Message);
+        }
+    }
 }
+
 //
 public sealed partial class MCPDriver
 {
-    internal static async Task<Wolfpack> HandleAiAnalizeWolfpack(Hunter h, object args)
+    private Dictionary<string, Func<object, Task<WolfpackMessage>>> InitToolHandlers()
+    {
+        return new()
+        {
+            ["create"] = _hunter!.HandleCreateWolfpack,
+            ["get"] = _hunter.HandleGetWolfpack,
+            ["get-many"] = _hunter.HandleGetManyWolfpack,
+            ["update"] = _hunter.HandleUpdateWolfpack,
+            ["delete"] = _hunter.HandleDeleteWolfpack,
+            ["ai-analyze"] = HandleAiAnalizeWolfpack,
+            ["ai-generate"] = HandleAiGenerateWolfpack
+        };
+    }
+}
+
+public sealed partial class MCPDriver
+{
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="h"></param>
+    /// <param name="args">options (any additional context), key (element to analyze)</param>
+    /// <returns></returns>
+    private async Task<WolfpackMessage> HandleAiAnalizeWolfpack(object args)
     {
         var json = JsonSerializer.Serialize(args);
         var data = JsonSerializer.Deserialize<JsonElement>(json);
@@ -57,20 +109,15 @@ public sealed partial class MCPDriver
         var options = data.TryGetProperty("options", out var props)
             ? JsonSerializer.Deserialize<Dictionary<string, object>>(props.GetRawText())
             : null;
-        var wp = WolfpackMessage.Create("wolfpack://direwolf/hunter/llm/analyze", new Dictionary<string, object>
+        var wp = WolfpackMessage.Create("wolfpack://direwolf/hunter/tools/llm/analyze", new Dictionary<string, object>
         {
             ["key"] = elementToAnalyze, ["options"] = options! // token limit, model, etc.
         });
-        
-        var response = await h.GetAsync(in wp);
-        var jsonResponse = JsonSerializer.Serialize(response.McpResponseResult);
+        var response = await _hunter!.GetAsync(in wp);
+        var jsonResponse = JsonSerializer.Serialize(response.Result);
         var prompt =
             $"Analyze this entity and provide insights about its structure, potential use cases, and suggestions for improvement:\n\n{jsonResponse}";
-        var messages = new List<Message>
-        {
-            new(RoleType.User, prompt)
-        };
-
+        var messages = new List<Message> { new(RoleType.User, prompt) };
         var parameters = new MessageParameters
         {
             Messages = messages,
@@ -79,28 +126,19 @@ public sealed partial class MCPDriver
             Stream = false,
             Temperature = 1.0m
         };
-
         var claudeResponse = await _anthropicClient?.Messages.GetClaudeMessageAsync(parameters)!;
-
-        wp = wp with
-        {
-            Result = claudeResponse
-        };
-
-        response = response with
-        {
-            Name = wp.Name,
-            McpResponseResult = wp.Result,
-            Description = wp.Description,
-            MessageResponse = MessageResponse.Result,
-            Parameters = wp.Parameters,
-            RequestType = RequestType.Get
-        };
-
-        return await Task.FromResult(response);
+        wp =  wp with { Result = claudeResponse };
+      
+        return await Task.FromResult(wp);
     }
 
-    internal static async Task<object> HandleAiGenertateWolfpack(Hunter h, object args)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="h"></param>
+    /// <param name="args">prompt: (text prompt), options: (any additional context). Set to 512 tokens max.</param>
+    /// <returns></returns>
+    private static async Task<WolfpackMessage> HandleAiGenerateWolfpack(object args)
     {
         var json = JsonSerializer.Serialize(args);
         var data = JsonSerializer.Deserialize<JsonElement>(json);
@@ -108,19 +146,14 @@ public sealed partial class MCPDriver
         var options = data.TryGetProperty("options", out var props)
             ? JsonSerializer.Deserialize<Dictionary<string, object>>(props.GetRawText())
             : null;
-        var wp = WolfpackMessage.Create("wolfpack://direwolf/hunter/llm/generate", new Dictionary<string, object>
+        var wp = WolfpackMessage.Create("wolfpack://direwolf/hunter/tools/llm/generate", new Dictionary<string, object>
         {
             ["prompt"] = k, ["options"] = options! // token limit, model, etc.
         });
-        var response = await h.GetAsync(in wp);
-        var jsonResponse = JsonSerializer.Serialize(response.McpResponseResult);
-        var prompt =
-            $"{k}:\n\n{jsonResponse}";
-        var messages = new List<Message>
-        {
-            new(RoleType.User, prompt)
-        };
-
+        var response = await _hunter!.GetAsync(in wp);
+        var jsonResponse = JsonSerializer.Serialize(response.Result);
+        var prompt = $"{k}:\n\n{jsonResponse}";
+        var messages = new List<Message> { new(RoleType.User, prompt) };
         var parameters = new MessageParameters
         {
             Messages = messages,
@@ -129,14 +162,8 @@ public sealed partial class MCPDriver
             Stream = false,
             Temperature = 1.0m
         };
-
         var claudeResponse = await _anthropicClient?.Messages.GetClaudeMessageAsync(parameters)!;
-
-        wp = wp with
-        {
-            Result = claudeResponse
-        };
-
+        wp = wp with { Result = claudeResponse };
         return await Task.FromResult(wp);
     }
 }

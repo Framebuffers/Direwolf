@@ -158,7 +158,7 @@ public readonly record struct Wolfpack(
     
     public static Wolfpack Read(WolfpackMessage parameters)
     {
-        return Create("read", MessageResponse.Request, RequestType.Get, parameters.Parameters!.ToDictionary(x => x.Key, x => x.Value), null);
+        return Create("read", MessageResponse.Request, RequestType.Get, (Dictionary<string, object>)parameters.Parameters!, null);
     }
     
     public static Wolfpack Add(Dictionary<string, object> values)
@@ -168,12 +168,12 @@ public readonly record struct Wolfpack(
     
     public static Wolfpack Delete(WolfpackMessage parameters)
     {
-        return Create("delete", MessageResponse.Request, RequestType.Delete, parameters.Parameters!.ToDictionary(x => x.Key, x => x.Value), null);
+        return Create("delete", MessageResponse.Request, RequestType.Delete, (Dictionary<string, object>)parameters.Parameters!, null);
     }
     
     public static Wolfpack Update(WolfpackMessage parameters)
     {
-        return Create("update", MessageResponse.Request, RequestType.Patch, parameters.Parameters!.ToDictionary(x => x.Key, x => x.Value), null);
+        return Create("update", MessageResponse.Request, RequestType.Patch, (Dictionary<string, object>)parameters.Parameters!, null);
     }
   
 }

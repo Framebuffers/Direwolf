@@ -1,6 +1,4 @@
 ﻿using System.Runtime.Caching;
-using Direwolf.Definitions;
-using Direwolf.Definitions.Enums;
 using Direwolf.Definitions.LLM;
 
 namespace Direwolf;
@@ -39,9 +37,10 @@ public sealed class Hunter : IDirewolfClient
         {
             DataCache.Add(new CacheItem(element.Key, element.Value), Policy);
         }
+
         return await Task.FromResult(true);
     }
-    
+
     public static async Task<bool> Export()
     {
         if (Wolfden is null) throw new NullReferenceException();
@@ -49,9 +48,10 @@ public sealed class Hunter : IDirewolfClient
         {
             Wolfden.Add(new CacheItem(element.Key, element.Value), Policy);
         }
+
         return await Task.FromResult(true);
     }
-    
+
     /// <summary>
     /// When a Wolfpack is created, it will strip the <see cref="WolfpackMessage.Parameters"/> dictionary's data
     /// and do two things: create a CacheElement, delete the entry from the dictionary.
@@ -59,17 +59,17 @@ public sealed class Hunter : IDirewolfClient
     /// </summary>
     /// <param name="wolfpackMessage"></param>
     /// <returns></returns>
-    public Task<Wolfpack> CreateAsync(in WolfpackMessage wolfpackMessage)
+    public Task<WolfpackMessage> CreateAsync(in WolfpackMessage wolfpackMessage)
     {
         try
         {
             ArgumentNullException.ThrowIfNull(wolfpackMessage.Parameters);
             Crud(in wolfpackMessage, Operation.Create, out var wolfpack);
-            return Task.FromResult(wolfpack with { RequestType = RequestType.Post, MessageResponse = MessageResponse.Notification});
+            return Task.FromResult(wolfpack);
         }
         catch (Exception e)
         {
-            return (Task<Wolfpack>)Task.FromException(e);
+            return (Task<WolfpackMessage>)Task.FromException(e);
         }
     }
 
@@ -83,18 +83,17 @@ public sealed class Hunter : IDirewolfClient
     /// </summary>
     /// <param name="wolfpackMessage"></param>
     /// <returns></returns>
-    public Task<Wolfpack> UpdateAsync(in WolfpackMessage wolfpackMessage)
+    public Task<WolfpackMessage> UpdateAsync(in WolfpackMessage wolfpackMessage)
     {
         try
         {
-            ArgumentNullException.ThrowIfNull(wolfpackMessage);
             ArgumentNullException.ThrowIfNull(wolfpackMessage.Parameters);
             Crud(in wolfpackMessage, Operation.Update, out var wolfpack);
-            return Task.FromResult(wolfpack with { RequestType = RequestType.Patch, MessageResponse = MessageResponse.Notification});
+            return Task.FromResult(wolfpack);
         }
         catch (Exception e)
         {
-            return (Task<Wolfpack>)Task.FromException(e);
+            return (Task<WolfpackMessage>)Task.FromException(e);
         }
     }
 
@@ -104,17 +103,17 @@ public sealed class Hunter : IDirewolfClient
     /// </summary>
     /// <param name="wolfpackMessage"></param>
     /// <returns></returns>
-    public Task<Wolfpack> DeleteAsync(in WolfpackMessage wolfpackMessage)
+    public Task<WolfpackMessage> DeleteAsync(in WolfpackMessage wolfpackMessage)
     {
         try
         {
             ArgumentNullException.ThrowIfNull(wolfpackMessage.Parameters);
             Crud(in wolfpackMessage, Operation.Delete, out var wolfpack);
-            return Task.FromResult(wolfpack with { RequestType = RequestType.Delete, MessageResponse = MessageResponse.Notification});
+            return Task.FromResult(wolfpack);
         }
         catch (Exception e)
         {
-            return (Task<Wolfpack>)Task.FromException(e);
+            return (Task<WolfpackMessage>)Task.FromException(e);
         }
     }
 
@@ -129,30 +128,20 @@ public sealed class Hunter : IDirewolfClient
     /// </summary>
     /// <param name="wolfpackMessage"></param>
     /// <returns></returns>
-    public Task<Wolfpack> GetAsync(in WolfpackMessage wolfpackMessage)
+    public Task<WolfpackMessage> GetAsync(in WolfpackMessage wolfpackMessage)
     {
         try
         {
             ArgumentNullException.ThrowIfNull(wolfpackMessage.Parameters);
-            var decode = (IDictionary<string, object>)wolfpackMessage.Parameters["keys"];
-            if (decode.Count == 0)
-            {
-                var wp = Wolfpack.Create(wolfpackMessage.Name, MessageResponse.Error, RequestType.Patch,
-                    wolfpackMessage.Parameters, wolfpackMessage.Description);
-                wp = wp with
-                {
-                    McpResponseResult = null, Parameters = null
-                };
-                return Task.FromResult(wp);
-            }
+            var decode = (IDictionary<string, object>)wolfpackMessage.Parameters;
 
-            var addedPayload = wolfpackMessage with { Parameters = decode };
+            var addedPayload = wolfpackMessage with { Parameters = decode["keys"] };
             Crud(in addedPayload, Operation.Read, out var wolfpack);
-            return Task.FromResult(wolfpack with { RequestType = RequestType.Get, Parameters = wolfpack.Parameters, MessageResponse = MessageResponse.Result});
+            return Task.FromResult(wolfpack);
         }
         catch (Exception e)
         {
-            return (Task<Wolfpack>)Task.FromException(e);
+            return (Task<WolfpackMessage>)Task.FromException(e);
         }
     }
 
@@ -160,19 +149,18 @@ public sealed class Hunter : IDirewolfClient
     /// <inheritdoc/>>
     /// <param name="wolfpackMessage"></param>
     /// <returns></returns>
-    public Task<Wolfpack> GetManyAsync(in WolfpackMessage wolfpackMessage)
+    public Task<WolfpackMessage> GetManyAsync(in WolfpackMessage wolfpackMessage)
     {
         try
         {
             Crud(in wolfpackMessage, Operation.ReadArray, out var wolfpack);
-            return Task.FromResult(wolfpack with { RequestType = RequestType.Get, MessageResponse = MessageResponse.Result});
+            return Task.FromResult(wolfpack);
         }
         catch (Exception e)
         {
-            return (Task<Wolfpack>)Task.FromException(e);
+            return (Task<WolfpackMessage>)Task.FromException(e);
         }
     }
-
 
     private enum Operation
     {
@@ -183,17 +171,12 @@ public sealed class Hunter : IDirewolfClient
         Delete
     }
 
-    private void Crud(in WolfpackMessage input, Operation op, out Wolfpack output)
+    private void Crud(in WolfpackMessage input, Operation op, out WolfpackMessage output)
     {
-        var wp = Wolfpack.Create(input.Name, MessageResponse.Notification, RequestType.Patch, input.Parameters,
-            input.Description);
+
         if (input.Parameters is null) throw new NullReferenceException();
-        var incomingDictionary = input.Parameters;
-        if (incomingDictionary is null)
-            output = wp with
-            {
-                MessageResponse = MessageResponse.Error, McpResponseResult = null, Parameters = null
-            };
+        var incomingDictionary = (Dictionary<string, object>)input.Parameters;
+
         var counter = 0;
         foreach (var incomingKey in incomingDictionary!)
         {
@@ -206,12 +189,12 @@ public sealed class Hunter : IDirewolfClient
                     break;
                 case Operation.Read:
                     var readValue = DataCache.Get(cacheKey.Key);
-                    wp = wp with { McpResponseResult = readValue, Parameters = null};
+                    output = input with { Result = readValue };
                     counter++;
                     break;
                 case Operation.ReadArray:
                     var values = DataCache.GetValues(incomingDictionary.Keys);
-                    wp = wp with { McpResponseResult = values };
+                    output = input with { Result = values };
                     counter = +incomingDictionary.Count;
                     break;
                 case Operation.Update:
@@ -230,31 +213,12 @@ public sealed class Hunter : IDirewolfClient
             }
         }
 
-        output = wp with
+        output = input with
         {
-            MessageResponse = MessageResponse.Result,
-            Description = new
+            Parameters = new
             {
-                incoming = incomingDictionary.Count,
-                updated = counter,
-                difference = counter,
-                checkPassed = counter != 0
-            }.ToString()
+                updated = counter
+            }
         };
-}
-
-    private static McpResponse NotificationAccepted =>
-        new(null, $"message: {MessageResponse.Notification}, result: {ResultType.Accepted}", null);
-
-    private static McpResponse NotificationRejected =>
-        new(null, $"message: {MessageResponse.Notification}, result: {ResultType.Rejected}", null);
-
-    private static McpResponse ResultAccepted =>
-        new(null, $"message: {MessageResponse.Notification}, result: {ResultType.Accepted}", null);
-
-    private static McpResponse ResultRejected =>
-        new(null, $"message: {MessageResponse.Notification}, result: {ResultType.Rejected}", null);
-
-    private static McpResponse RequestAccepted =>
-        new(null, $"message: {MessageResponse.Request}, result: {ResultType.Accepted}", null);
+    }
 }

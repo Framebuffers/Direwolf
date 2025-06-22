@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Autodesk.Revit.DB;
 using Direwolf.Definitions;
 using Direwolf.Definitions.Enums;
 using Direwolf.Definitions.LLM;
@@ -49,14 +50,14 @@ namespace Direwolf.Driver.MCP.Tools;
 public static class OperationHandler
 {
     // see McpTool.CreateWolfpack
-    internal static async Task<object> HandleCreateWolfpack(this Hunter h, object args)
+    internal static async Task<WolfpackMessage> HandleCreateWolfpack(this Hunter h, object args)
     {
         var json = JsonSerializer.Serialize(args);
         var data = JsonSerializer.Deserialize<JsonElement>(json);
         var properties = data.TryGetProperty("payload", out var props)
             ? JsonSerializer.Deserialize<Dictionary<string, object>>(props.GetRawText())
             : null;
-        var wparam = WolfpackMessage.Create("wolfpack://direwolf/hunter/create", properties) with
+        var wparam = WolfpackMessage.Create("wolfpack://direwolf/hunter/tools/create", properties) with
         {
             Name = data.GetProperty("name").GetString()!, Description = data.GetProperty("description").GetString()!
         };
@@ -64,7 +65,7 @@ public static class OperationHandler
     }
 
     // see McpTool.GetWolfpack
-    internal static async Task<object> HandleGetManyWolfpack(this Hunter h, object args)
+    internal static async Task<WolfpackMessage> HandleGetManyWolfpack(this Hunter h, object args)
     {
         var json = JsonSerializer.Serialize(args);
         var data = JsonSerializer.Deserialize<JsonElement>(json);
@@ -74,113 +75,107 @@ public static class OperationHandler
         var result = data.TryGetProperty("keys", out var props)
             ? JsonSerializer.Deserialize<Dictionary<string, object>>(props.GetRawText())
             : null;
-        var wp = WolfpackMessage.Create("wolfpack://direwolf/hunter/get-many",
+        var wp = WolfpackMessage.Create("wolfpack://direwolf/hunter/tools/get-many",
             new Dictionary<string, object> { ["keys"] = result!.Values.ToArray() });
         return await h.GetManyAsync(in wp);
     }
 
     // see McpTool.GetWolfpack
-    internal static async Task<object> HandleGetWolfpack(this Hunter h, object args)
+    internal static async Task<WolfpackMessage> HandleGetWolfpack(this Hunter h, object args)
     {
         var json = JsonSerializer.Serialize(args);
         var data = JsonSerializer.Deserialize<JsonElement>(json);
         var result = data.TryGetProperty("key", out var props)
             ? JsonSerializer.Deserialize<Dictionary<string, object>>(props.GetRawText())
             : null;
-        var wp = WolfpackMessage.Create("wolfpack://direwolf/hunter/get",
+        var wp = WolfpackMessage.Create("wolfpack://direwolf/hunter/tools/get",
             new Dictionary<string, object> { ["key"] = result!.Values.ToArray() });
         return await h.GetAsync(in wp);
     }
 
-    internal static async Task<object> HandleListWolfpacks(this Hunter h, object args)
+    internal static async Task<WolfpackMessage> HandleListWolfpacks(this Hunter h, object args)
     {
         var json = JsonSerializer.Serialize(args);
         var data = JsonSerializer.Deserialize<JsonElement>(json);
         var limit = data.TryGetProperty("limit", out var limitFound) ? limitFound.GetInt32() : 0;
         var offset = data.TryGetProperty("offset", out var offsetFound) ? offsetFound.GetInt32() : 0;
-        var wp = WolfpackMessage.Create("wolfpack://direwolf/hunter/list",
+        var wp = WolfpackMessage.Create("wolfpack://direwolf/hunter/tools/list",
             new Dictionary<string, object> { ["limit"] = limit, ["offset"] = offset });
         return await h.GetManyAsync(in wp); // change to ListMany => list the cache.
     }
 
-    internal static async Task<object> HandleUpdateWolfpack(this Hunter h, object args)
+    internal static async Task<WolfpackMessage> HandleUpdateWolfpack(this Hunter h, object args)
     {
         var json = JsonSerializer.Serialize(args);
         var data = JsonSerializer.Deserialize<JsonElement>(json);
         var k = data.GetProperty("key");
         var v = data.TryGetProperty("value", out var value) ? value.GetRawText() : null;
-        var wp = WolfpackMessage.Create("wolfpack://direwolf/hunter/update",
+        var wp = WolfpackMessage.Create("wolfpack://direwolf/hunter/tools/update",
             new Dictionary<string, object> { ["key"] = k, ["value"] = v });
         return await h.UpdateAsync(in wp);
     }
 
-    internal static async Task<object> HandleDeleteWolfpack(this Hunter h, object args)
+    internal static async Task<WolfpackMessage> HandleDeleteWolfpack(this Hunter h, object args)
     {
         var json = JsonSerializer.Serialize(args);
         var data = JsonSerializer.Deserialize<JsonElement>(json);
         var k = data.GetProperty("key");
-        var wp = WolfpackMessage.Create("wolfpack://direwolf/hunter/delete",
+        var wp = WolfpackMessage.Create("wolfpack://direwolf/hunter/tools/delete",
             new Dictionary<string, object> { ["key"] = k });
         return await h.UpdateAsync(in wp);
     }
 
-    internal static async Task<McpResource> HandleListResources(this Hunter h, WolfpackMessage args)
+    internal static async Task<WolfpackMessage> HandleListResources()
     {
-        var response = new McpResource(null, "wolfpack://direwolf/hunter", "All entities", "List of all entities.",
-            "application/json");
-        return await Task.FromResult(response);
+        return await Task.FromResult(WolfpackMessage.Create("wolfpack://direwolf/hunter/resources/all", new{name = "All entities", description = "List of all tools.", mimeType = "application/json"}));
     }
 
     // this will use the uri to get data:
     //      it will use the URI detailed inside the args:
     //          available = wolfpack://direwolf/hunter/[create, getMany, get, list, update, delete, llm/analyze, llm/generate
     //      inside parameters, it will look for args each one needs. 
-    internal static async Task<McpResponse> HandleReadResource(this Hunter h, McpRequest request)
+    internal static async Task<McpResponse> HandleReadResource(McpRequest request)
     {
         var parameters = JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(request.Params));
-                    var uri = parameters.GetProperty("uri").GetString() ?? "wolfpack://direwolf/hunter";
-                    var wpUri = new WolfpackUri(uri);
-                    var wpack = WolfpackMessage.Create(uri, null);
+        var uri = parameters.GetProperty("uri").GetString() ?? "wolfpack://direwolf/hunter";
+        var wpUri = new WolfpackUri(uri);
+        var wpack = WolfpackMessage.Create(uri, null);
         try
         {
-            
-
             // get tools
-            var listTools = await ListTools(wpack);
+            var listTools = await HandleListTools(wpack);
             var availableTools = (IDictionary<string, List<McpTool>>?)listTools.Result;
             if (availableTools is not null)
-                switch (wpUri.GetPath())
+                return wpUri.GetPath() switch
                 {
-                    case "hunter/create":
-                        return await Task.FromResult(McpResponse.Create(ToolDefinitions.CreateWolfpack, null));
-                    case "hunter/get":
-                        return await Task.FromResult(McpResponse.Create(ToolDefinitions.GetWolfpack, null));
-                    case "hunter/get-many":
-                        return await Task.FromResult(McpResponse.Create(ToolDefinitions.GetWolfpackMany, null));
-                    case "hunter/update":
-                        return await Task.FromResult(McpResponse.Create(ToolDefinitions.UpdateWolfpack, null));
-                    case "hunter/delete":
-                        return await Task.FromResult(McpResponse.Create(ToolDefinitions.DeleteWolfpack, null));
-                    case "hunter/ai-analyze":
-                        return await Task.FromResult(McpResponse.Create(ToolDefinitions.AiAnalyzeWolfpack, null));
-                    case "hunter/ai-generate":
-                        return await Task.FromResult(McpResponse.Create(ToolDefinitions.AiGenerateWolfpack, null));
-                }
+                    "tools/create" => await Task.FromResult(McpResponse.Create(ToolDefinitions.CreateWolfpack, null)),
+                    "tools/get" => await Task.FromResult(McpResponse.Create(ToolDefinitions.GetWolfpack, null)),
+                    "tools/get-many" => await Task.FromResult(
+                        McpResponse.Create(ToolDefinitions.GetWolfpackMany, null)),
+                    "tools/update" => await Task.FromResult(McpResponse.Create(ToolDefinitions.UpdateWolfpack, null)),
+                    "tools/delete" => await Task.FromResult(McpResponse.Create(ToolDefinitions.DeleteWolfpack, null)),
+                    "tools/llm/ai-analyze" => await Task.FromResult(McpResponse.Create(ToolDefinitions.AiAnalyzeWolfpack,
+                        null)),
+                    "tools/llm/ai-generate" => await Task.FromResult(McpResponse.Create(ToolDefinitions.AiGenerateWolfpack,
+                        null)),
+                    _ => new McpResponse(request.Id, "Could not read resource.",
+                        new { code = -32063, message = "URI not found.", data = wpUri.GetPath() })
+                };
         }
         catch (Exception e)
         {
-            return CreateErrorResponse(-32602, "Invalid resource URI: unknown or invalid value", e.Message);
+            return new McpResponse(request.Id, "Could not read resource.", new {code = -32063, message = "An exception has occured.", data = e.Message});
         }
-        return CreateErrorResponse(-32602, "Invalid resource URI: empty value", wpack.Name);
+
+        return new McpResponse(request.Id, "Could not read resource.", new {code = -32063, message = "Could not read resource."});
     }
 
-    private static McpResponse CreateErrorResponse(int code, string message, object? data = null)
+    public  static WolfpackMessage CreateErrorResponse(int code, string message, object? data = null)
     {
-        var id = Cuid.Create();
-        return new McpResponse(id, new McpError(code, message, data).ToString(), data);
+        return WolfpackMessage.Create("wolfpack://direwolf/hunter", new { code, message, data = data! });
     }
 
-    private static Task<WolfpackMessage> ListTools(in WolfpackMessage request)
+    internal static Task<WolfpackMessage> HandleListTools(in WolfpackMessage request)
     {
         var propertyNames = new List<McpTool>
         {
@@ -194,27 +189,20 @@ public static class OperationHandler
         return Task.FromResult(request with
         {
             MessageType = MessageResponse.Result.ToString(),
-            Result = new Dictionary<string, object> { ["tools"] = propertyNames }
+            Result = new { tools = propertyNames }
         });
     }
 
-    internal static Task<WolfpackMessage> Initialize(in WolfpackMessage request)
+    internal static Task<WolfpackMessage> HandleInitialize(in WolfpackMessage request)
     {
         return Task.FromResult(request with
         {
             MessageType = MessageResponse.Result.ToString(),
-            Result = new Dictionary<string, object>
+            Result = new
             {
-                ["protocolVersion"] = Hunter.McpProtocolVersion,
-                ["capabilities"] =
-                    new Dictionary<string, object>
-                    {
-                        ["tools"] = new List<McpTool>(), ["resources"] = new List<McpResource>()
-                    },
-                ["server-info"] = new Dictionary<string, object>
-                {
-                    ["name"] = "direwolf-hunter", ["version"] = "v0.2-alpha"
-                }
+                protocolVersion = "2025-06-18",
+                capabilities = new { tools = new { }, resources = new { } },
+                serverinfo = new { name = "direwolf-hunter", version = "v0.2-alpha" }
             }
         });
     }

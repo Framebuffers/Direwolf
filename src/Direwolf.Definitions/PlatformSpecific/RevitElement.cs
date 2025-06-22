@@ -191,37 +191,37 @@ public readonly record struct RevitElement(
             .Equals(GetEmbeddedDocumentId(r));
     }
 
-    /// <summary>
-    /// Aggregate <see cref="RevitElement"/> into a single Wolfpack with RevitElements, where the <see cref="WolfpackMessage.Parameters"/> dictionary sorts them by <see cref="RevitElement.ElementUniqueId"/>
-    /// as key, and <see cref="RevitElement"/> itself as value.
-    /// </summary>
-    /// <param name="elements"></param>
-    /// <param name="wolfpack"></param>
-    /// <param name="updated"></param>
-    /// <returns></returns>
-    public static MessageResponse Aggregate(in RevitElement[] elements, WolfpackMessage wolfpack,
-        out WolfpackMessage updated)
-    {
-        var uniqueKeys = wolfpack.Parameters;
-
-        if (uniqueKeys is null)
-        {
-            updated = wolfpack;
-            return MessageResponse.Result;
-        }
-
-        foreach (var (key, result) in from incomingElement in elements
-                 let newKey = incomingElement.ElementUniqueId
-                 where wolfpack.Parameters.ContainsKey(newKey) is false
-                 select (newKey, incomingElement))
-        {
-
-            uniqueKeys.Add(key, result);
-        }
-        
-        updated = wolfpack;
-        return MessageResponse.Result;
-    }
+    // /// <summary>
+    // /// Aggregate <see cref="RevitElement"/> into a single Wolfpack with RevitElements, where the <see cref="WolfpackMessage.Parameters"/> dictionary sorts them by <see cref="RevitElement.ElementUniqueId"/>
+    // /// as key, and <see cref="RevitElement"/> itself as value.
+    // /// </summary>
+    // /// <param name="elements"></param>
+    // /// <param name="wolfpack"></param>
+    // /// <param name="updated"></param>
+    // /// <returns></returns>
+    // public static MessageResponse Aggregate(in RevitElement[] elements, WolfpackMessage wolfpack,
+    //     out WolfpackMessage updated)
+    // {
+    //     var uniqueKeys = wolfpack.Parameters;
+    //
+    //     if (uniqueKeys is null)
+    //     {
+    //         updated = wolfpack;
+    //         return MessageResponse.Result;
+    //     }
+    //
+    //     foreach (var (key, result) in from incomingElement in elements
+    //              let newKey = incomingElement.ElementUniqueId
+    //              where wolfpack.Parameters.ContainsKey(newKey) is false
+    //              select (newKey, incomingElement))
+    //     {
+    //
+    //         uniqueKeys.Add(key, result);
+    //     }
+    //     
+    //     updated = wolfpack;
+    //     return MessageResponse.Result;
+    // }
 
     /// <summary>
     ///     Checks if an <see cref="Autodesk.Revit.DB.Element" /> has a valid <see cref="Autodesk.Revit.DB.Category" />,
