@@ -77,8 +77,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Resource Include="Resources\Icons\RibbonIcon16.png"/>
-        <Resource Include="Resources\Icons\RibbonIcon32.png"/>
+        <Resource Include="Resources\Icons\Placeholder\slice1_16.png"/>
+        <Resource Include="Resources\Icons\Placeholder\slice1_32.png"/>
     </ItemGroup>
 
     <ItemGroup>

@@ -173,17 +173,6 @@ public sealed class ElementJsonSerializer : JsonConverter<RevitElement>
     {
         _ = options;
 
-        // {
-        //   "<Definition.ArgumentName>": "<Value>",
-        //   "storageType": "StorageType.JsonType"
-        //  },
-        //
-        // or
-        //
-        // {
-        //   "undefined": "undefined"
-        //   "storageType": "undefined"
-        // },
         if (parameter is null) return;
         writer.WriteStartObject(string.IsNullOrWhiteSpace(parameter.Value.Key) ? "undefined" : parameter.Value.Key);
         writer.WritePropertyName(nameof(parameter.Value));

@@ -19,7 +19,7 @@ public class About : ExternalCommand
             {
                 MainInstruction = "About Direwolf",
                 MainContent = $"Direwolf v0.4-alpha."
-                              + $"Parameters Hunting Framework for Autodesk Revit."
+                              + $"Properties Hunting Framework for Autodesk Revit."
                               + $""
                               + $"Copyright (C) 2025 Sebastian Torres Sagredo"
                               + $""

@@ -75,13 +75,13 @@
 //  */
 //
 //
-// //TODO: move payload to Parameters and everything pointing to it. it is now inside the Parameters.
+// //TODO: move payload to Properties and everything pointing to it. it is now inside the Properties.
 // public readonly record struct Wolfpack(
 //     [property: JsonPropertyName("id")]            Cuid Id, 
 //     [property: JsonPropertyName("name")]          string? Name, 
 //     [property: JsonPropertyName("description")]   string? Description,
 //     [property: JsonIgnore]                        HttpMethod Method, //   direwolf-specific
-//     [property: JsonPropertyName("@Parameters")]       WolfpackMessage Params )
+//     [property: JsonPropertyName("@Properties")]       WolfpackMessage Params )
 // {
 //     [JsonPropertyName("jsonrpc"), JsonPropertyOrder(0)] public const string JsonRpc = "2.0";
 //     [JsonPropertyName("wolfpack")] public const string WolfpackVersion = "1.0";
@@ -92,13 +92,13 @@
 //         string? name,
 //         string? description,
 //         HttpMethod requestType, 
-//         WolfpackMessage @Parameters)
+//         WolfpackMessage @Properties)
 //     {
 //         return new Wolfpack(id ?? Cuid.Create(),
 //             name, 
 //             description,
 //             requestType, 
-//             @Parameters);
+//             @Properties);
 //     }
 //    
 //

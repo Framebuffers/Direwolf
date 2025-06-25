@@ -88,4 +88,5 @@ public static class ElementExtensions
             ? (null, null, null, null)
             : (element, element.Id, TryDo(() => element.GetType()), element?.GetTypeId());
     }
+    
 }

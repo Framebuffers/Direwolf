@@ -25,7 +25,7 @@ public static class ExceptionExtensions
                 {
                     MessageResponse = MessageResponse.Error,
                     RequestType = RequestType.Put,
-                    McpResponseResult = ResultType.Rejected
+                    Result = ResultType.Rejected
                 });
                 break;
             default:
@@ -34,7 +34,7 @@ public static class ExceptionExtensions
                 {
                      MessageResponse = MessageResponse.Error,
                     RequestType = RequestType.Put,
-                    McpResponseResult = ResultType.Rejected
+                    Result = ResultType.Rejected
                 });
 
                 break;

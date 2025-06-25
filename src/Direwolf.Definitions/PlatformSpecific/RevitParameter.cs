@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics;
+using System.Globalization;
 using Autodesk.Revit.DB;
 
 namespace Direwolf.Definitions.PlatformSpecific;
@@ -36,9 +37,28 @@ public readonly record struct RevitParameter(StorageType StorageType, string Key
             return null;
         }
     }
-
+    
     private static string GetValue(Parameter p)
     {
+        // as simple an approach as possible.
+        // ConvertFromInternalUnits() always takes doubles as an input.
+        // elements without a 
+        if (p.GetUnitTypeId() is not null && p.StorageType == StorageType.Double)
+        {
+            try
+            {
+                if (UnitUtils.IsUnit(p.Definition.GetDataType()))
+                    Debug.Print($"Unit converted: {p.Definition.Name}, {p.GetTypeId().TypeId}");
+                 return UnitUtils.ConvertFromInternalUnits(p.AsDouble(),
+                        p.GetUnitTypeId())
+                    .ToString(CultureInfo.InvariantCulture);
+            }
+            catch
+            {
+                return p.AsDouble().ToString(CultureInfo.InvariantCulture);
+            } 
+        }
+        
         return p.StorageType switch
         {
             StorageType.None => "None",

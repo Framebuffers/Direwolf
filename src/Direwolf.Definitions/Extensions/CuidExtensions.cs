@@ -49,19 +49,22 @@ public static class CuidExtensions
     /// <returns></returns>
     public static Cuid ParseAsCuid(this string s)
     {
-        var timestamp = s.Substring(1, 7);
+        var asAlphanumeric =  s.Where(char.IsLetterOrDigit).ToArray();
+        if (s.Length < 32 || string.IsNullOrEmpty(asAlphanumeric.ToString())) throw new FormatException();
+        var substring = s.Substring(1, 7);
+        var timestamp = CuidDriver.DecodeBase36(substring); // base36 unixtimemilliseconds
+        if (DateTimeOffset.FromUnixTimeSeconds(timestamp).UtcDateTime == default) throw new FormatException();
+        
         return new Cuid
         {
-            TimestampNumeric = CuidDriver.DecodeBase36(timestamp), // Time of creation, in UNIX format, encoded in Base36
-            Timestamp = timestamp,
+            TimestampNumeric = timestamp, // Time of creation, in UNIX format, encoded in Base36
+            Timestamp = substring.Length == 7 ? substring : throw new FormatException(),
             Counter = s.Substring(8, 8),
             Fingerprint = s.Substring(16, 4),
             Random = s.Substring(32, CuidDriver.RandomComponentLength),
             Value = s
         };
     }
-    
-    
 
     public static DateTimeOffset GetDateTimeCreation(this Cuid id) => DateTimeOffset.FromUnixTimeMilliseconds(id.TimestampNumeric!.Value);
 }

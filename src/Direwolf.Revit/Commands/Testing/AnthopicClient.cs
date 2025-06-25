@@ -1,9 +1,11 @@
 ﻿using System.Diagnostics;
 using System.IO;
+using System.Text.Json;
 using System.Windows.Forms.VisualStyles;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI.Events;
 using Direwolf.Definitions.LLM;
+using Direwolf.Definitions.PlatformSpecific;
 using Direwolf.Driver.MCP;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Nice3point.Revit.Toolkit.External;
@@ -40,7 +42,7 @@ public class AnthopicClient : ExternalCommand
                 "Test cancelled.");
         
         _anthropicApiKey = File.ReadAllText(_path!);
-        
+       
         
         var panel = UiApplication.GetRibbonPanels("Direwolf").FirstOrDefault(x => x.Name.Equals("MCP"));
         var promptInput = panel!.AddTextBox("promptIn");
@@ -50,18 +52,21 @@ public class AnthopicClient : ExternalCommand
              if (_hunter is null || string.IsNullOrEmpty(_anthropicApiKey))
                  throw new NullReferenceException("AnthropicApiKey is null or empty.");
              _driver = McpDriver.GetInstance(_hunter, _anthropicApiKey);
-
-             var wp = WolfpackMessage.Create("wolfpack://direwolf/hunter/tools/llm/analyze", null) with
-             {
-                 Parameters = new Dictionary<string, object>
-                 {
-                     ["method"] = "initialize"
-                 }
-             };
+             
+             // var wp = WolfpackMessage.Create("wolfpack://direwolf/hunter/tools/llm/analyze") with
+             // {
+             //     Properties = new Dictionary<string, object>
+             //     {
+             //         ["method"] = "ai_analyze",
+             //         ["keys"] = "test_key" 
+             //     }
+             // };
 
              Debug.WriteLine("MCP Host listening.");
+             var t = McpDriver.AiAnalyze("test");
+             var result = t.Result.Result;
 
-             McpDriver.GetInstance(_hunter, _anthropicApiKey).HandleRequest(wp);
+             Debug.Print(JsonSerializer.Serialize(result));
          };
     }
 
@@ -89,5 +94,15 @@ public class AnthopicClient : ExternalCommand
             _path = Path.GetFullPath(d.FileName);
     }
 
-
+    private void ToolDropDown(object? args)
+    {
+        var wp = WolfpackMessage.Create("wolfpack://direwolf/hunter/", null) with
+        {
+            Properties = new Dictionary<string, object>
+            {
+                ["method"] = "tools"
+            }
+        }; 
+        
+    }
 }

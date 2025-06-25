@@ -35,18 +35,17 @@ public class TestCommands : ExternalCommand
 {
     private static readonly StringWriter? StringWriter = new();
     private static string _path = string.Empty;
-    private static List<Wolfpack> _results = [];
-    private const string Uri = "wolfpack://com.revit.autodesk-2025/direwolf/custom?t=";
+    private static List<WolfpackMessage> _results = [];
 
     private readonly WolfpackMessage _message = new(
-        "",
-        "",
+        Cuid.Create().Value!,
+        "Direwolf Self Test",
+        "object",
         "object",
         1,
-        "",
-        ResultType.Rejected.ToString(),
-        $"{Uri}/",
-        null);
+        MessageResponse.Result.ToString(),
+        null,
+        $"{GlobalDictionary.DirewolfSelfTest}/");
     
     /*
      * 1. Populate Database.
@@ -56,9 +55,15 @@ public class TestCommands : ExternalCommand
      */
     private MessageResponse Check_PopulateDB()
     {
+        using Autodesk.Revit.DB.Transaction trans = new Transaction(Document);
+        
         WriteToConsole("Populating Database");
-        Direwolf.GetAllElements(Document, out var db);
-        WriteToConsole($"Found {db!.Count} elements");
+        var wolfden = Wolfden.GetInstance(Document);
+        if (wolfden.GetRevitCache().Count == 0) wolfden.PopulateDatabase(Document);
+        var db = Wolfden.GetInstance(Document).GetRevitCache();
+        Hunter.Import();
+        WriteToConsole($"Found {db.Count} elements\n\tCache count: {wolfden.GetRevitCache().Count}\n\tKeyStorage: {Direwolf.GetInstance().ElementCacheStorage}\n\tHunterCache: {Hunter.CacheCount}");
+        
         return db.Count != 0 ? MessageResponse.Result : MessageResponse.Error;
     }
 
@@ -92,26 +97,24 @@ public class TestCommands : ExternalCommand
         }
         
         WriteToConsole("Checking DB:");
-         var wp = _message with
-                    {
-                        Name = "json_from_wolfden",
-                        Description = "Get the whole Revit Document from the local cache.",
-                        Result = new
-                        {
-                            key = uuids
-                        }
-                    };
-         
-        var read = Direwolf.GetInstance().ReadRevitElements(doors, Document, out _);
-        if (read is MessageResponse.Error) return MessageResponse.Error;
-        var wolfpack = Wolfpack.Create("dwolf_test", MessageResponse.Result, RequestType.Get, WolfpackMessage.ToDictionary(wp));
+          var wp = _message with
+                     {
+                         Name = "json_from_wolfden",
+                         Description = "Get the whole Revit Document from the local cache."
+                     };       
+        if (Direwolf.GetInstance().ReadRevitElements(uuids.ToArray(), Document, out var values) is MessageResponse.Error) return MessageResponse.Error;
+       
+        wp = wp with
+        {
+            Result = values
+        };
 
         WriteFile("Test02_CacheQuery.json",
-            JsonSerializer.Serialize(wolfpack),
+            JsonSerializer.Serialize(wp),
             out var t);
         WriteToConsole($"Time taken: {t}");
         
-        _results.Add(wolfpack);
+        _results.Add(wp);
         return MessageResponse.Result;
     }
 
@@ -132,24 +135,15 @@ public class TestCommands : ExternalCommand
             {
                 Name = "json_from_wolfden",
                 Description = "Get the whole Revit Document from the local cache.",
-                Result = ResultType.Accepted.ToString(),
-                Parameters = dictionary
+                Result = dictionary!
             };
             
-            var wolfpack = Wolfpack.Create("dwolf_test", MessageResponse.Result, RequestType.Get, WolfpackMessage.ToDictionary(wp));
-            
             WriteFile("Test03_CheckCachedElements.json",
-                JsonSerializer.Serialize(wolfpack),
+                JsonSerializer.Serialize(wp),
                 out var t);
             WriteToConsole("Wrote JsonSchemas from Disk");
             WriteToConsole($"Time taken to write from Disk: {t}");
-            _results.Add(wolfpack with
-            {
-                McpResponseResult = new
-                {
-                    properties = wolfpack.Parameters!.Count
-                }
-            });
+           
             return MessageResponse.Notification;
         }
         catch (Exception e)
@@ -175,7 +169,7 @@ public class TestCommands : ExternalCommand
         {
             var database = Document.GetRevitDbByCategory();
 
-            Dictionary<string, object> dictionary = database.ToDictionary(pair => pair.Key.ToString(), pair => (object)pair.Value);
+            Dictionary<string, object> dictionary = database.ToDictionary(pair => pair.Key.ToString(), object (pair) => pair.Value);
             var wp = _message with
             {
                 Name = "json_from_disk",
@@ -183,20 +177,12 @@ public class TestCommands : ExternalCommand
                 Result = dictionary
             };
             
-            var wolfpack = Wolfpack.Create("dwolf_test", MessageResponse.Result, RequestType.Get, WolfpackMessage.ToDictionary(wp));
-            
             WriteFile("Test04_CheckDocumentElements.json",
-                JsonSerializer.Serialize(wolfpack),
+                JsonSerializer.Serialize(wp),
                 out var t);
             WriteToConsole("Wrote JsonSchemas from Disk");
             WriteToConsole($"Time taken to write from Disk: {t}");
-            _results.Add(wolfpack with
-            {
-                McpResponseResult = new
-                {
-                    properties = wolfpack.Parameters!.Count
-                }
-            });
+            _results.Add(wp);
             return MessageResponse.Notification;
         }
         catch (Exception e)
@@ -224,8 +210,7 @@ public class TestCommands : ExternalCommand
                 x.UniqueId))
             .ToList();
       
-        foreach (var rvtElement in chosen)
-            WriteToConsole($"Check DB Query::Found: {rvtElement?.Id}");
+            WriteToConsole($"Check DB Query::Found: {chosen.Count}");
         
         using StringWriter sw = new();
        
@@ -236,24 +221,15 @@ public class TestCommands : ExternalCommand
         {
             Name = "get_door_ifc_guid",
             Description = "Get the IFC GUID of all the Doors inside Revit.",
-            Result = ResultType.Accepted.ToString(),
-            Parameters = x
+            Result = x
         };
             
-        var wolfpack = Wolfpack.Create("dwolf_test", MessageResponse.Result, RequestType.Get, WolfpackMessage.ToDictionary(wp));
-    
         WriteFile("Test05_QueryDB.json",
-            JsonSerializer.Serialize(wolfpack),
+            JsonSerializer.Serialize(wp),
             out var time);
         WriteToConsole($"Time taken: {time}");
         
-        _results.Add(wolfpack with
-        {
-            McpResponseResult = new Dictionary<string, object>
-            {
-                ["properties"] = wolfpack.Parameters!.Count
-            }
-        });
+        _results.Add(wp);
         return MessageResponse.Result;
     }
 
@@ -280,28 +256,15 @@ public class TestCommands : ExternalCommand
         
         McpDriver.ToConsole(wp.ToString());
                     
-                var wolfpack = Wolfpack.Create("dwolf_test", MessageResponse.Result, RequestType.Get, (Dictionary<string, object>)wp.Parameters!, wp.Description);
                 WriteFile("Test06_WindowsToJsonl.json",
-                    JsonSerializer.Serialize(wolfpack),
+                    JsonSerializer.Serialize(wp),
                     out var time);
                 WriteToConsole($"Time taken: {time}");
-        
-                _results.Add(wolfpack with
-                {
-                    McpResponseResult = new Dictionary<string, object>
-                    {
-                        ["properties"] = wolfpack.Parameters!.Count
-                    }
-                });
                 return MessageResponse.Result; 
     }
-
-  
-
+    
     public override void Execute()
     {
-        using Transaction trans = new(Document,
-            "Running tests");
         var t2 = TaskDialog.Show("Executing Direwolf Tests",
             "This Command will run through five tests to determine if Direwolf is running correctly." +
             " Would you like to continue?",
@@ -340,12 +303,8 @@ public class TestCommands : ExternalCommand
                              "\nThis makes sure that all elements of Direwolf are working: caching, querying and serialization.",
                 Result = _results
             };
-            var wolfpackAll = Wolfpack.Create(args.Name, MessageResponse.Result, RequestType.Get, (Dictionary<string, object>)args.Parameters!, args.Description) with
-            {
-                McpResponseResult = args.Result
-            };
             
-            WriteFile("wolfpack.json", JsonSerializer.Serialize(wolfpackAll), out var time);
+            WriteFile("wolfpack.json", JsonSerializer.Serialize(args), out var time);
             WriteToConsole($"Tests finished at {DateTime.UtcNow}, time: {time}");
         }
         catch (Exception e)
