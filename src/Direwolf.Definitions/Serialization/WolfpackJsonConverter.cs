@@ -65,7 +65,7 @@
 //                                 }
 //
 //                             break;
-//                         case "Parameters":
+//                         case "Properties":
 //                             if (string.IsNullOrEmpty(reader.GetString()))
 //                                 throw new JsonException(" is empty.");
 //                             if (reader.TokenType == JsonTokenType.StartArray)

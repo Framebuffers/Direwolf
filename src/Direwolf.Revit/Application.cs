@@ -30,14 +30,14 @@ public class Application : ExternalApplication
                 {
                     var combinedIds = addedIds.Concat(modifiedIds);
                     var uuids = combinedIds.Select(x => doc.GetElement(x).UniqueId).ToArray();
-                    Direwolf.GetInstance().AddOrUpdateRevitElement(uuids, doc, out var _);
+                    Direwolf.GetInstance().AddOrUpdateRevitElement(uuids, doc);
                 }
 
                 var deletedIds = args.GetDeletedElementIds();
                 if (deletedIds.Count == 0) return;
                 {
                     var uuids = deletedIds.Select(x => doc.GetElement(x).UniqueId).ToArray();
-                    Direwolf.GetInstance().DeleteRevitElement(uuids, doc, out var _);
+                    Direwolf.GetInstance().DeleteRevitElement(uuids, doc);
                 }
             }
             finally
@@ -49,14 +49,25 @@ public class Application : ExternalApplication
 
     private void CreateRibbon()
     {
-        var panel = Application.CreatePanel("Tests", "Direwolf");
-        panel.AddPushButton<ExportCacheToJson>("From Cache");
-        panel.AddPushButton<ExportToJsonFromScratch>("From Disk");
-        panel.AddPushButton<About>("About").SetImage("Resources/Icons/RibbonIcon16.png");
-        
+        var panel = Application.CreatePanel("Export", "Direwolf");
+        panel.AddPushButton<ExportCacheToJson>("From Cache")
+            .SetImage("/Direwolf.Revit;component/Resources/Icons/Placeholder/slice1_16.png")
+            .SetLargeImage("/Direwolf.Revit;component/Resources/Icons/Placeholder/slice_32.png");
+        panel.AddPushButton<ExportToJsonFromScratch>("From Disk")
+            .SetImage("/Direwolf.Revit;component/Resources/Icons/Placeholder/slice1_16.png")
+            .SetLargeImage("/Direwolf.Revit;component/Resources/Icons/Placeholder/slice_32.png");
+        panel.AddPushButton<About>("About")
+            .SetImage("/Direwolf.Revit;component/Resources/Icons/Placeholder/slice1_16.png")
+            .SetLargeImage("/Direwolf.Revit;component/Resources/Icons/Placeholder/slice_32.png");
         var ai = Application.CreatePanel("MCP", "Direwolf");
-        ai.AddPushButton<CheckStabilityOfElements>("Check IDs");
-        ai.AddPushButton<AnthopicClient>("Init MCP Client");
-        ai.AddPushButton<TestCommands>("Self Test");
+        ai.AddPushButton<CheckStabilityOfElements>("Check IDs")
+            .SetImage("/Direwolf.Revit;component/Resources/Icons/Placeholder/slice1_16.png)")
+            .SetLargeImage("/Direwolf.Revit;component/Resources/Icons/Placeholder/slice_32.png");
+        ai.AddPushButton<AnthopicClient>("Init MCP Client")
+            .SetImage("/Direwolf.Revit;component/Resources/Icons/Placeholder/slice1_16.png")
+            .SetLargeImage("/Direwolf.Revit;component/Resources/Icons/Placeholder/slice_32.png");
+        ai.AddPushButton<TestCommands>("Self Test")
+            .SetImage("/Direwolf.Revit;component/Resources/Icons/Placeholder/slice1_16.png")
+            .SetLargeImage("/Direwolf.Revit;component/Resources/Icons/Placeholder/slice_32.png");
     }
 }

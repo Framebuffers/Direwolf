@@ -13,6 +13,7 @@ public sealed class Hunter : IDirewolfClient
     private static ObjectCache? Wolfden => _direwolf?.GetHunterCache();
     private static readonly CacheItemPolicy Policy = new() { SlidingExpiration = TimeSpan.FromMinutes(60) };
     public const string McpProtocolVersion = "2025-06-18";
+    public static int CacheCount = DataCache.Count();
 
     private Hunter(Direwolf? direwolf)
     {
@@ -53,7 +54,7 @@ public sealed class Hunter : IDirewolfClient
     }
 
     /// <summary>
-    /// When a Wolfpack is created, it will strip the <see cref="WolfpackMessage.Parameters"/> dictionary's data
+    /// When a Wolfpack is created, it will strip the <see cref="WolfpackMessage.Properties"/> dictionary's data
     /// and do two things: create a CacheElement, delete the entry from the dictionary.
     /// Whenever a Wolfpack is returned with an empty Payload, means it loaded all elements to Cache. 
     /// </summary>
@@ -63,7 +64,7 @@ public sealed class Hunter : IDirewolfClient
     {
         try
         {
-            ArgumentNullException.ThrowIfNull(wolfpackMessage.Parameters);
+            ArgumentNullException.ThrowIfNull(wolfpackMessage.Properties);
             Crud(in wolfpackMessage, Operation.Create, out var wolfpack);
             return Task.FromResult(wolfpack);
         }
@@ -74,10 +75,10 @@ public sealed class Hunter : IDirewolfClient
     }
 
     /// <summary>
-    /// Takes the keys inside <see cref="WolfpackMessage.Parameters"/> and looks for them inside the <see cref="DataCache"/>.
-    /// If found, it will remove the element with the same key, and add another with the values stored in Parameters.
+    /// Takes the keys inside <see cref="WolfpackMessage.Properties"/> and looks for them inside the <see cref="DataCache"/>.
+    /// If found, it will remove the element with the same key, and add another with the values stored in Properties.
     /// <remarks>
-    /// All operations are one-on-one with <see cref="WolfpackMessage.Parameters"/>: all key-value pair inside the <see cref="WolfpackMessage"/>
+    /// All operations are one-on-one with <see cref="WolfpackMessage.Properties"/>: all key-value pair inside the <see cref="WolfpackMessage"/>
     /// equals a key-value pair inside <see cref="DataCache"/>. Use this property to manipulate the database directly.
     /// </remarks>
     /// </summary>
@@ -87,7 +88,7 @@ public sealed class Hunter : IDirewolfClient
     {
         try
         {
-            ArgumentNullException.ThrowIfNull(wolfpackMessage.Parameters);
+            ArgumentNullException.ThrowIfNull(wolfpackMessage.Properties);
             Crud(in wolfpackMessage, Operation.Update, out var wolfpack);
             return Task.FromResult(wolfpack);
         }
@@ -98,7 +99,7 @@ public sealed class Hunter : IDirewolfClient
     }
 
     /// <summary>
-    /// Looks for all cached elements with the same keys as the ones inside <see cref="WolfpackMessage.Parameters"/> and
+    /// Looks for all cached elements with the same keys as the ones inside <see cref="WolfpackMessage.Properties"/> and
     /// deletes them from the <see cref="DataCache"/>.
     /// </summary>
     /// <param name="wolfpackMessage"></param>
@@ -107,7 +108,7 @@ public sealed class Hunter : IDirewolfClient
     {
         try
         {
-            ArgumentNullException.ThrowIfNull(wolfpackMessage.Parameters);
+            ArgumentNullException.ThrowIfNull(wolfpackMessage.Properties);
             Crud(in wolfpackMessage, Operation.Delete, out var wolfpack);
             return Task.FromResult(wolfpack);
         }
@@ -118,7 +119,7 @@ public sealed class Hunter : IDirewolfClient
     }
 
     /// <summary>
-    /// Looks for all the cached elements matching all keys inside <see cref="WolfpackMessage.Parameters"/>, and
+    /// Looks for all the cached elements matching all keys inside <see cref="WolfpackMessage.Properties"/>, and
     /// returns a Wolfpack with the values filled.
     ///
     /// <remarks>
@@ -132,10 +133,10 @@ public sealed class Hunter : IDirewolfClient
     {
         try
         {
-            ArgumentNullException.ThrowIfNull(wolfpackMessage.Parameters);
-            var decode = (IDictionary<string, object>)wolfpackMessage.Parameters;
+            ArgumentNullException.ThrowIfNull(wolfpackMessage.Properties);
+            var decode = (IDictionary<string, object>)wolfpackMessage.Properties;
 
-            var addedPayload = wolfpackMessage with { Parameters = decode["keys"] };
+            var addedPayload = wolfpackMessage with { Properties = decode["keys"] };
             Crud(in addedPayload, Operation.Read, out var wolfpack);
             return Task.FromResult(wolfpack);
         }
@@ -174,8 +175,8 @@ public sealed class Hunter : IDirewolfClient
     private void Crud(in WolfpackMessage input, Operation op, out WolfpackMessage output)
     {
 
-        if (input.Parameters is null) throw new NullReferenceException();
-        var incomingDictionary = (Dictionary<string, object>)input.Parameters;
+        if (input.Properties is null) throw new NullReferenceException();
+        var incomingDictionary = (Dictionary<string, object>)input.Properties;
 
         var counter = 0;
         foreach (var incomingKey in incomingDictionary!)
@@ -215,7 +216,7 @@ public sealed class Hunter : IDirewolfClient
 
         output = input with
         {
-            Parameters = new
+            Properties = new
             {
                 updated = counter
             }

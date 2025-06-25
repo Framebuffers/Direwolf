@@ -15,16 +15,16 @@ public class HunterClient(McpDriver driver, TextReader? input = null, TextWriter
         {
             try
             {
-                var request = JsonSerializer.Deserialize<WolfpackMessage>(line);
-                var response = await driver.HandleRequest(request);
-                var responseJson = JsonSerializer.Serialize(response);
-                Debug.WriteLine(responseJson);
-                await output?.WriteLineAsync(responseJson)!;
+                // var request = JsonSerializer.Deserialize<McpRequest>(line);
+                // // var response = await McpDriver.RequestTool(WolfpackMessage.Create(GlobalDictionary.HunterResources, request));
+                // var responseJson = JsonSerializer.Serialize(response);
+                // Debug.WriteLine(responseJson);
+                // await output?.WriteLineAsync(responseJson)!;
                 await output?.FlushAsync()!;
             }
             catch (Exception e)
             {
-                var error = OperationHandler.CreateErrorResponse(-32700, "Parsing error.", e.Message);
+                var error = ResourceHandler.CreateErrorResponse(-32700, "Parsing error.", e.Message);
                 var json = JsonSerializer.Serialize(error);
                 Debug.WriteLine(json);
                 await output?.WriteLineAsync(json)!;

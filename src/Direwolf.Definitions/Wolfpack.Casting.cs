@@ -13,24 +13,24 @@
 //     public static Wolfpack Create(Cuid? id,
 //         MessageType requestType,
 //         string? name,
-//         WolfpackMessage @Parameters,
+//         WolfpackMessage @Properties,
 //         string? description = null)
 // return new Wolfpack(id ?? Cuid.Create(), 
 //             requestType, 
 //             name, 
-//             @Parameters, 
+//             @Properties, 
 //             description);
 //     }
 //
 //     public static Wolfpack Create(MessageType requestType, 
 //         string? name, 
-//         WolfpackMessage @Parameters,
+//         WolfpackMessage @Properties,
 //         string? description = null)
 //     {
 //         return new Wolfpack(Cuid.Create(), 
 //             requestType, 
 //             name, 
-//             @Parameters, 
+//             @Properties, 
 //             description);
 //     }
 //     

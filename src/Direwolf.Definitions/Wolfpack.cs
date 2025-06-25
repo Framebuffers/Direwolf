@@ -27,9 +27,9 @@ namespace Direwolf.Definitions;
 // ///         standard for transport across Clients and Servers.
 // ///     </remarks>
 // /// </summary>
-// /// <Parameters>
+// /// <Properties>
 // /// 
-// /// </Parameters>
+// /// </Properties>
 
 /// <summary>
 /// 
@@ -38,7 +38,7 @@ namespace Direwolf.Definitions;
 /// <param name="Name"></param>
 /// <param name="MessageResponse"></param>
 /// <param name="RequestType"></param>
-/// <param name="McpResponseResult"></param>
+/// <param name="Result"></param>
 /// <param name="Data"></param>
 /// <param name="Description"></param>
 public readonly record struct Wolfpack(
@@ -46,8 +46,8 @@ public readonly record struct Wolfpack(
     [property: JsonPropertyName("name"), JsonPropertyOrder(1)]string Name,
     [property: JsonIgnore]MessageResponse MessageResponse,
     [property: JsonIgnore]RequestType RequestType,
-    [property: JsonPropertyName("result")]object? McpResponseResult,
-    [property: JsonPropertyName("Parameters"), JsonPropertyOrder(3)]IDictionary<string, object>? Parameters,
+    [property: JsonPropertyName("result")]object? Result,
+    [property: JsonPropertyName("parameters"), JsonPropertyOrder(3)]object? Parameters,
     [property: JsonPropertyName("description"), JsonPropertyOrder(2)]string? Description
 )
 {
@@ -62,12 +62,12 @@ public readonly record struct Wolfpack(
     ///     Creates a specialized deep clone of a <see cref="Wolfpack" />, on which only <see cref="Result" />
     ///     and <see cref="Data" /> are modified.
     /// </summary>
-    /// <param name="token">Another token with different Parameters and ResultType payloads.</param>
+    /// <param name="token">Another token with different Properties and ResultType payloads.</param>
     private Wolfpack(Wolfpack token) : this(Cuid.Create(), 
         token.Name, 
         token.MessageResponse,
         token.RequestType, 
-        token.McpResponseResult, 
+        token.Result, 
         token.Parameters,
         token.Description)
     {
@@ -87,9 +87,9 @@ public readonly record struct Wolfpack(
     /// <param name="description"></param>
     /// <param name="name">Name for this Wolfpack</param>
     /// <returns></returns>
-    public static Wolfpack Create(string name, MessageResponse messageResponse, RequestType requestType, IDictionary<string, object>? @params = null, string? description = null)
+    public static Wolfpack Create(string name, MessageResponse messageResponse, RequestType requestType, object? result, object? @params, string? description = null)
     {
-        var howl = new Wolfpack(Cuid.Create(), name, messageResponse, requestType, null,@params, description);
+        var howl = new Wolfpack(Cuid.Create(), name, messageResponse, requestType, result, @params, description);
         return howl;
     }
 
@@ -122,7 +122,7 @@ public readonly record struct Wolfpack(
     /// <returns></returns>
     public Wolfpack DeepCopy(ResultType resultType, Dictionary<string, object> newParams)
     {
-        return this with { McpResponseResult= resultType, Parameters = newParams, MessageResponse = MessageResponse.Result };
+        return this with { Result= resultType, Parameters = newParams, MessageResponse = MessageResponse.Result };
     }
 
     // public static string GetHowlDataTypeAsString(Wolfpack wolfpack)
@@ -143,37 +143,8 @@ public readonly record struct Wolfpack(
     //     }; 
     // }
 
-    public static CacheItem[]? AsCacheItem(Wolfpack? howl)
+    public static CacheItem? AsCacheItem(Wolfpack? howl)
     {
-        return howl?
-                .Parameters?
-            .Select(payloadElement => 
-                new CacheItem(payloadElement.Key, payloadElement.Value))
-            .ToArray(); 
+        return new CacheItem(howl?.Id.Value, howl);
     }
-    
-    
-    // To normalize all operations done with Howls, these methods are provided. Use them to make sure
-    // you're doing what you want inside the ElementCache.
-    
-    public static Wolfpack Read(WolfpackMessage parameters)
-    {
-        return Create("read", MessageResponse.Request, RequestType.Get, (Dictionary<string, object>)parameters.Parameters!, null);
-    }
-    
-    public static Wolfpack Add(Dictionary<string, object> values)
-    {
-        return Create("add", MessageResponse.Request, RequestType.Put, values);
-    }
-    
-    public static Wolfpack Delete(WolfpackMessage parameters)
-    {
-        return Create("delete", MessageResponse.Request, RequestType.Delete, (Dictionary<string, object>)parameters.Parameters!, null);
-    }
-    
-    public static Wolfpack Update(WolfpackMessage parameters)
-    {
-        return Create("update", MessageResponse.Request, RequestType.Patch, (Dictionary<string, object>)parameters.Parameters!, null);
-    }
-  
 }

@@ -3,7 +3,7 @@
 namespace Direwolf.Driver.MCP.Tools;
 
 //TODO: update tasks to reflect new tools.
-public static class ToolDefinitions
+public static class ResourceDefinitions
 {
     public static McpTool CreateWolfpack => new McpTool(
         "create",
@@ -15,12 +15,12 @@ public static class ToolDefinitions
             {
                 name = new { type = "string", description = "Wolfpack name" },
                 description = new { type = "string", description = "Wolfpack content's Description" },
-                payload = new { type = "object", description = "Parameters to add to the DataCache." }
+                payload = new { type = "object", description = "Properties to add to the DataCache." }
             },
             required = new[] { "name", "payload" }
         });
 
-    public static McpTool GetWolfpack => new(
+    public static McpTool ReadWolfpack => new(
         "get",
         "Get a Wolfpack by its ID",
         new
