@@ -25,12 +25,17 @@ public static class ElementExtensions
         try
         {
             parameters = [];
-            if (element.Category is null || element.Document is null || element.Parameters is null) return;
-            parameters = [];
-            foreach (Parameter p in element.Parameters)
+            if (element.Category is null || element.Document is null || element.Parameters is null || element.Id.Value < 0) return;
+            foreach (Parameter p in element.GetOrderedParameters())
             {
                 if (p is null || !p.HasValue || p.Definition is null) continue;
-                parameters.Add(TryDo(() => RevitParameter.Create(p)));
+                try
+                {
+                    parameters.Add(RevitParameter.Create(p));
+                }
+                catch
+                {
+                }
             }
 
             parameters.AddRange(from Parameter p in element.Parameters select RevitParameter.Create(p));

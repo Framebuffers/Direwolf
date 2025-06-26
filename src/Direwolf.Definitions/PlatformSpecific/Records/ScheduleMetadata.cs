@@ -88,7 +88,7 @@ public readonly record struct RevitSchedule(Document doc, ScheduleMetadata Metad
         {
             var rowData = new Dictionary<string, object>();
             var cellsData = new List<object>();
-            for (int col = 0; col < sectionData.NumberOfColumns; col++)
+            for (int col = 0; col <= sectionData.NumberOfColumns; col++)
             {
                 try
                 {
@@ -121,10 +121,10 @@ public readonly record struct RevitSchedule(Document doc, ScheduleMetadata Metad
         if (footerSection is not null && footerSection.NumberOfRows > 0)
         {
             var footerRows = new List<List<string>>();
-            for (int row = 0; row < footerSection.NumberOfRows; row++)
+            for (int row = 0; row <= footerSection.NumberOfRows; row++)
             {
                 var footerCells = new List<string>();
-                for (int col = 0; col < footerSection.NumberOfColumns; col++)
+                for (int col = 0; col <= footerSection.NumberOfColumns; col++)
                 {
                     try
                     {
@@ -153,7 +153,7 @@ public readonly record struct RevitSchedule(Document doc, ScheduleMetadata Metad
 
         var definition = table.Definition;
         var fields = new List<Dictionary<string, object>>();
-        for (int i = 0; i < definition.GetFieldCount(); i++)
+        for (int i = 0; i <= definition.GetFieldCount(); i++)
         {
             var field = definition.GetField(i);
             var fieldInfo = new Dictionary<string, object>()
@@ -190,7 +190,7 @@ public readonly record struct RevitSchedule(Document doc, ScheduleMetadata Metad
         var definition = table.Definition;
         var sortingInfo = new Dictionary<string, object>();
         var sortFields = new List<Dictionary<string, object>>();
-        for (int i = 0; i < definition.GetSortGroupFieldCount(); i++)
+        for (int i = 0; i <= definition.GetSortGroupFieldCount(); i++)
         {
             var sortField = definition.GetSortGroupField(i);
             var sortInfo = new Dictionary<string, object>()
@@ -218,7 +218,7 @@ public readonly record struct RevitSchedule(Document doc, ScheduleMetadata Metad
         var filteringInfo = new Dictionary<string, object>();
 
         var filters = new List<Dictionary<string, object>>();
-        for (int i = 0; i < definition.GetFilterCount(); i++)
+        for (int i = 0; i <= definition.GetFilterCount(); i++)
         {
             var filter = definition.GetFilter(i);
             var filterInfo = new Dictionary<string, object>()

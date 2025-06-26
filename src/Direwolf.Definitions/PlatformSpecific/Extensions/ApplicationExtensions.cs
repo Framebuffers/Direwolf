@@ -36,16 +36,12 @@ public static class ApplicationExtensions
             .Select(x => x.UniqueId);
     }
 
-    public static string ElementsOfCategoryInViewToJsonl(this View v, Document doc, Category categoryToFilter)
+    public static string?[] ElementsOfCategoryInViewToJsonl(this View v, Document doc, Category categoryToFilter)
     {
-        var sb = new StringWriter();
-        sb.Write(v.GetElementsInViewByCategory(doc, categoryToFilter)
-            .Select(x => RevitElement.Create(doc, x))
-            .Where(x => x is not null)
-            .SelectMany(x => x!.Value.Parameters.Where(y => y is not null)
-                .Select(y => y!.Value))
-            .ToList());
-        return sb.ToString(); 
+        return v.GetElementsInViewByCategory(doc, categoryToFilter)
+        .Select(x => RevitElement.AsJsonl(doc, x))
+        .Where(x => x is not null)
+        .ToArray();
     }
 
     

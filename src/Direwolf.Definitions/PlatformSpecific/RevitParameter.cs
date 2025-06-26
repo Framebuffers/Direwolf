@@ -1,6 +1,6 @@
-﻿using System.Diagnostics;
-using System.Globalization;
+﻿using System.Globalization;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Mechanical;
 
 namespace Direwolf.Definitions.PlatformSpecific;
 
@@ -37,38 +37,27 @@ public readonly record struct RevitParameter(StorageType StorageType, string Key
             return null;
         }
     }
-    
+
     private static string GetValue(Parameter p)
     {
-        // as simple an approach as possible.
-        // ConvertFromInternalUnits() always takes doubles as an input.
-        // elements without a 
-        if (p.GetUnitTypeId() is not null && p.StorageType == StorageType.Double)
+        try
         {
-            try
+            return p.StorageType switch
             {
-                if (UnitUtils.IsUnit(p.Definition.GetDataType()))
-                    Debug.Print($"Unit converted: {p.Definition.Name}, {p.GetTypeId().TypeId}");
-                 return UnitUtils.ConvertFromInternalUnits(p.AsDouble(),
-                        p.GetUnitTypeId())
-                    .ToString(CultureInfo.InvariantCulture);
-            }
-            catch
-            {
-                return p.AsDouble().ToString(CultureInfo.InvariantCulture);
-            } 
+                StorageType.None => "None",
+                StorageType.Integer => p.AsInteger().ToString(),
+                StorageType.Double => p.AsDouble()
+                    .ToString
+                        (CultureInfo.InvariantCulture),
+                StorageType.String => p.AsString(),
+                StorageType.ElementId => p.AsElementId().ToString(),
+                _ => "None"
+            };
         }
-        
-        return p.StorageType switch
+        catch
         {
-            StorageType.None => "None",
-            StorageType.Integer => p.AsInteger().ToString(),
-            StorageType.Double => p.AsDouble()
-                .ToString
-                    (CultureInfo.InvariantCulture),
-            StorageType.String => p.AsString(),
-            StorageType.ElementId => p.AsElementId().ToString(),
-            _ => "None"
-        };
+            return "undefined";
+        }
+
     }
 }

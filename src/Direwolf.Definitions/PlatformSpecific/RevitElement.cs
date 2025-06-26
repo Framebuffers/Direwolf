@@ -1,4 +1,5 @@
 ﻿using System.Runtime.Caching;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Autodesk.Revit.DB;
 using Direwolf.Definitions.Extensions;
@@ -236,5 +237,22 @@ public readonly record struct RevitElement(
         return category is null
             ? (CategoryType.Invalid, BuiltInCategory.INVALID)
             : (category.CategoryType, category.BuiltInCategory);
+    }
+
+    public static string? AsJsonl(Document doc, string elementUniqueId)
+    { 
+        var el = doc.GetElement(elementUniqueId);
+        var parameters = new Dictionary<string, object>();
+        foreach (var param in el.GetOrderedParameters())
+        {
+            var decodedParam = RevitParameter.Create(param);
+            if (decodedParam is null) continue;
+            parameters.Add(decodedParam.Value.Key, decodedParam.Value.Value);
+        }
+
+        return JsonSerializer.Serialize(new Dictionary<string, object>
+        {
+            [elementUniqueId] = parameters
+        });
     }
 }

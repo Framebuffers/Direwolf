@@ -8,6 +8,7 @@ using Direwolf.Definitions.Enums;
 using Direwolf.Definitions.LLM;
 using Direwolf.Definitions.PlatformSpecific;
 using Direwolf.Definitions.PlatformSpecific.Extensions;
+using Direwolf.Definitions.PlatformSpecific.Records;
 using Direwolf.Driver.MCP;
 using Direwolf.Extensions;
 using Microsoft.WindowsAPICodePack.Dialogs;
@@ -30,7 +31,7 @@ namespace Direwolf.Revit.Commands.Testing;
 ///     Test suite for Direwolf.
 /// </summary>
 [UsedImplicitly]
-[Transaction(TransactionMode.ReadOnly)]
+[Transaction(TransactionMode.Manual)]
 public class TestCommands : ExternalCommand
 {
     private static readonly StringWriter? StringWriter = new();
@@ -55,8 +56,6 @@ public class TestCommands : ExternalCommand
      */
     private MessageResponse Check_PopulateDB()
     {
-        using Autodesk.Revit.DB.Transaction trans = new Transaction(Document);
-        
         WriteToConsole("Populating Database");
         var wolfden = Wolfden.GetInstance(Document);
         if (wolfden.GetRevitCache().Count == 0) wolfden.PopulateDatabase(Document);
@@ -233,33 +232,50 @@ public class TestCommands : ExternalCommand
         return MessageResponse.Result;
     }
 
-    private MessageResponse Check_CategoryAsJsonl()
+    private MessageResponse Check_SchedulesToJson()
     {
-        var x = ExternalCommandData.Application.ActiveUIDocument.ActiveView;
-        var windows = Document.GetElements()
-                    .WhereElementIsNotElementType()
-                    .WhereElementIsViewIndependent()
-                    .OfCategory(BuiltInCategory.OST_Windows)
-                    .ToElementIds()
-                    .Where(x => !x.Equals(ElementId.InvalidElementId))
-                    .ToArray();
-        var jsonl = x.ElementsOfCategoryInViewToJsonl(Document, Document.GetElement(windows[0]).Category);
+        using Transaction trans = new(Document);
+        trans.Start("Writing Schedules to JSON");
+        var schedules = new FilteredElementCollector(Document)
+            .OfClass(typeof(ViewSchedule))
+            .ToElements()
+            .Select(x => x as ViewSchedule);
+        
+        var results = new List<RevitSchedule>();
+        
+        foreach (var sch in schedules)
+        {
+            if (sch is null) continue;
+            var data = RevitSchedule.Create(ScheduleMetadata.Create(sch), Document);
+            results.Add(data);
+        }
+        
+        
+        // var windows = Document.GetElements()
+        //             .WhereElementIsNotElementType()
+        //             .WhereElementIsViewIndependent()
+        //             .OfCategory(BuiltInCategory.OST_Windows)
+        //             .ToElementIds()
+        //             .Where(x => !x.Equals(ElementId.InvalidElementId))
+        //             .ToArray();
+        
         var wp = _message with
                 {
-                    Name = "category_as_jsonl",
-                    Description = "Get all windows as a JSONL.",
+                    Name = "schedule_to_json",
+                    Description = "Serialize all schedules to JSON.",
                     Result = new
                     {
-                        result = jsonl
+                        result = results
                     }
                 };
         
         McpDriver.ToConsole(wp.ToString());
                     
-                WriteFile("Test06_WindowsToJsonl.json",
+                WriteFile("Test06_SchedulesToJson.json",
                     JsonSerializer.Serialize(wp),
                     out var time);
                 WriteToConsole($"Time taken: {time}");
+                trans.Commit();
                 return MessageResponse.Result; 
     }
     
@@ -293,7 +309,7 @@ public class TestCommands : ExternalCommand
             WriteToConsole("Running Test 5: Get all IFC GUID's from all Doors");
             WriteToConsole(Check_DatabaseQuery().ToString());
             WriteToConsole("Running Test 6: Serialize all windows to JSONL");
-            WriteToConsole(Check_CategoryAsJsonl().ToString());
+            WriteToConsole(Check_SchedulesToJson().ToString());
 
 
             var args = _message with
