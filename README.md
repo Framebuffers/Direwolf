@@ -19,7 +19,11 @@ Some features are in constant, fast development. They may be broken, they may br
   - Completely new object definitions.
   - Engine is completely independent of the running Revit application (just provide a Document and you're ready to go!),
   - and much more!
-- **v0.1-alpha: Proof of concept. Users have been experiencing problems setting it up. I am working right now for a patch to make it easier to get up and running, as well as a working binary. If you want it to work right now, **make sure the DLL's from the `Direwolf.Revit.UI\Libraries` folder are in the same place as the rest of Direwolf's DLL's. The solution file + `.csproj` should do this automatically. I am aware of the issues and I'm working to sort them out. Thanks for the feedback!
+- **v0.1-alpha:**
+  - Proof of concept.
+  - Users have been experiencing problems setting it up. I am working right now for a patch to make it easier to get up and running, as well as a working binary.
+  - If you want it to work right now, **make sure the DLL's from the `Direwolf.Revit.UI\Libraries` folder are in the same place as the rest of Direwolf's DLL's. The solution file + `.csproj` should do this automatically. I am aware of the issues and I'm working to sort them out.
+  - Thanks for the feedback!
 
 
 ## ⚙️ Installation
