@@ -1,0 +1,15 @@
+﻿<RevitAddIns>
+    <AddIn Type="Application">
+        <Name>Direwolf.Revit</Name>
+        <Assembly>Direwolf.Revit\Direwolf.Revit.dll</Assembly>
+        <AddInId>A9EDD133-00A2-4A5B-8C35-EB20BB32F9D8</AddInId>
+        <FullClassName>Direwolf.Revit.Application</FullClassName>
+        <VendorId>Framebuffer</VendorId>
+        <VendorDescription></VendorDescription>
+        <VendorEmail>hello@framebuffer.cl</VendorEmail>
+    </AddIn>
+    <ManifestSettings>
+        <UseRevitContext>False</UseRevitContext>
+        <ContextName>Direwolf.Revit</ContextName>
+    </ManifestSettings>
+</RevitAddIns>

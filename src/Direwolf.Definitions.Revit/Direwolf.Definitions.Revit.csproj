@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0-windows</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Direwolf.Definitions\Direwolf.Definitions.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Serialization\ScheduleSerialization.cs" />
+    </ItemGroup>
+
+</Project>
