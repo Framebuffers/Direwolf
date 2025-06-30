@@ -50,7 +50,7 @@ Everything needed to connect to Revit, query, store and visualise parameters and
   - `Direwolf`: Contains the main classes for Direwolf, Wolfden and Hunter.
   - `Direwolf.Definitions`: All the type and class definitions used across the framework.
   - `Direwolf.Definitions.Revit`: All Autodesk Revit-specific type and class definitions.
-  - `Direwolf.Driver.MCP`: **[in development]** Model Context Protocol (MCP) driver for Direwolf.
+  - `Direwolf.Driver.MCP`: **[in development]** Model Context Protocol (MCP) driver for Direwolf. // not available in this release
   - `Direwolf.Revit`: Revit add-in.
 
 ## ⚠️ What is not in this repository?
