@@ -1,10 +1,5 @@
-﻿using System.Diagnostics;
-using System.Net.Http.Headers;
-using System.Text.Json;
-using System.Windows.Input;
-using Autodesk.Revit.DB;
+﻿using System.Text.Json;
 using Direwolf.Definitions;
-using Direwolf.Definitions.Enums;
 using Direwolf.Definitions.LLM;
 
 namespace Direwolf.Driver.MCP.Tools;

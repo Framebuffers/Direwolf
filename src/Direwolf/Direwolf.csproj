@@ -36,6 +36,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Direwolf.Definitions.Revit\Direwolf.Definitions.Revit.csproj" />
         <ProjectReference Include="..\Direwolf.Definitions\Direwolf.Definitions.csproj"/>
     </ItemGroup>
 </Project>

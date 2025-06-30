@@ -24,4 +24,13 @@
     <ItemGroup>
       <Reference Include="Microsoft.Extensions.Primitives" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Wolfpack_legacy.cs" />
+      <Compile Remove="Serialization\WolfpackJsonConverter.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="PlatformSpecific\" />
+    </ItemGroup>
 </Project>

@@ -1,5 +1,4 @@
 ﻿using System.Runtime.Caching;
-using System.Threading.Tasks.Sources;
 using Autodesk.Revit.DB;
 using Direwolf.Definitions.Extensions;
 
@@ -67,7 +66,7 @@ public static class DocumentExtensions
     ///     A collection of every single valid <see cref="Autodesk.Revit.DB.Element" /> inside the <see cref="Document" />
     ///     as a <see cref="CacheItem" /> of a <see cref="RevitElement" />.
     /// </returns>
-    public static IEnumerable<CacheItem?> GetRevitDatabaseAsCacheItems(this Document doc, out Dictionary<string, string?> keyCacheValue)
+    public static IEnumerable<CacheItem?> GetRevitDatabaseAsCacheItems(this Document doc, out Dictionary<string, string> keyCacheValue)
     {
         ArgumentNullException.ThrowIfNull
             (doc);
@@ -87,7 +86,7 @@ public static class DocumentExtensions
         var revitUnique = x.Select(x => x.elementUniqueId).ToList();
         var direwolfUnique = x.Select(x => x.direwolfId).ToList();
 
-        keyCacheValue = revitUnique.Zip(direwolfUnique).ToDictionary(y => y.First, y => y.Second);
+        keyCacheValue = revitUnique.Zip(direwolfUnique).ToDictionary(y => y.First, y => y.Second)!;
         return elements;
         // var d = filteredElementCollector
         //     .WhereElementIsNotElementType()

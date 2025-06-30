@@ -7,8 +7,6 @@ using Direwolf.Definitions;
 using Direwolf.Definitions.Enums;
 using Direwolf.Definitions.LLM;
 using Direwolf.Definitions.PlatformSpecific;
-using Direwolf.Definitions.PlatformSpecific.Extensions;
-using Direwolf.Definitions.PlatformSpecific.Records;
 using Direwolf.Driver.MCP;
 using Direwolf.Extensions;
 using Microsoft.WindowsAPICodePack.Dialogs;
@@ -232,53 +230,7 @@ public class TestCommands : ExternalCommand
         return MessageResponse.Result;
     }
 
-    private MessageResponse Check_SchedulesToJson()
-    {
-        using Transaction trans = new(Document);
-        trans.Start("Writing Schedules to JSON");
-        var schedules = new FilteredElementCollector(Document)
-            .OfClass(typeof(ViewSchedule))
-            .ToElements()
-            .Select(x => x as ViewSchedule);
-        
-        var results = new List<RevitSchedule>();
-        
-        foreach (var sch in schedules)
-        {
-            if (sch is null) continue;
-            var data = RevitSchedule.Create(ScheduleMetadata.Create(sch), Document);
-            results.Add(data);
-        }
-        
-        
-        // var windows = Document.GetElements()
-        //             .WhereElementIsNotElementType()
-        //             .WhereElementIsViewIndependent()
-        //             .OfCategory(BuiltInCategory.OST_Windows)
-        //             .ToElementIds()
-        //             .Where(x => !x.Equals(ElementId.InvalidElementId))
-        //             .ToArray();
-        
-        var wp = _message with
-                {
-                    Name = "schedule_to_json",
-                    Description = "Serialize all schedules to JSON.",
-                    Result = new
-                    {
-                        result = results
-                    }
-                };
-        
-        McpDriver.ToConsole(wp.ToString());
-                    
-                WriteFile("Test06_SchedulesToJson.json",
-                    JsonSerializer.Serialize(wp),
-                    out var time);
-                WriteToConsole($"Time taken: {time}");
-                trans.Commit();
-                return MessageResponse.Result; 
-    }
-    
+  
     public override void Execute()
     {
         var t2 = TaskDialog.Show("Executing Direwolf Tests",
@@ -308,8 +260,6 @@ public class TestCommands : ExternalCommand
             WriteToConsole(Check_JsonFromDisk().ToString());
             WriteToConsole("Running Test 5: Get all IFC GUID's from all Doors");
             WriteToConsole(Check_DatabaseQuery().ToString());
-            WriteToConsole("Running Test 6: Serialize all windows to JSONL");
-            WriteToConsole(Check_SchedulesToJson().ToString());
 
 
             var args = _message with

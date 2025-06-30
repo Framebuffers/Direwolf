@@ -71,15 +71,16 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Direwolf.Definitions.Revit\Direwolf.Definitions.Revit.csproj" />
         <ProjectReference Include="..\Direwolf.Driver.MCP\Direwolf.Driver.MCP.csproj" />
         <ProjectReference Include="..\Direwolf\Direwolf.csproj"/>
         <ProjectReference Include="..\Direwolf.Definitions\Direwolf.Definitions.csproj"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <Resource Include="Resources\Icons\Placeholder\slice1_16.png"/>
-        <Resource Include="Resources\Icons\Placeholder\slice1_32.png"/>
-    </ItemGroup>
+<!--    <ItemGroup>-->
+<!--        <Resource Include="Resources\Icons\Placeholder\slice1_16.png"/>-->
+<!--        <Resource Include="Resources\Icons\Placeholder\slice1_32.png"/>-->
+<!--    </ItemGroup>-->
 
     <ItemGroup>
         <Reference Include="RevitLookup.UI">
@@ -96,11 +97,6 @@
             <Pack>True</Pack>
             <PackagePath></PackagePath>
         </None>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Folder Include="Commands\Exporting\"/>
-        <Folder Include="Commands\Importing\"/>
     </ItemGroup>
 
 </Project>

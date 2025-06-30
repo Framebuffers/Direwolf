@@ -1,16 +1,12 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
-using System.Windows.Forms.VisualStyles;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI.Events;
 using Direwolf.Definitions.LLM;
-using Direwolf.Definitions.PlatformSpecific;
 using Direwolf.Driver.MCP;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Nice3point.Revit.Toolkit.External;
-using Revit.Async;
-using Wpf.Ui.Controls;
 using static Autodesk.Revit.UI.TaskDialogCommonButtons;
 using TaskDialog = Autodesk.Revit.UI.TaskDialog;
 using TaskDialogResult = Autodesk.Revit.UI.TaskDialogResult;
@@ -25,8 +21,6 @@ public class AnthopicClient : ExternalCommand
     private readonly Hunter? _hunter = Hunter.GetInstance(Direwolf.GetInstance());
     private string? _anthropicApiKey;
     private static string? _path;
-    private readonly TextReader? _reader = null;
-    private readonly TextWriter? _writer = null;
     
     public override void Execute()
     {

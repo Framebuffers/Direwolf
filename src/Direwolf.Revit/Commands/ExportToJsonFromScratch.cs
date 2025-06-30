@@ -3,6 +3,9 @@ using System.IO;
 using System.Text.Json;
 using System.Windows.Forms;
 using Autodesk.Revit.Attributes;
+using Direwolf.Definitions;
+using Direwolf.Definitions.Enums;
+using Direwolf.Definitions.LLM;
 using Direwolf.Extensions;
 using Nice3point.Revit.Toolkit.External;
 using TaskDialog = Autodesk.Revit.UI.TaskDialog;
@@ -17,6 +20,15 @@ namespace Direwolf.Revit.Commands;
     (TransactionMode.Manual)]
 public class ExportToJsonFromScratch : ExternalCommand
 {
+    private readonly WolfpackMessage _message = new(
+        Cuid.Create().Value!,
+        "Direwolf Self Test",
+        "object",
+        "object",
+        1,
+        MessageResponse.Result.ToString(),
+        null,
+        $"{GlobalDictionary.DirewolfSelfTest}/"); 
     public override void Execute()
     {
         using var saveDialog = new SaveFileDialog();
@@ -27,9 +39,20 @@ public class ExportToJsonFromScratch : ExternalCommand
 
         if (saveDialog.ShowDialog() == DialogResult.OK)
         {
+            var database = Document.GetRevitDbByCategory();
+
+            Dictionary<string, object> dictionary = database.ToDictionary(pair => pair.Key.ToString(), object (pair) => pair.Value);
+            var wp = _message with
+            {
+                Name = "json_from_disk",
+                Description = "Get the whole Revit Document to a JSON file.",
+                Result = dictionary
+            };
+            
+            
             var filePath = saveDialog.FileName;
             WriteFile
-                (filePath);
+                (filePath, JsonSerializer.Serialize(wp));
         }
         else
         {
@@ -40,16 +63,14 @@ public class ExportToJsonFromScratch : ExternalCommand
         }
     }
 
-    private void WriteFile(string fileName)
+    private void WriteFile(string fileName, string data)
     {
         TaskDialog t = new
             ("Exporting Results to JsonSchemas");
         Stopwatch sw = new();
         sw.Start();
         File.WriteAllText
-        (fileName,
-            JsonSerializer.Serialize
-                (Document.GetRevitDbByCategory()));
+        (fileName, data);
         sw.Stop();
         t.MainContent = $"File saved at {fileName}Time taken: {sw.Elapsed.TotalSeconds}";
         t.Show();

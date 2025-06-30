@@ -7,7 +7,7 @@ namespace Direwolf.Definitions.Extensions;
 
 public static class CuidExtensions
 {
-    internal const string Base36Chars = "0123456789abcdefghijklmnopqrstuvwxyz";
+    public const string Base36Chars = "0123456789abcdefghijklmnopqrstuvwxyz";
 
     public static string GetDocumentUuidHash(this Document doc)
     {

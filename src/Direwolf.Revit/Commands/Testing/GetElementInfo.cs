@@ -6,18 +6,14 @@ using Autodesk.Revit.Attributes;
 using Direwolf.Definitions;
 using Direwolf.Definitions.Enums;
 using Direwolf.Definitions.LLM;
+using Direwolf.Definitions.PlatformSpecific;
 using Nice3point.Revit.Toolkit.External;
 using TaskDialog = Autodesk.Revit.UI.TaskDialog;
 
-namespace Direwolf.Revit.Commands;
+namespace Direwolf.Revit.Commands.Testing;
 
-/// <summary>
-///     Exports the Direwolf Wolfden to JsonSchemas.
-/// </summary>
-[UsedImplicitly]
-[Transaction
-    (TransactionMode.Manual)]
-public class ExportCacheToJson : ExternalCommand
+[Transaction(TransactionMode.ReadOnly)]
+public class GetElementInfo : ExternalCommand
 {
     private readonly WolfpackMessage _message = new(
         Cuid.Create().Value!,
@@ -35,15 +31,23 @@ public class ExportCacheToJson : ExternalCommand
         saveDialog.Title = "Save ResultType";
         saveDialog.DefaultExt = "json";
         saveDialog.AddExtension = true;
-
+        
         if (saveDialog.ShowDialog() == DialogResult.OK)
         {
-            Direwolf.GetAllElements(Document, out var dictionary);
+            var elements = new List<RevitElement?>();
+            
+            var selection = UiDocument.Selection; 
+            var selectedElements = selection.GetElementIds().ToElements(Document);
+            foreach (var element in selectedElements)
+            {
+                elements.Add(RevitElement.Create(Document, element.UniqueId));
+            }
+            
             var wp = _message with
             {
-                Name = "json_from_wolfden",
-                Description = "Get the whole Revit Document from the local cache.",
-                Result = dictionary!
+                Name = "selected_elements",
+                Description = "Get information from selected elements.",
+                Result = elements
             };
             
             var filePath = saveDialog.FileName;
@@ -53,7 +57,7 @@ public class ExportCacheToJson : ExternalCommand
         else
         {
             var t = new TaskDialog
-                ("Exporting Cache to JsonSchemas") { MainContent = "File not saved" };
+                ("Writing info about selected elements") { MainContent = "File not saved" };
             t.Show();
             t.Dispose();
         }
@@ -62,7 +66,7 @@ public class ExportCacheToJson : ExternalCommand
     private void WriteFile(string fileName, string data)
     {
         TaskDialog t = new
-            ("Exporting Results to JsonSchemas");
+            ("Writing info about selected elements");
         Stopwatch sw = new();
         sw.Start();
         File.WriteAllText

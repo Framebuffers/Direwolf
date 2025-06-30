@@ -1,7 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Text.Json;
-using Direwolf.Definitions;
-using Direwolf.Definitions.LLM;
 using Direwolf.Driver.MCP.Tools;
 
 namespace Direwolf.Driver.MCP;

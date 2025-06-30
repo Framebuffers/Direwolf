@@ -1,13 +1,10 @@
-﻿using System.Diagnostics;
-using System.Text.Json;
+﻿using System.Text.Json;
 using Anthropic.SDK;
 using Anthropic.SDK.Constants;
 using Anthropic.SDK.Messaging;
 using Direwolf.Definitions;
-using Direwolf.Definitions.Enums;
 using Direwolf.Definitions.LLM;
 using Direwolf.Driver.MCP.Tools;
-using MessageResponse = Direwolf.Definitions.Enums.MessageResponse;
 
 namespace Direwolf.Driver.MCP;
 

@@ -2,7 +2,6 @@
 using System.Text.Json.Serialization;
 using Direwolf.Definitions.Enums;
 using Direwolf.Definitions.Extensions;
-using Direwolf.Definitions.LLM;
 
 namespace Direwolf.Definitions;
 

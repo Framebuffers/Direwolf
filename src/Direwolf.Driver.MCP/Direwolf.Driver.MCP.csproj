@@ -17,8 +17,4 @@
       <ProjectReference Include="..\Direwolf\Direwolf.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Serialization\" />
-    </ItemGroup>
-
 </Project>

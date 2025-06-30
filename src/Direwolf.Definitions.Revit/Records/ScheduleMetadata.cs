@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 
 namespace Direwolf.Definitions.PlatformSpecific.Records;
 
@@ -27,7 +26,7 @@ public readonly record struct ScheduleMetadata(
     }
 }
 
-public readonly record struct RevitSchedule(Document doc, ScheduleMetadata Metadata, IDictionary<string, object> Data = null)
+public readonly record struct RevitSchedule(Document doc, ScheduleMetadata Metadata, IDictionary<string, object>? Data = null)
 {
 
     public static RevitSchedule Create(ScheduleMetadata metadata, Document doc)
@@ -160,7 +159,7 @@ public readonly record struct RevitSchedule(Document doc, ScheduleMetadata Metad
             {
                 ["index"] = i,
                 ["fieldId"] = field.FieldId.IntegerValue,
-                ["parameterId"] = field.ParameterId?.IntegerValue,
+                ["parameterId"] = field.ParameterId?.Value!,
                 ["heading"] = field.GetName(),
                 ["isHidden"] = field.IsHidden,
                 ["width"] = field.SheetColumnWidth,

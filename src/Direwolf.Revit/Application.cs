@@ -1,5 +1,4 @@
 ﻿using Direwolf.Revit.Commands;
-using Direwolf.Revit.Commands.Testing;
 using Nice3point.Revit.Toolkit.External;
 
 namespace Direwolf.Revit;
@@ -59,15 +58,15 @@ public class Application : ExternalApplication
         panel.AddPushButton<About>("About")
             .SetImage("/Direwolf.Revit;component/Resources/Icons/Placeholder/slice1_16.png")
             .SetLargeImage("/Direwolf.Revit;component/Resources/Icons/Placeholder/slice_32.png");
-        var ai = Application.CreatePanel("MCP", "Direwolf");
-        ai.AddPushButton<CheckStabilityOfElements>("Check IDs")
-            .SetImage("/Direwolf.Revit;component/Resources/Icons/Placeholder/slice1_16.png)")
-            .SetLargeImage("/Direwolf.Revit;component/Resources/Icons/Placeholder/slice_32.png");
-        ai.AddPushButton<AnthopicClient>("Init MCP Client")
-            .SetImage("/Direwolf.Revit;component/Resources/Icons/Placeholder/slice1_16.png")
-            .SetLargeImage("/Direwolf.Revit;component/Resources/Icons/Placeholder/slice_32.png");
-        ai.AddPushButton<TestCommands>("Self Test")
-            .SetImage("/Direwolf.Revit;component/Resources/Icons/Placeholder/slice1_16.png")
-            .SetLargeImage("/Direwolf.Revit;component/Resources/Icons/Placeholder/slice_32.png");
+        // var ai = Application.CreatePanel("MCP", "Direwolf");
+        // ai.AddPushButton<GetElementInfo>("Check IDs")
+        //     .SetImage("/Direwolf.Revit;component/Resources/Icons/Placeholder/slice1_16.png)")
+        //     .SetLargeImage("/Direwolf.Revit;component/Resources/Icons/Placeholder/slice_32.png");
+        // ai.AddPushButton<AnthopicClient>("Init MCP Client")
+        //     .SetImage("/Direwolf.Revit;component/Resources/Icons/Placeholder/slice1_16.png")
+        //     .SetLargeImage("/Direwolf.Revit;component/Resources/Icons/Placeholder/slice_32.png");
+        // ai.AddPushButton<TestCommands>("Self Test")
+        //     .SetImage("/Direwolf.Revit;component/Resources/Icons/Placeholder/slice1_16.png")
+        //     .SetLargeImage("/Direwolf.Revit;component/Resources/Icons/Placeholder/slice_32.png");
     }
 }

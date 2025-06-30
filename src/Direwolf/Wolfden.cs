@@ -1,13 +1,10 @@
 ﻿using System.Runtime.Caching;
-using System.Text.Json;
 using Autodesk.Revit.DB;
 using Direwolf.Definitions;
 using Direwolf.Definitions.Enums;
-using Direwolf.Definitions.Extensions;
 using Direwolf.Definitions.LLM;
 using Direwolf.Definitions.PlatformSpecific;
 using Direwolf.Definitions.PlatformSpecific.Extensions;
-using YamlDotNet.Core.Tokens;
 
 namespace Direwolf;
 
@@ -45,7 +42,7 @@ public sealed class Wolfden
             // These cache items have the Revit Element's UniqueId as a key, and the RevitElement object as values.
             var revitDb = doc.GetRevitDatabaseAsCacheItems(out var kvpCache);
             
-            
+            if (kvpCache is null) throw new NullReferenceException();
             foreach (var cacheItem in revitDb)
             {
                 if (cacheItem is null) continue;
