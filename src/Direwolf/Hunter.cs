@@ -16,7 +16,7 @@ public class Hunter
     private static readonly object Lock = new();
     private static Direwolf _direwolf;
     private static Hunter? _instance;
-    private static 
+    // private static 
 
     private Hunter(Direwolf dw) { _direwolf = dw; }
 
@@ -65,18 +65,18 @@ public class Hunter
 
     private void NotFound()
     {
-        using HttpListenerResponse resp = ctx.Response;
-        resp.Headers.Set("Content-Type", "text/plain");
-
-        using Stream ros = resp.OutputStream;
-
-        ctx.Response.StatusCode = (int)HttpStatusCode.NotFound;
-        string err = "404 - not found";
-
-        byte[] ebuf = Encoding.UTF8.GetBytes(err);
-        resp.ContentLength64 = ebuf.Length;
-
-        ros.Write(ebuf, 0, ebuf.Length); 
+        // using HttpListenerResponse resp = ctx.Response;
+        // resp.Headers.Set("Content-Type", "text/plain");
+        //
+        // using Stream ros = resp.OutputStream;
+        //
+        // ctx.Response.StatusCode = (int)HttpStatusCode.NotFound;
+        // string err = "404 - not found";
+        //
+        // byte[] ebuf = Encoding.UTF8.GetBytes(err);
+        // resp.ContentLength64 = ebuf.Length;
+        //
+        // ros.Write(ebuf, 0, ebuf.Length); 
     }
     
     

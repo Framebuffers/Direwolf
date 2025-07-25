@@ -7,3 +7,6 @@
 [submodule "wolfden"]
 	path = wolfden
 	url = https://github.com/Framebuffers/wolfden.git
+[submodule "src/Direwolf.Revit"]
+	path = src/Direwolf.Revit
+	url = https://github.com/Framebuffers/Direwolf.Revit.git
