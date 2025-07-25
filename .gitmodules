@@ -1,0 +1,9 @@
+[submodule "wolfpack"]
+	path = wolfpack
+	url = https://github.com/Framebuffers/wolfpack.git
+[submodule "hunter"]
+	path = hunter
+	url = https://github.com/Framebuffers/hunter.git
+[submodule "wolfden"]
+	path = wolfden
+	url = https://github.com/Framebuffers/wolfden.git

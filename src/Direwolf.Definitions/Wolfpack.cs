@@ -5,33 +5,41 @@ using Direwolf.Definitions.Extensions;
 
 namespace Direwolf.Definitions;
 
-// /// <summary>
-// ///     A <see cref="Wolfpack" /> is the specialized interchange format of <see cref="Direwolf" />. Any and all communications
-// ///     made, both internally and externally, is made through <see cref="Wolfpack" />s. It is an immutable, value-typed,
-// ///     JsonSchemas-inspired,
-// ///     universal interchange object. <see cref="Wolfpack" />s are identified using <see cref="Cuid" /> (Collision-Resistant
-// ///     Unique Identifiers) to identify themselves. This format encodes both time and date, origin, and ensures a certain
-// ///     level of uniqueness and security. See <see cref="Cuid" /> for more details.
-// ///     <remarks>
-// ///         This format loosely follows the draft specification for
-// ///         <see href="https://modelcontextprotocol.io/introduction">Model Control Protocol</see>
-// ///         by Anthropic. It is designed to also serve as an interoperability object to communicate both internally and
-// ///         externally to any kind of data warehouse; including direct communication between the Direwolf instance and an
-// ///         LLM.
-// ///         <see cref="Direwolf" />, by design, is designed to be platform-agnostic. Regardless of host, any communication
-// ///         to and from the client.
-// ///         MCP is implemented as an abstract concept of information exchange between any kind of entity, as it includes
-// ///         all the information needed to comply with the
-// ///         <see href="https://www.jsonrpc.org/specification">JsonSchemas-RPC 2.0</see>
-// ///         standard for transport across Clients and Servers.
-// ///     </remarks>
-// /// </summary>
-// /// <Properties>
-// /// 
-// /// </Properties>
-
+//TODO: Fix data model, it does not represent actual MCP.
+//      Server      = exposes tools.
+//      Tools       = functions that can be called by the LLM.
+//      Resources   = Data that can be read by the LLM (API responses or file contents).
+//      Prompts     = pre-written templates to accomplish specific tasks.
+// In Direwolf's context:
+//      Server      = Hunter, exposes functions that are called by MCP hosts, like Wolfden operations or Direwolf host calls.
+//      Tools       = Each specific operation, be it a primitive operation (read, write, delete, update) or a composite of those.
+//      Resources   = Wolfden raw data, or Direwolf responses.
+//      Prompts     = Commands issued by the end-user.
+// **ALL** internal communications **MUST** be made using HTTP, with Hunter being an HTTP server running locally.
+// Only a single method of communications must be used throughout all of Direwolf's context.
+// The C# codebase's scope will be limited up to providing tools for manipulating the host app only, making it 100%
+// RESTful.
+// Hunter will be moved outside the C# codebase onto a Python/Node/idk right now what codebase to make it **much** easier to write for.
 /// <summary>
-/// 
+///     A <see cref="Wolfpack" /> is the specialized interchange format of <see cref="Direwolf" />. Any and all communications
+///     made, both internally and externally, is made through <see cref="Wolfpack" />s. It is an immutable, value-typed,
+///     JsonSchemas-inspired,
+///     universal interchange object. <see cref="Wolfpack" />s are identified using <see cref="Cuid" /> (Collision-Resistant
+///     Unique Identifiers) to identify themselves. This format encodes both time and date, origin, and ensures a certain
+///     level of uniqueness and security. See <see cref="Cuid" /> for more details.
+///     <remarks>
+///         This format loosely follows the draft specification for
+///         <see href="https://modelcontextprotocol.io/introduction">Model Control Protocol</see>
+///         by Anthropic. It is designed to also serve as an interoperability object to communicate both internally and
+///         externally to any kind of data warehouse; including direct communication between the Direwolf instance and an
+///         LLM.
+///         <see cref="Direwolf" />, by design, is designed to be platform-agnostic. Regardless of host, any communication
+///         to and from the client.
+///         MCP is implemented as an abstract concept of information exchange between any kind of entity, as it includes
+///         all the information needed to comply with the
+///         <see href="https://www.jsonrpc.org/specification">JsonSchemas-RPC 2.0</see>
+///         standard for transport across Clients and Servers.
+///     </remarks>
 /// </summary>
 /// <param name="Id"></param>
 /// <param name="Name"></param>
