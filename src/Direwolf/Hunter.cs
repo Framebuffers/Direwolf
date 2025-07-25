@@ -24,7 +24,4 @@ public class Hunter
             return _instance;
         }
     }
-   
-     
-    
 }
