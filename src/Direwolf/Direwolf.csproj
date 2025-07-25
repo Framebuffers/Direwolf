@@ -39,4 +39,8 @@
         <ProjectReference Include="..\Direwolf.Definitions.Revit\Direwolf.Definitions.Revit.csproj" />
         <ProjectReference Include="..\Direwolf.Definitions\Direwolf.Definitions.csproj"/>
     </ItemGroup>
+
+    <ItemGroup>
+      <Compile Include=".legacy\_Hunter.cs" />
+    </ItemGroup>
 </Project>

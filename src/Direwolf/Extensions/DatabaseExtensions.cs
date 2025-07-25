@@ -1,8 +1,8 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.Exceptions;
 using Direwolf.Definitions.Enums;
-using Direwolf.Definitions.PlatformSpecific;
-using Direwolf.Definitions.PlatformSpecific.Extensions;
+using Direwolf.Definitions.Revit;
+using Direwolf.Definitions.Revit.Extensions;
 
 namespace Direwolf.Extensions;
 

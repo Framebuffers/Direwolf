@@ -6,7 +6,7 @@ using Autodesk.Revit.DB;
 using Direwolf.Definitions.Extensions;
 using static System.Enum;
 
-namespace Direwolf.Definitions.PlatformSpecific.Serialization;
+namespace Direwolf.Definitions.Revit.Serialization;
 
 [SuppressMessage("ReSharper", "RedundantAssignment")]
 public sealed class ElementJsonSerializer : JsonConverter<RevitElement>

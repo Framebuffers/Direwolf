@@ -3,11 +3,11 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Autodesk.Revit.DB;
 using Direwolf.Definitions.Extensions;
-using Direwolf.Definitions.PlatformSpecific.Extensions;
-using Direwolf.Definitions.PlatformSpecific.Serialization;
+using Direwolf.Definitions.Revit.Extensions;
+using Direwolf.Definitions.Revit.Serialization;
 using Direwolf.Definitions.Serialization;
 
-namespace Direwolf.Definitions.PlatformSpecific;
+namespace Direwolf.Definitions.Revit;
 
 /// <summary>
 ///     A symbolic representation of a <see cref="Autodesk.Revit.DB.Element" /> inside the context of

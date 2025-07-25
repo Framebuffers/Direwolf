@@ -2,7 +2,7 @@
 using Autodesk.Revit.DB;
 using Direwolf.Definitions.Extensions;
 
-namespace Direwolf.Definitions.PlatformSpecific.Extensions;
+namespace Direwolf.Definitions.Revit.Extensions;
 
 /// <summary>
 ///     Helper functions to manage data in and out of a <see cref="Document" />

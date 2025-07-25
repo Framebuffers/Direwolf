@@ -1,6 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 
-namespace Direwolf.Definitions.PlatformSpecific.Extensions;
+namespace Direwolf.Definitions.Revit.Extensions;
 
 public static class ElementIdExtensions
 {

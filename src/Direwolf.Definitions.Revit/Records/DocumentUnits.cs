@@ -3,7 +3,7 @@ using Autodesk.Revit.DB;
 using static System.String;
 
 
-namespace Direwolf.Definitions.PlatformSpecific.Records;
+namespace Direwolf.Definitions.Revit.Records;
 
 // Unimplemented feature as of 2025-05-29
 public readonly record struct DocumentUnits(

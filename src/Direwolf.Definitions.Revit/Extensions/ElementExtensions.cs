@@ -3,7 +3,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.Exceptions;
 using static Direwolf.Definitions.Extensions.DirewolfExtensions;
 
-namespace Direwolf.Definitions.PlatformSpecific.Extensions;
+namespace Direwolf.Definitions.Revit.Extensions;
 
 /// <summary>
 ///     Helper methods for <see cref="Autodesk.Revit.DB.Element" />.

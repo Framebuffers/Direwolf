@@ -1,4 +1,4 @@
-﻿namespace Direwolf.Definitions.PlatformSpecific.Enums;
+﻿namespace Direwolf.Definitions.Revit.Enums;
 
 // Unimplemented feature as of 2025-05-29
 /// <summary>

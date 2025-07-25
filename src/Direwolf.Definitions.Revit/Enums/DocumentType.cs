@@ -1,4 +1,4 @@
-﻿namespace Direwolf.Definitions.PlatformSpecific.Enums;
+﻿namespace Direwolf.Definitions.Revit.Enums;
 
 /// <summary>
 ///     Constrains the execution of this query to a given type of Document. This is

@@ -1,4 +1,4 @@
-﻿namespace Direwolf.Definitions.PlatformSpecific.Serialization;
+﻿namespace Direwolf.Definitions.Revit.Serialization;
 
 public static class RevitElementJsonSchema
 {

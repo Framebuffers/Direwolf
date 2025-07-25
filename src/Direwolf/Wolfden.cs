@@ -3,8 +3,8 @@ using Autodesk.Revit.DB;
 using Direwolf.Definitions;
 using Direwolf.Definitions.Enums;
 using Direwolf.Definitions.LLM;
-using Direwolf.Definitions.PlatformSpecific;
-using Direwolf.Definitions.PlatformSpecific.Extensions;
+using Direwolf.Definitions.Revit;
+using Direwolf.Definitions.Revit.Extensions;
 
 namespace Direwolf;
 

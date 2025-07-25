@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using Autodesk.Revit.DB;
 
-namespace Direwolf.Definitions.PlatformSpecific;
+namespace Direwolf.Definitions.Revit;
 
 /// <summary>
 ///     A symbolic representation of a <see cref="Parameter" /> inside a <see cref="Autodesk.Revit.DB.Element" />. It

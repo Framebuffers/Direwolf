@@ -1,6 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 
-namespace Direwolf.Definitions.PlatformSpecific.Records;
+namespace Direwolf.Definitions.Revit.Records;
 
 public readonly record struct ScheduleMetadata(
     string Id,

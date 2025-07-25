@@ -4,7 +4,7 @@ using Autodesk.Revit.DB;
 using Direwolf.Definitions.Extensions;
 using Direwolf.Definitions.Serialization;
 
-namespace Direwolf.Definitions.PlatformSpecific.Extensions;
+namespace Direwolf.Definitions.Revit.Extensions;
 
 public static class RevitCuidExtensions
 {

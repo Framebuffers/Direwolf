@@ -6,9 +6,9 @@
 /// </summary>
 public interface IDirewolfClient
 {
-    Task<WolfpackMessage> CreateAsync(in WolfpackMessage wolfpackMessage);
-    Task<WolfpackMessage> UpdateAsync(in WolfpackMessage wolfpackMessage);
-    Task<WolfpackMessage> DeleteAsync(in WolfpackMessage wolfpackMessage);
-    Task<WolfpackMessage> GetAsync(in WolfpackMessage wolfpackMessage);
-    Task<WolfpackMessage> GetManyAsync(in WolfpackMessage wolfpackMessage);
+    Task<McpResponse> CreateAsync(in McpRequest wolfpackMessage);
+    Task<McpResponse> UpdateAsync(in McpRequest wolfpackMessage);
+    Task<McpResponse> DeleteAsync(in McpRequest wolfpackMessage);
+    Task<McpResponse> GetAsync(in McpRequest wolfpackMessage);
+    Task<McpResponse> GetManyAsync(in McpRequest wolfpackMessage);
 }

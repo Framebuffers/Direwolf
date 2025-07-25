@@ -1,6 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 
-namespace Direwolf.Definitions.PlatformSpecific.Records;
+namespace Direwolf.Definitions.Revit.Records;
 
 /// <summary>
 ///     An episode is an identifier for the state of a <see cref="Document" /> that can both uniquely identify it, and
