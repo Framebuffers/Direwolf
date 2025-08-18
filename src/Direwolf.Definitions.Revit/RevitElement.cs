@@ -191,7 +191,7 @@ public readonly record struct RevitElement(
     }
 
     // /// <summary>
-    // /// Aggregate <see cref="RevitElement"/> into a single Wolfpack with RevitElements, where the <see cref="WolfpackMessage.Properties"/> dictionary sorts them by <see cref="RevitElement.ElementUniqueId"/>
+    // /// Aggregate <see cref="RevitElement"/> into a single Wolfpack with RevitElements, where the <see cref="WolfpackMessage.Parameters"/> dictionary sorts them by <see cref="RevitElement.ElementUniqueId"/>
     // /// as key, and <see cref="RevitElement"/> itself as value.
     // /// </summary>
     // /// <param name="elements"></param>
@@ -201,7 +201,7 @@ public readonly record struct RevitElement(
     // public static MessageResponse Aggregate(in RevitElement[] elements, WolfpackMessage wolfpack,
     //     out WolfpackMessage updated)
     // {
-    //     var uniqueKeys = wolfpack.Properties;
+    //     var uniqueKeys = wolfpack.Parameters;
     //
     //     if (uniqueKeys is null)
     //     {
@@ -211,7 +211,7 @@ public readonly record struct RevitElement(
     //
     //     foreach (var (key, result) in from incomingElement in elements
     //              let newKey = incomingElement.ElementUniqueId
-    //              where wolfpack.Properties.ContainsKey(newKey) is false
+    //              where wolfpack.Parameters.ContainsKey(newKey) is false
     //              select (newKey, incomingElement))
     //     {
     //

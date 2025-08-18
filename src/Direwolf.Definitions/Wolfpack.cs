@@ -69,7 +69,7 @@ public readonly record struct Wolfpack(
     ///     Creates a specialized deep clone of a <see cref="Wolfpack" />, on which only <see cref="Result" />
     ///     and <see cref="Data" /> are modified.
     /// </summary>
-    /// <param name="token">Another token with different Properties and ResultType payloads.</param>
+    /// <param name="token">Another token with different Parameters and ResultType payloads.</param>
     private Wolfpack(Wolfpack token) : this(Cuid.Create(), 
         token.Name, 
         token.MessageResponse,

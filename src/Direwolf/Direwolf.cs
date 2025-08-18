@@ -1,5 +1,4 @@
-﻿using System.Runtime.Caching;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 using Direwolf.Definitions;
 using Direwolf.Definitions.Enums;
 using Direwolf.Definitions.Extensions;
@@ -13,15 +12,6 @@ using Exception = System.Exception;
 // ReSharper disable HeapView.ObjectAllocation.Possible
 // ReSharper disable HeapView.ObjectAllocation
 
-/*
- * To do: 2025-06-23
- *
- * Changing dicts to anonymous objs
- *      - prolly better for the MCP stuff
- * Views, sheets and schedules
- *      - main focus for testing
- *      - ok cool JSON and shit, now make it useful
- */
 
 namespace Direwolf;
 
@@ -48,7 +38,7 @@ namespace Direwolf;
 ///     <see cref="Document" />
 ///     to perform the <see cref="Transaction" /> it requires. Each one is tracked
 /// </summary>
-public sealed class Direwolf
+public sealed partial class Direwolf
 {
     private static readonly object Lock = new();
 
@@ -56,7 +46,8 @@ public sealed class Direwolf
     private static Direwolf? _instance;
     private readonly List<Wolfpack> _exceptions = [];
     private readonly Dictionary<string, string> _loadCache = [];
-
+    // public Hunter GetHunter() => Hunter.GetInstance(this);
+    
     internal void LoadCache(Dictionary<string, string> keys)
     {
         foreach (var key in keys)
@@ -114,7 +105,7 @@ public sealed class Direwolf
                     Id = element.Value.Id.Value!, // cuid
                     Description = $"{element.Value.CategoryType}: {element.Value.BuiltInCategory}",
                     MessageType = MessageResponse.Result.ToString(),
-                    Properties = element.Value.Parameters,
+                    Parameters = element.Value.Parameters,
                     Type = "object",
                     Uri = $"{GlobalDictionary.RevitElement}/{element.Value.BuiltInCategory}"
                 };
@@ -235,9 +226,8 @@ public sealed class Direwolf
 
     public static MessageResponse GetAllElements(Document doc, out IDictionary<string, object>? elements)
     {
-        elements = Wolfden.GetInstance(doc).GetRevitCache();
+        elements = Wolfden.GetInstance(doc).GetDatabase();
         return MessageResponse.Result;
     }
 
-    public ObjectCache GetHunterCache() => Wolfden.HunterCache;
 }

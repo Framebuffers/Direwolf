@@ -57,6 +57,5 @@ public readonly record struct RevitParameter(StorageType StorageType, string Key
         {
             return "undefined";
         }
-
     }
 }

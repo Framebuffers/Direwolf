@@ -2,6 +2,9 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$/.." vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../hunter" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Direwolf.Revit" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../wolfden" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../wolfpack" vcs="Git" />
   </component>
 </project>

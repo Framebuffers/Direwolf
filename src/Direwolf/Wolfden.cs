@@ -12,8 +12,7 @@ public sealed class Wolfden
 {
     private static Wolfden? _instance;
     private static readonly object Lock = new();
-    private readonly ObjectCache _revitCache = MemoryCache.Default;
-    public static ObjectCache HunterCache = MemoryCache.Default;
+    private static readonly ObjectCache Database = MemoryCache.Default;
     private static readonly CacheItemPolicy Policy = new() { SlidingExpiration = TimeSpan.FromMinutes(60) };
 
     private Wolfden(Document doc)
@@ -22,7 +21,8 @@ public sealed class Wolfden
         PopulateDatabase(doc);
     }
     
-    public IDictionary<string, object> GetRevitCache() => _revitCache.ToDictionary();
+    public static IDictionary<string, object> GetDatabase() => Database.ToDictionary();
+    public ObjectCache GetHunterCache() => Database;
 
     public static Wolfden GetInstance(Document? doc)
     {
@@ -46,7 +46,7 @@ public sealed class Wolfden
             foreach (var cacheItem in revitDb)
             {
                 if (cacheItem is null) continue;
-                _revitCache.Add(cacheItem, Policy);
+                Database.Add(cacheItem, Policy);
             }
             Direwolf.GetInstance().LoadCache(kvpCache);
             return MessageResponse.Result;
@@ -64,9 +64,9 @@ public sealed class Wolfden
             // Inside Direwolf, the AddOrUpdateRevitElement() method will take
             // each Element's UniqueId, create a RevitElement as a CacheItem, and put them on an array.
             // We know what type it's going to be, so we can cast it safely.
-            if (entity?.Properties is null) return MessageResponse.Error;
+            if (entity?.Parameters is null) return MessageResponse.Error;
             var encodedWolfpack = Encode(entity);
-            _revitCache.Add(encodedWolfpack, Policy); 
+            Database.Add(encodedWolfpack, Policy); 
 
             return MessageResponse.Notification;
         }
@@ -75,33 +75,32 @@ public sealed class Wolfden
             return MessageResponse.Error;
         }
     }
-    
 
     public MessageResponse Delete(WolfpackMessage? entity)
     {
         // We know that the Wolfpack's payload value is string[]?, if it was constructed using Direwolf
         // Given Wolfden is Internal, all operations should go through Direwolf.
         // So this shouldn't be a problem... right?
-        if (entity?.Properties is null) return MessageResponse.Error;
+        if (entity?.Parameters is null) return MessageResponse.Error;
         var encodedWolfpack = Encode(entity); 
-        _revitCache.Remove(encodedWolfpack.Key); 
+        Database.Remove(encodedWolfpack.Key); 
      
         return MessageResponse.Notification;
     }
 
-    internal IDictionary<string, object> DirectRead(string[] keys) => _revitCache.GetValues(keys);
+    internal IDictionary<string, object> DirectRead(string[] keys) => Database.GetValues(keys);
     internal void DirectWrite(CacheItem[] objects)
     {
         foreach (var o in objects)
         {
-            _revitCache.Add(o, Policy);
+            Database.Add(o, Policy);
         }
     }
 
     internal void DirectDelete(string[] keys)
     {
         foreach (var o in keys)
-            _revitCache.Remove(o);
+            Database.Remove(o);
     }
 
     public MessageResponse Read(WolfpackMessage? entity, out IDictionary<string, object>? results)
@@ -112,7 +111,7 @@ public sealed class Wolfden
             return MessageResponse.Error;
         }
         
-        results = _revitCache.GetValues(entity.Value.Id);
+        results = Database.GetValues(entity.Value.Id);
         return MessageResponse.Notification;
     }
 

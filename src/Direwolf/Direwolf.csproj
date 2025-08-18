@@ -15,7 +15,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="MessagePack" Version="3.1.4" />
         <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.5"/>
+        <PackageReference Include="StreamJsonRpc" Version="2.22.11" />
         <PackageReference Include="System.Runtime.Caching" Version="9.0.5"/>
         <PackageReference Include="YamlDotNet" Version="16.3.0"/>
 
@@ -36,11 +38,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Direwolf.Definitions.Revit\Direwolf.Definitions.Revit.csproj" />
         <ProjectReference Include="..\Direwolf.Definitions\Direwolf.Definitions.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Include=".legacy\_Hunter.cs" />
+      <Compile Include=".legacy\.Hunter.cs" />
     </ItemGroup>
 </Project>

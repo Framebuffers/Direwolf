@@ -1,10 +1,11 @@
 ﻿// using System.Runtime.Caching;
+// using Direwolf.Definitions;
 // using Direwolf.Definitions.LLM;
 //
 // namespace Direwolf;
 //
 // //TODO: refactor to use Wolfpack for everything **except** finalised data out.
-// public sealed class Hunter : IDirewolfClient
+// public sealed class Hunter : IHunter
 // {
 //     private static readonly object Lock = new();
 //     private static Hunter? _instance;
@@ -54,7 +55,7 @@
 //     }
 //
 //     /// <summary>
-//     /// When a Wolfpack is created, it will strip the <see cref="WolfpackMessage.Properties"/> dictionary's data
+//     /// When a Wolfpack is created, it will strip the <see cref="WolfpackMessage.Parameters"/> dictionary's data
 //     /// and do two things: create a CacheElement, delete the entry from the dictionary.
 //     /// Whenever a Wolfpack is returned with an empty Payload, means it loaded all elements to Cache. 
 //     /// </summary>
@@ -64,7 +65,7 @@
 //     {
 //         try
 //         {
-//             ArgumentNullException.ThrowIfNull(wolfpackMessage.Properties);
+//             ArgumentNullException.ThrowIfNull(wolfpackMessage.Parameters);
 //             Crud(in wolfpackMessage, Operation.Create, out var wolfpack);
 //             return Task.FromResult(wolfpack);
 //         }
@@ -75,10 +76,10 @@
 //     }
 //
 //     /// <summary>
-//     /// Takes the keys inside <see cref="WolfpackMessage.Properties"/> and looks for them inside the <see cref="DataCache"/>.
-//     /// If found, it will remove the element with the same key, and add another with the values stored in Properties.
+//     /// Takes the keys inside <see cref="WolfpackMessage.Parameters"/> and looks for them inside the <see cref="DataCache"/>.
+//     /// If found, it will remove the element with the same key, and add another with the values stored in Parameters.
 //     /// <remarks>
-//     /// All operations are one-on-one with <see cref="WolfpackMessage.Properties"/>: all key-value pair inside the <see cref="WolfpackMessage"/>
+//     /// All operations are one-on-one with <see cref="WolfpackMessage.Parameters"/>: all key-value pair inside the <see cref="WolfpackMessage"/>
 //     /// equals a key-value pair inside <see cref="DataCache"/>. Use this property to manipulate the database directly.
 //     /// </remarks>
 //     /// </summary>
@@ -88,7 +89,7 @@
 //     {
 //         try
 //         {
-//             ArgumentNullException.ThrowIfNull(wolfpackMessage.Properties);
+//             ArgumentNullException.ThrowIfNull(wolfpackMessage.Parameters);
 //             Crud(in wolfpackMessage, Operation.Update, out var wolfpack);
 //             return Task.FromResult(wolfpack);
 //         }
@@ -99,7 +100,7 @@
 //     }
 //
 //     /// <summary>
-//     /// Looks for all cached elements with the same keys as the ones inside <see cref="WolfpackMessage.Properties"/> and
+//     /// Looks for all cached elements with the same keys as the ones inside <see cref="WolfpackMessage.Parameters"/> and
 //     /// deletes them from the <see cref="DataCache"/>.
 //     /// </summary>
 //     /// <param name="wolfpackMessage"></param>
@@ -108,7 +109,7 @@
 //     {
 //         try
 //         {
-//             ArgumentNullException.ThrowIfNull(wolfpackMessage.Properties);
+//             ArgumentNullException.ThrowIfNull(wolfpackMessage.Parameters);
 //             Crud(in wolfpackMessage, Operation.Delete, out var wolfpack);
 //             return Task.FromResult(wolfpack);
 //         }
@@ -119,7 +120,7 @@
 //     }
 //
 //     /// <summary>
-//     /// Looks for all the cached elements matching all keys inside <see cref="WolfpackMessage.Properties"/>, and
+//     /// Looks for all the cached elements matching all keys inside <see cref="WolfpackMessage.Parameters"/>, and
 //     /// returns a Wolfpack with the values filled.
 //     ///
 //     /// <remarks>
@@ -133,10 +134,10 @@
 //     {
 //         try
 //         {
-//             ArgumentNullException.ThrowIfNull(wolfpackMessage.Properties);
-//             var decode = (IDictionary<string, object>)wolfpackMessage.Properties;
+//             ArgumentNullException.ThrowIfNull(wolfpackMessage.Parameters);
+//             var decode = (IDictionary<string, object>)wolfpackMessage.Parameters;
 //
-//             var addedPayload = wolfpackMessage with { Properties = decode["keys"] };
+//             var addedPayload = wolfpackMessage with { Parameters = decode["keys"] };
 //             Crud(in addedPayload, Operation.Read, out var wolfpack);
 //             return Task.FromResult(wolfpack);
 //         }
@@ -172,56 +173,76 @@
 //         Delete
 //     }
 //
-//     private void Crud(in WolfpackMessage input, Operation op, out WolfpackMessage output)
+//     private void Crud(in McpRequest input, out McpRequest output, string? key)
 //     {
 //
-//         if (input.Properties is null) throw new NullReferenceException();
-//         var incomingDictionary = (Dictionary<string, object>)input.Properties;
-//
+//         if (input is null) throw new NullReferenceException();
+//         key ??= Cuid.Create().Value;
+//         
 //         var counter = 0;
-//         foreach (var incomingKey in incomingDictionary!)
-//         {
-//             var cacheKey = new CacheItem(incomingKey.Key, incomingDictionary[incomingKey.Key]);
-//             switch (op)
+//
+//             var cacheKey = new CacheItem(key, input.);
+//             switch (input.Method)
 //             {
-//                 case Operation.Create:
-//                     DataCache.Add(new CacheItem(incomingKey.Key, incomingDictionary[incomingKey.Key]), Policy);
+//                 case "create":
+//                     DataCache.Add(new CacheItem(key, incomingDictionary[incomingKey.Key]), Policy);
 //                     counter++;
 //                     break;
-//                 case Operation.Read:
+//                 case "read":
 //                     var readValue = DataCache.Get(cacheKey.Key);
-//                     output = input with { Result = readValue };
+//                     output = input with { s = readValue };
 //                     counter++;
-//                     break;
-//                 case Operation.ReadArray:
+//                     break;ggVG
+//                 case "read_many":
 //                     var values = DataCache.GetValues(incomingDictionary.Keys);
 //                     output = input with { Result = values };
-//                     counter = +incomingDictionary.Count;
 //                     break;
-//                 case Operation.Update:
-//                     if (!DataCache.Contains(incomingKey.Key)) continue;
-//                     DataCache.Remove(incomingKey.Key);
+//                 case "update":
+//                     DataCache.Remove(key);
 //                     DataCache.Add(cacheKey, Policy);
 //                     counter++;
 //                     break;
-//                 case Operation.Delete:
-//                     if (!DataCache.Contains(incomingKey.Key)) continue;
-//                     DataCache.Remove(incomingKey.Key);
+//                 case "delete":
+//                     DataCache.Remove(key);
 //                     counter++;
 //                     break;
 //                 default:
-//                     throw new ArgumentOutOfRangeException(nameof(op), op, null);
-//             }
+//                     throw new ArgumentOutOfRangeException(nameof(input), input, null);
+//             
 //         }
 //
 //         output = input with
 //         {
-//             Properties = new
+//             Parameters = new
 //             {
 //                 updated = counter
 //             }
 //         };
 //     }
-//     
-//     
+//
+//
+//     public Task<McpResponse> CreateAsync(in McpRequest wolfpackMessage)
+//     {
+//         throw new NotImplementedException();
+//     }
+//
+//     public Task<McpResponse> UpdateAsync(in McpRequest wolfpackMessage)
+//     {
+//         throw new NotImplementedException();
+//     }
+//
+//     public Task<McpResponse> DeleteAsync(in McpRequest wolfpackMessage)
+//     {
+//         throw new NotImplementedException();
+//     }
+//
+//     public Task<McpResponse> GetAsync(in McpRequest wolfpackMessage)
+//     {
+//         throw new NotImplementedException();
+//     }
+//
+//     public Task<McpResponse> GetManyAsync(in McpRequest wolfpackMessage)
+//     {
+//         throw new NotImplementedException();
+//     }
 // }

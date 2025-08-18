@@ -12,7 +12,7 @@ public readonly record struct WolfpackMessage(
     [property: JsonPropertyName("message_type")] string MessageType,
     [property: JsonPropertyName("result")] object? Result,
     [property: JsonPropertyName("uri")] string Uri,
-    [property: JsonPropertyName("parameters")] object? Properties = null)
+    [property: JsonPropertyName("parameters")] object? Parameters = null)
 {
     [JsonPropertyOrder(0), JsonPropertyName("jsonrpc")] public const string JsonRpc = "2.0";
     [JsonPropertyName("createdAt")] public readonly DateTime CreatedAt = DateTime.UtcNow;
@@ -41,7 +41,7 @@ public readonly record struct WolfpackMessage(
             ["version"] = p.Version,
             ["message_type"] = p.MessageType,
             ["uri"] = p.Uri,
-            ["properties"] = p.Properties!
+            ["properties"] = p.Parameters!
         };
     }
 }

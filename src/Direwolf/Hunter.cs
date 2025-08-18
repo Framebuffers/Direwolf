@@ -1,83 +1,88 @@
-﻿using System.Net;
-using System.Text;
+﻿using System.Runtime.Caching;
+using Direwolf.Definitions.Enums;
+using Direwolf.Definitions.LLM;
 
 namespace Direwolf;
 
-/// <summary>
-/// Direwolf's Server. Handles any external communications between Direwolf and any third-party program.
-/// <list type="bullet">
-///     <item>
-///         <term>Connection with an external PostgreSQL database.</term>
-///     </item>
-/// </list>
-/// </summary>
-public class Hunter
+public class Hunter : IHunter
 {
     private static readonly object Lock = new();
-    private static Direwolf _direwolf;
     private static Hunter? _instance;
-    // private static 
+    private static Direwolf? _direwolf;
+    private static readonly CacheItemPolicy _policy = new CacheItemPolicy(){ SlidingExpiration = TimeSpan.FromMinutes(60) };
+    public const string McpProtocolVersion = "2025-06-18";
 
-    private Hunter(Direwolf dw) { _direwolf = dw; }
+    private Hunter(Direwolf? direwolf)
+    {
+        _direwolf = direwolf;
+    }
 
-    public static Hunter GetInstance(Direwolf dw)
+    public static Hunter GetInstance(Direwolf direwolf)
     {
         if (_instance is not null) return _instance;
-        lock(Lock)
+        lock (Lock)
         {
             if (_instance is not null) return _instance;
-            _instance = new Hunter(dw);
+            _instance = new Hunter(direwolf);
             return _instance;
         }
     }
 
-    /// <summary>
-    /// HTTP server to communicate with Direwolf from the outside.
-    /// 
-    /// <remarks>Direwolf uses port 6621.</remarks>
-    /// </summary>
-    public void StartListener()
+    public Task<WolfpackMessage> CreateAsync(in WolfpackMessage wolfpackMessage)
     {
-        using var listener = new HttpListener();
-        listener.Prefixes.Add("http://localhost:6621/");
-        listener.Start();
-
-        Console.WriteLine("Listening on port 8001...");
-
-        while (true)
+        if (wolfpackMessage.Parameters is null) throw new ArgumentNullException(nameof(wolfpackMessage));
+        var parameters = (Dictionary<string, object>)wolfpackMessage.Parameters;
+        var newElements = (Dictionary<string, object>)parameters.Values.First();
+        foreach (var el in newElements)
         {
-            HttpListenerContext context = listener.GetContext();
-            HttpListenerRequest req = context.Request;
-
-            Console.WriteLine($"Received request for {req.Url}");
-
-            using HttpListenerResponse resp = context.Response;
-            resp.Headers.Set("Content-Type", "text/plain");
-
-            string data = "Hello there!";
-            byte[] buffer = Encoding.UTF8.GetBytes(data);
-            resp.ContentLength64 = buffer.Length;
-
-            using Stream ros = resp.OutputStream;
-            ros.Write(buffer, 0, buffer.Length);
+            Wolfden.GetDatabase().Add(el.Key, el.Value);
         }
+
+        var result = wolfpackMessage with
+        {
+            MessageType = MessageResponse.Result.ToString(),
+            Result = new Dictionary<string, object> { ["create"] = "ok" }
+        };
+        
+        return Task.FromResult(result);
     }
 
-    private void NotFound()
+    public Task<WolfpackMessage> UpdateAsync(in WolfpackMessage wolfpackMessage)
     {
-        // using HttpListenerResponse resp = ctx.Response;
-        // resp.Headers.Set("Content-Type", "text/plain");
-        //
-        // using Stream ros = resp.OutputStream;
-        //
-        // ctx.Response.StatusCode = (int)HttpStatusCode.NotFound;
-        // string err = "404 - not found";
-        //
-        // byte[] ebuf = Encoding.UTF8.GetBytes(err);
-        // resp.ContentLength64 = ebuf.Length;
-        //
-        // ros.Write(ebuf, 0, ebuf.Length); 
+         if (wolfpackMessage.Parameters is null) throw new ArgumentNullException(nameof(wolfpackMessage));
+         var parameters = (Dictionary<string, object>)wolfpackMessage.Parameters;
+         var newElements = (Dictionary<string, object>)parameters.Values.First();
+         
+         foreach (var el in newElements)
+         {
+             var db = Wolfden.GetDatabase();
+             if (!db.TryGetValue(el.Key, out var value))
+             {
+                 db[el.Key] = el.Value;
+             }
+         }
+
+         var result = wolfpackMessage with
+         {
+             MessageType = MessageResponse.Result.ToString(),
+             Result = new Dictionary<string, object> { ["create"] = "ok" }
+         };
+        
+         return Task.FromResult(result);
     }
-    
-    
+
+    public Task<WolfpackMessage> DeleteAsync(in WolfpackMessage wolfpackMessage)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<WolfpackMessage> GetAsync(in WolfpackMessage wolfpackMessage)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<WolfpackMessage> ListAsync(int limit = 100, int offset = 0)
+    {
+        throw new NotImplementedException();
+    }
 }
