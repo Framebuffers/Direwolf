@@ -10,3 +10,6 @@
 [submodule "direwolf-revit"]
 	path = direwolf-revit
 	url = https://github.com/Framebuffers/direwolf-revit.git
+[submodule "hunter-sharp"]
+	path = hunter-sharp
+	url = https://github.com/framebuffers/hunter-sharp
